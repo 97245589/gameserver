@@ -1,0 +1,36 @@
+.package {
+    type 0 : integer
+    session 1 : integer
+}
+
+login_req 1 {
+    request {
+        acc 0 : string
+        server 1 : integer
+    }
+    response {
+        code 0 : integer
+        token 1 : string
+        host 2 : string
+    }
+}
+
+select_player 1001 {
+    request {
+        acc 0 : string
+        token 1 : string
+        playerid 2 : string
+    }
+    response {
+        code 0 : integer
+    }
+}
+
+push_test 1002 {
+    request {
+        test 0 : integer
+    }
+    response {
+        code 0 : integer
+    }
+}

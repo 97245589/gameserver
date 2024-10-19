@@ -1,0 +1,1 @@
+./skynet/skynet ./server_config/config.$1
