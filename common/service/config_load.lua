@@ -6,7 +6,6 @@ local excel_configs = {}
 local M = {}
 
 M.reload = function()
-    proto_data = nil
     excel_configs = {}
 end
 

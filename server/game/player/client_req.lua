@@ -60,6 +60,11 @@ local select_player = function(fd, msg, gate)
         skynet.send("watchdog", "lua", "close_conn", fd)
         return
     end
+    local fplayerid = fd_playerid[fd]
+    fd_playerid[fd] = nil
+    if fplayerid then
+        playerid_fd[fplayerid] = nil
+    end
     game_common.send_player_service("player_enter", playerid, fd, gate, acc)
     send_package(fd, res {
         code = 0
