@@ -29,14 +29,7 @@ local create_path = function(parent_path, name)
     return newpath
 end
 
-local player_dirty_delete = function()
-end
-local player_dirty_update = function(dirtys, id, patharr, k, v, objs)
-    if not dirtys[id] then
-        dirtys[id] = {}
-    end
-    local obj = objs[id]
-    local dirty_obj = dirtys[id]
+local fill_dirty_obj = function(obj, dirty_obj, patharr)
     for i = 1, #patharr do
         local nk = patharr[i]
         if not dirty_obj[nk] then
@@ -52,29 +45,49 @@ local player_dirty_update = function(dirtys, id, patharr, k, v, objs)
         obj = obj[nk]
         dirty_obj = dirty_obj[nk]
     end
+    return dirty_obj, obj
+end
+local player_dirty_delete = function(dirtys, id, patharr, k)
+    local deletes = dirtys.deletes
+    local objs = dirtys.objs
+    if not deletes[id] then
+        deletes[id] = {}
+    end
+    local delete_obj, obj = fill_dirty_obj(objs[id], deletes[id], patharr)
+    delete_obj[k] = {
+        id = k
+    }
+end
+local player_dirty_update = function(dirtys, id, patharr, k, v)
+    local updates = dirtys.updates
+    local objs = dirtys.objs
+    if not updates[id] then
+        updates[id] = {}
+    end
+    local update_obj = fill_dirty_obj(objs[id], updates[id], patharr)
     if type(v) == 'table' then
-        dirty_obj[k] = v.__INFO
+        update_obj[k] = v.__INFO
     else
-        dirty_obj[k] = v
+        update_obj[k] = v
     end
 end
-local newindexcb = function(obj, id, path, k, v)
-    if not obj.dirtys then
-        obj.dirtys = {}
+local newindexcb = function(dirtys, id, path, k, v)
+    if not dirtys.updates then
+        dirtys.updates = {}
     end
-    if not obj.deletes then
-        obj.deletes = {}
+    if not dirtys.deletes then
+        dirtys.deletes = {}
     end
     local patharr = path_cache[path]
     if v == nil then
-        player_dirty_delete(obj.deletes, id, patharr, k)
+        player_dirty_delete(dirtys, id, patharr, k)
     else
-        player_dirty_update(obj.dirtys, id, patharr, k, v, obj.objs)
+        player_dirty_update(dirtys, id, patharr, k, v)
     end
 end
 
 local M = {}
-M.create_obj_syn = function(obj)
+M.create_obj_syn = function(dirtys)
     local m = {}
     local MT = {
         __index = function(tb, k)
@@ -92,7 +105,7 @@ M.create_obj_syn = function(obj)
                 v = m.create_syn(v, tb.__ID, tb.__PATH, k)
             end
             info[k] = v
-            newindexcb(obj, tb.__ID, tb.__PATH, k, v)
+            newindexcb(dirtys, tb.__ID, tb.__PATH, k, v)
         end,
         __pairs = function(tb)
             return next, tb.__INFO, nil
