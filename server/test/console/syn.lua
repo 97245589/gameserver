@@ -5,34 +5,42 @@ local skynet = require "skynet"
 local sproto = require "sproto"
 local syn = require "common.tool.syn"
 
-local push_update = function(id, update)
-    print("push_update", id, dump(update))
-end
-local push_delete = function(id, delete)
-    print("push_delete", id, dump(delete))
+local players_dirty
+local add_push = function(id, info, mark)
+    local pushs = players_dirty.pushs
+    if not pushs[id] then
+        pushs[id] = {}
+    end
+    table.insert(pushs[id], {
+        mark = mark,
+        info = info
+    })
 end
 local players = {}
-local players_dirty = {
-    updates = nil,
-    deletes = nil,
+players_dirty = {
+    updates = {},
+    deletes = {},
+    pushs = {},
     objs = players,
-    push_update = push_update,
-    push_delete = push_delete
+    add_push = add_push
 }
+
 
 local tick_players_dirty = function()
     if players_dirty.updates then
         for id, update in pairs(players_dirty.updates) do
-            push_update(id, update)
+            add_push(id, update, 1)
         end
     end
     if players_dirty.deletes then
         for id, delete in pairs(players_dirty.deletes) do
-            push_delete(id, delete)
+            add_push(id, delete, 2)
         end
     end
-    players_dirty.updates = nil
-    players_dirty.deletes = nil
+    print_v(players_dirty.pushs, "pushs")
+    players_dirty.updates = {}
+    players_dirty.deletes = {}
+    players_dirty.pushs = {}
 end
 
 local player_syn = syn.create_obj_syn(players_dirty)

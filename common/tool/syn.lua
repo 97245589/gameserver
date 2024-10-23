@@ -60,7 +60,7 @@ local newindexcb = function(dirtys, id, path, k, v)
         }
         local updates = dirtys.updates
         if updates[id] then
-            dirtys.push_update(id, updates[id])
+            dirtys.add_push(id, updates[id], 1)
             updates[id] = nil
         end
     end
@@ -77,15 +77,9 @@ local newindexcb = function(dirtys, id, path, k, v)
         end
         update_obj[k] = v
         if deletes[id] then
-            dirtys.push_delete(id, deletes[id])
+            dirtys.add_push(id, deletes[id], 2)
             deletes[id] = nil
         end
-    end
-    if not dirtys.updates then
-        dirtys.updates = {}
-    end
-    if not dirtys.deletes then
-        dirtys.deletes = {}
     end
     local patharr = path_cache[path]
     if v == nil then
