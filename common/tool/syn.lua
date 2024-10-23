@@ -29,63 +29,58 @@ local create_path = function(parent_path, name)
     return newpath
 end
 
-local fill_dirty_obj = function(obj, dirty_obj, other_dirty, patharr)
-    for i = 1, #patharr do
-        local nk = patharr[i]
-        local obj = obj[nk]
-        if not dirty_obj[nk] then
-            local objnid = id
-            if objnid == nk then
-                dirty_obj[nk] = {
-                    id = objnid
-                }
-            else
-                dirty_obj[nk] = {}
-            end
-        end
-        dirty_obj = dirty_obj[nk]
-        if other_dirty then
-            if other_dirty[nk] then
-                other_dirty = other_dirty[nk]
-            else
-                other_dirty = nil
-            end
-        end
-    end
-    return dirty_obj, other_dirty
-end
-local dirty_delete = function(dirtys, id, patharr, k)
-    local deletes = dirtys.deletes
-    local objs = dirtys.objs
-    if not deletes[id] then
-        deletes[id] = {}
-    end
-    local delete_obj, update_obj = fill_dirty_obj(objs[id], deletes[id], dirtys.updates[id], patharr)
-    delete_obj[k] = {
-        id = k
-    }
-    if update_obj then
-        update_obj[k] = nil
-    end
-end
-local dirty_update = function(dirtys, id, patharr, k, v)
-    local updates = dirtys.updates
-    local objs = dirtys.objs
-    if not updates[id] then
-        updates[id] = {}
-    end
-    local update_obj, delete_obj = fill_dirty_obj(objs[id], updates[id], dirtys.deletes[id], patharr)
-
-    if type(v) == "table" then
-        v = clone(v.__INFO)
-    end
-    update_obj[k] = v
-    if delete_obj then
-        -- delete_obj[k] = v
-        delete_obj[k] = nil
-    end
-end
 local newindexcb = function(dirtys, id, path, k, v)
+    local fill_dirty_obj = function(obj, dirty_obj, patharr)
+        for i = 1, #patharr do
+            local nk = patharr[i]
+            obj = obj[nk]
+            if not dirty_obj[nk] then
+                local objnid = obj.id
+                if objnid == nk then
+                    dirty_obj[nk] = {
+                        id = objnid
+                    }
+                else
+                    dirty_obj[nk] = {}
+                end
+            end
+            dirty_obj = dirty_obj[nk]
+        end
+        return dirty_obj
+    end
+    local dirty_delete = function(dirtys, id, patharr, k)
+        local deletes = dirtys.deletes
+        local objs = dirtys.objs
+        if not deletes[id] then
+            deletes[id] = {}
+        end
+        local delete_obj = fill_dirty_obj(objs[id], deletes[id], patharr)
+        delete_obj[k] = {
+            id = k
+        }
+        local updates = dirtys.updates
+        if updates[id] then
+            dirtys.push_update(id, updates[id])
+            updates[id] = nil
+        end
+    end
+    local dirty_update = function(dirtys, id, patharr, k, v)
+        local updates = dirtys.updates
+        local deletes = dirtys.deletes
+        local objs = dirtys.objs
+        if not updates[id] then
+            updates[id] = {}
+        end
+        local update_obj = fill_dirty_obj(objs[id], updates[id], patharr)
+        if type(v) == "table" then
+            v = clone(v.__INFO)
+        end
+        update_obj[k] = v
+        if deletes[id] then
+            dirtys.push_delete(id, deletes[id])
+            deletes[id] = nil
+        end
+    end
     if not dirtys.updates then
         dirtys.updates = {}
     end
@@ -119,6 +114,7 @@ M.create_obj_syn = function(dirtys)
                 v = m.create_syn(v, tb.__ID, tb.__PATH, k)
             end
             info[k] = v
+            -- newindexcb(dirtys, tb.__ID, tb.__PATH, k, v)
             newindexcb(dirtys, tb.__ID, tb.__PATH, k, v)
         end,
         __pairs = function(tb)

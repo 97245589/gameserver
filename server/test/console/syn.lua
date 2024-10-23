@@ -5,48 +5,32 @@ local skynet = require "skynet"
 local sproto = require "sproto"
 local syn = require "common.tool.syn"
 
-local sp = sproto.parse [[
-    .Role {
-        id 0 : integer
-        name 1: string
-    }
-    .Item {
-        id 0 : integer
-        num 1 : integer
-    }
-    .Player {
-        role 0 : Role
-        item 1: *Item(id)
-    }
-]]
-
+local push_update = function(id, update)
+    print("push_update", id, dump(update))
+end
+local push_delete = function(id, delete)
+    print("push_delete", id, dump(delete))
+end
 local players = {}
 local players_dirty = {
     updates = nil,
     deletes = nil,
-    objs = players
+    objs = players,
+    push_update = push_update,
+    push_delete = push_delete
 }
 
-local handle_dirty
-handle_dirty = function(tb)
-    for k, v in pairs(tb) do
-        if type(v) == "table" then
-            tb[k] = handle_dirty(v)
+local tick_players_dirty = function()
+    if players_dirty.updates then
+        for id, update in pairs(players_dirty.updates) do
+            push_update(id, update)
         end
     end
-    if next(tb) then
-        return tb
-    else
-        return nil
+    if players_dirty.deletes then
+        for id, delete in pairs(players_dirty.deletes) do
+            push_update(id, delete)
+        end
     end
-end
-
-local tick_players_dirty = function()
-    players_dirty.objs = nil
-    handle_dirty(players_dirty)
-    print_v(players_dirty)
-
-    players_dirty.objs = players
     players_dirty.updates = nil
     players_dirty.deletes = nil
 end
@@ -54,28 +38,23 @@ end
 local player_syn = syn.create_obj_syn(players_dirty)
 
 local test = function()
-    local player = {
-        role = {
-            id = 1000,
-            name = 'hello'
-        },
-        item = {
-            [1000] = {
-                id = 1000,
-                num = 100
+    local player = {}
+    player = player_syn.create_syn(player, 1000)
+    players[1000] = player
+
+    player.map = {
+        [100] = {
+            id = 100,
+            map = {
+                [200] = {
+                    id = 200
+                }
             }
         }
     }
-
-    player = player_syn.create_syn(player, 1000)
-    players[1000] = player
-    player.role.name = 'hello world'
-    player.item[1000].num = 10
-    player.item[2000] = {
-        id = 2000,
-        num = 200
-    }
-    player.item[1000] = nil
+    tick_players_dirty()
+    player.map[100].map[200].num = 200
+    player.map[100].map[200] = nil
     tick_players_dirty()
 end
 
