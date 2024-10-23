@@ -108,7 +108,6 @@ M.create_obj_syn = function(dirtys)
                 v = m.create_syn(v, tb.__ID, tb.__PATH, k)
             end
             info[k] = v
-            -- newindexcb(dirtys, tb.__ID, tb.__PATH, k, v)
             newindexcb(dirtys, tb.__ID, tb.__PATH, k, v)
         end,
         __pairs = function(tb)
