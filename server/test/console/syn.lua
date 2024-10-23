@@ -28,7 +28,7 @@ local tick_players_dirty = function()
     end
     if players_dirty.deletes then
         for id, delete in pairs(players_dirty.deletes) do
-            push_update(id, delete)
+            push_delete(id, delete)
         end
     end
     players_dirty.updates = nil
