@@ -1,4 +1,4 @@
-local type, setmetatable = type, setmetatable
+local type, setmetatable, rawget, rawset, clone = type, setmetatable, rawget, rawset, clone
 local table, pairs, next = table, pairs, next
 local tmove, tinsert = table.move, table.insert
 
@@ -29,11 +29,12 @@ local create_path = function(parent_path, name)
     return newpath
 end
 
-local fill_dirty_obj = function(obj, dirty_obj, patharr)
+local fill_dirty_obj = function(obj, dirty_obj, other_dirty, patharr)
     for i = 1, #patharr do
         local nk = patharr[i]
+        local obj = obj[nk]
         if not dirty_obj[nk] then
-            local objnid = obj[nk].id
+            local objnid = id
             if objnid == nk then
                 dirty_obj[nk] = {
                     id = objnid
@@ -42,33 +43,46 @@ local fill_dirty_obj = function(obj, dirty_obj, patharr)
                 dirty_obj[nk] = {}
             end
         end
-        obj = obj[nk]
         dirty_obj = dirty_obj[nk]
+        if other_dirty then
+            if other_dirty[nk] then
+                other_dirty = other_dirty[nk]
+            else
+                other_dirty = nil
+            end
+        end
     end
-    return dirty_obj, obj
+    return dirty_obj, other_dirty
 end
-local player_dirty_delete = function(dirtys, id, patharr, k)
+local dirty_delete = function(dirtys, id, patharr, k)
     local deletes = dirtys.deletes
     local objs = dirtys.objs
     if not deletes[id] then
         deletes[id] = {}
     end
-    local delete_obj, obj = fill_dirty_obj(objs[id], deletes[id], patharr)
+    local delete_obj, update_obj = fill_dirty_obj(objs[id], deletes[id], dirtys.updates[id], patharr)
     delete_obj[k] = {
         id = k
     }
+    if update_obj then
+        update_obj[k] = nil
+    end
 end
-local player_dirty_update = function(dirtys, id, patharr, k, v)
+local dirty_update = function(dirtys, id, patharr, k, v)
     local updates = dirtys.updates
     local objs = dirtys.objs
     if not updates[id] then
         updates[id] = {}
     end
-    local update_obj = fill_dirty_obj(objs[id], updates[id], patharr)
-    if type(v) == 'table' then
-        update_obj[k] = v.__INFO
-    else
-        update_obj[k] = v
+    local update_obj, delete_obj = fill_dirty_obj(objs[id], updates[id], dirtys.deletes[id], patharr)
+
+    if type(v) == "table" then
+        v = clone(v.__INFO)
+    end
+    update_obj[k] = v
+    if delete_obj then
+        -- delete_obj[k] = v
+        delete_obj[k] = nil
     end
 end
 local newindexcb = function(dirtys, id, path, k, v)
@@ -80,9 +94,9 @@ local newindexcb = function(dirtys, id, path, k, v)
     end
     local patharr = path_cache[path]
     if v == nil then
-        player_dirty_delete(dirtys, id, patharr, k)
+        dirty_delete(dirtys, id, patharr, k)
     else
-        player_dirty_update(dirtys, id, patharr, k, v)
+        dirty_update(dirtys, id, patharr, k, v)
     end
 end
 
