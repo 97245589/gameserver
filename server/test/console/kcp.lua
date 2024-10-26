@@ -5,13 +5,20 @@ local socket = require "skynet.socket"
 local lkcp = require "lkcp"
 
 local function server()
-    local host, kcp
+    local kcps = {}
+    local host
     local i = 0
     host = socket.udp(function(str, from)
-        if not kcp then
-            kcp = lkcp.create_lkcp(1, host, from)
+        if not kcps[from] then
+            local kcp = lkcp.create_lkcp(1, host, from)
+            kcps[from] = {
+                kcp = kcp,
+                heartbeat = os.time()
+            }
         end
+        local kcp = kcps[from].kcp
         kcp:netpack_input(str)
+        -- kcp:netpack_pop()
         print(kcp:netpack_pop())
         kcp:update(i)
         i = i + 1
@@ -37,5 +44,6 @@ end
 
 skynet.start(function()
     skynet.fork(server)
+    skynet.fork(client)
     skynet.fork(client)
 end)
