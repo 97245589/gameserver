@@ -8,7 +8,7 @@ local common = require "server.game.game_common"
 
 local login_key = crypt.randomkey()
 local serverid = tonumber(skynet.getenv("server_id"))
-local ip = split(skynet.getenv("cluster_host"), ":")[1]
+local ip = skynet.getenv("ip")
 
 common.send_all_player_service("login_key", login_key)
 cluster.send("login1", "@login1", "game_login_info", serverid, {

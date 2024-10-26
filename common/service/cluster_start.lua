@@ -6,7 +6,7 @@ local cluster = require "skynet.cluster"
 local config = require "common.service.service_config"
 
 local cluster_name = skynet.getenv("server_name") .. skynet.getenv("server_id")
-local host = skynet.getenv("cluster_host")
+local host = skynet.getenv("ip") .. ":" .. skynet.getenv("cluster_port")
 print("clustername :", cluster_name, "cluster_host :", host)
 
 local cluster_node = {}

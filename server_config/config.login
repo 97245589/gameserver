@@ -1,4 +1,5 @@
-cluster_host = "0.0.0.0:10300"
+ip = "$IP"
+cluster_port = 10300
 gate_port = 10301
 debug_console_port = 10302
 server_name = "login"

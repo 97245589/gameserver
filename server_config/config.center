@@ -1,4 +1,5 @@
-cluster_host = "0.0.0.0:10200"
+ip = "$IP"
+cluster_port = 10200
 debug_console_port = 10201
 server_name = "center"
 server_id = 1
