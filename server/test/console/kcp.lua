@@ -19,7 +19,7 @@ local function server()
         local kcp = kcps[from].kcp
         kcp:netpack_input(str)
         -- kcp:netpack_pop()
-        print(kcp:netpack_pop())
+        print("recv from", socket.udp_address(from), kcp:netpack_pop())
         kcp:update(i)
         i = i + 1
     end, "127.0.0.1", 8765)
@@ -33,7 +33,7 @@ local function client()
         kcp_cli:netpack_input(str)
         kcp_cli:netpack_pop()
     end)
-    socket.udp_connect(host, "127.0.0.1", 8765)
+    socket.udp_connect(host, "0.0.0.0", 8765)
     kcp_cli = lkcp.lkcp_client(1, host)
     for i = 1, 1000 do
         skynet.sleep(1)
