@@ -9,7 +9,7 @@ local mode, func_path, static_dir = ...
 if mode == "agent" then
     local pairs, io = pairs, io
     local urllib = require "http.url"
-    local json = require "common.util.json"
+    local json = require "common.tool.json"
     local response = function(fd, write, ...)
         local ok, err = httpd.write_response(write, ...)
         if not ok then
@@ -116,7 +116,7 @@ else
 
         local agent = {}
         for i = 1, agent_num do
-            agent[i] = skynet.newservice("common/common/web", "agent", func_path, static_dir)
+            agent[i] = skynet.newservice("common/tool/web", "agent", func_path, static_dir)
         end
         local balance = 1
         local lfd = socket.listen("0.0.0.0", port)

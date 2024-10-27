@@ -1,7 +1,7 @@
 local require, setmetatable = require, setmetatable
 local print, string, io, next = print, string, io, next
 local table, ipairs = table, ipairs
-local json = require "common.util.json"
+local json = require "common.tool.json"
 local config = require "server.web.httpd.config"
 
 local ret = {}

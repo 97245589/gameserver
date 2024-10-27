@@ -1,7 +1,7 @@
 local require = require
-require "common.util.util"
+require "common.tool.lua_tool"
 local skynet = require "skynet"
-local web = require "common.common.web"
+local web = require "common.tool.web"
 
 skynet.start(function()
     web.start_web({
