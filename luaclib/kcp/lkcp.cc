@@ -27,7 +27,6 @@ struct Kcp_message {
     buf.clear();
     buf.shrink_to_fit();
   }
-  Kcp_message() { reset(); }
 };
 
 struct Kcp_user {
