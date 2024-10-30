@@ -13,8 +13,9 @@ all : lfs.so lzstd.so lutil.so lkcp.so
 lfs.so : lfs/lfs.c
 	$(CC) -o $@ $^ $(COMMON_FLAGS) $(DY_LIB)
 
+ZSTDPATH = ../3rd/zstd/lib
 lzstd.so : lzstd/lzstd.c
-	$(CC) -o $@ $^ $(COMMON_FLAGS) $(DY_LIB) -lzstd 
+	$(CC) -o $@ $^ $(COMMON_FLAGS) $(DY_LIB) -I$(ZSTDPATH) -L$(ZSTDPATH) -lzstd 
 
 lutil.so : lutil/*.cc
 	$(CXX) -o $@ $^ $(COMMON_FLAGS) $(DY_LIB) $(CXXFLAGS)
