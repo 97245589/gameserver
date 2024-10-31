@@ -1,8 +1,8 @@
 SKYNET = skynet/skynet
-LUACLIB = luaclib/lfs.so
-3RD = 3rd/test
+3RD = 3rd/zstd/zstd
+LUACLIB = luaclib/test
 
-all : $(SKYNET) $(LUACLIB) $(3RD)
+all : $(SKYNET) $(3RD) $(LUACLIB) 
 
 $(SKYNET):
 	make linux -j16 -Cskynet
