@@ -7,15 +7,22 @@ local crypt = require "skynet.crypt"
 local profile = require "skynet.profile"
 local profile_info = require "common.service.profile"
 local players = require "server.game.player.players"
-local config_load = require "common.service.config_load"
 local game_common = require "server.game.game_common"
 
-local proto = config_load.proto()
-local host = proto.host
-local push_req = proto.push_req
+local proto
+local host
+local push_req
 local SERVICE_NAME = SERVICE_NAME
-local GATE
 local LOGIN_KEY
+
+local load_proto = function()
+    local config_load = require "common.service.config_load"
+    proto = config_load.proto()
+    host = proto.host
+    push_req = proto.push_req
+end
+load_proto()
+
 local send_package = function(fd, pack)
     socket.write(fd, string.pack(">s2", pack))
 end
@@ -43,11 +50,7 @@ local player_enter = function(fd, gate, acc, playerid)
     local player = players.get_player(playerid)
 end
 
-local select_player = function(fd, msg, gate)
-    print("select_player", SERVICE_NAME)
-    GATE = gate
-    local type, name, args, res = host:dispatch(msg)
-    local acc, token, playerid = args.acc, args.token, args.playerid
+local verify = function(acc, token, playerid)
     if not acc or not token or not playerid then
         skynet.send("watchdog", "lua", "close_conn", fd)
         return
@@ -60,6 +63,19 @@ local select_player = function(fd, msg, gate)
         skynet.send("watchdog", "lua", "close_conn", fd)
         return
     end
+    return true
+end
+
+local select_player = function(fd, msg, gate)
+    print("select_player", SERVICE_NAME)
+    local type, name, args, res = host:dispatch(msg)
+    local acc, token, playerid = args.acc, args.token, args.playerid
+
+    if not verify(acc, token, playerid) then
+        skynet.send("watchdog", "lua", "close_conn", fd)
+        return
+    end
+
     local fplayerid = fd_playerid[fd]
     fd_playerid[fd] = nil
     if fplayerid then
@@ -119,7 +135,8 @@ local M = {
     player_enter = player_enter,
     select_player = select_player,
     login_key = login_key,
-    push = push
+    push = push,
+    load_proto = load_proto
 }
 
 return M
