@@ -1,8 +1,4 @@
-CC = gcc
-CXX = g++
-CXXFLAGS = -std=c++17
 DY_LIB = -shared
-
 LUA_DIR = ../skynet/3rd/lua
 SKYNET_DIR = ../skynet/skynet-src
 

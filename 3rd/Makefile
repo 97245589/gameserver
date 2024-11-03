@@ -3,7 +3,7 @@ ZSTD = zstd/zstd
 all : $(ZSTD)
 
 $(ZSTD):
-	cd ./zstd && make -j16
+	cd ./zstd && make -j$(THREAD_NUM)
 
 clean_zstd:
 	cd ./zstd && make clean
