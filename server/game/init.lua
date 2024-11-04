@@ -24,7 +24,7 @@ local init_services = function()
     services.player_mgr = addr
     addr = skynet.newservice("server/game/watchdog/start", "watchdog")
     services.watchdog = addr
-    if skynet.getenv("game_type") ~= "local" then
+    if not skynet.getenv("local_server") then
         skynet.newservice("server/game/cluster/start", "cluser")
     end
 end

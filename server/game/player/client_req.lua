@@ -51,6 +51,9 @@ local player_enter = function(fd, gate, acc, playerid)
 end
 
 local verify = function(acc, token, playerid)
+    if skynet.getenv("local_server") then
+        return true
+    end
     if not acc or not token or not playerid then
         skynet.send("watchdog", "lua", "close_conn", fd)
         return
