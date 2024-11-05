@@ -18,8 +18,8 @@ local function server()
         end
         local kcp = kcps[from].kcp
         kcp:netpack_input(str)
-        -- kcp:netpack_pop()
-        print("recv from", socket.udp_address(from), kcp:netpack_pop())
+        local str = kcp:netpack_pop()
+        print("recv from", socket.udp_address(from), str, #str)
         kcp:update(i)
         i = i + 1
     end, "127.0.0.1", 8765)

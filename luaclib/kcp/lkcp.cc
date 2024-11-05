@@ -42,31 +42,33 @@ struct Kcp_user {
 };
 
 void Kcp_user::fill_data(const char *p, int len) {
-  if (len <= 0) {
-    return;
-  }
-  if (0 == uncomplete.cur_len) {
-    int high = (int)(*p);
-    uncomplete.buf_len += high << 8;
-    uncomplete.cur_len++;
-    fill_data(++p, --len);
-  } else if (1 == uncomplete.cur_len) {
-    int low = (int)(*p);
-    uncomplete.buf_len += low;
-    uncomplete.buf.resize(uncomplete.buf_len);
-    uncomplete.cur_len++;
-    fill_data(++p, --len);
-  } else if (uncomplete.cur_len >= 2) {
-    int now_buf_len = uncomplete.cur_len - 2;
-    if (now_buf_len + len < uncomplete.buf_len) {
-      memcpy((void *)(uncomplete.buf.c_str() + now_buf_len), p, len);
-      uncomplete.cur_len += len;
-    } else {
-      int recv_len = uncomplete.buf_len - now_buf_len;
-      memcpy((void *)(uncomplete.buf.c_str() + now_buf_len), p, recv_len);
-      msgs.push(uncomplete.buf);
-      uncomplete.reset();
-      fill_data(p + recv_len, len - recv_len);
+  while (len > 0) {
+    if (0 == uncomplete.cur_len) {
+      int high = (int)(*p);
+      uncomplete.buf_len += high << 8;
+      ++uncomplete.cur_len;
+      ++p;
+      --len;
+    } else if (1 == uncomplete.cur_len) {
+      int low = (int)(*p);
+      uncomplete.buf_len += low;
+      uncomplete.buf.resize(uncomplete.buf_len);
+      ++uncomplete.cur_len;
+      ++p;
+      --len;
+    } else if (uncomplete.cur_len >= 2) {
+      int now_buf_len = uncomplete.cur_len - 2;
+      if (now_buf_len + len < uncomplete.buf_len) {
+        memcpy((void *)(uncomplete.buf.c_str() + now_buf_len), p, len);
+        uncomplete.cur_len += len;
+      } else {
+        int recv_len = uncomplete.buf_len - now_buf_len;
+        memcpy((void *)(uncomplete.buf.c_str() + now_buf_len), p, recv_len);
+        msgs.push(uncomplete.buf);
+        uncomplete.reset();
+        p += recv_len;
+        len -= recv_len;
+      }
     }
   }
 }
