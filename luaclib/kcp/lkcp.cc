@@ -77,9 +77,7 @@ struct Lkcp {
   static int netpack_pop(lua_State *L);
   static int netpack_input(lua_State *L);
   static int lkcp_send(lua_State *L);
-  static int lkcp_recv(lua_State *L);
   static int lkcp_update(lua_State *L);
-  static int lkcp_input(lua_State *L);
 
   static int lkcp_gc(lua_State *L);
   static void lkcp_meta(lua_State *L);
@@ -114,30 +112,6 @@ int Lkcp::lkcp_update(lua_State *L) {
   luaL_checktype(L, 2, LUA_TNUMBER);
   ikcp_update(p, lua_tointeger(L, 2) * 10);
   return 0;
-}
-
-int Lkcp::lkcp_input(lua_State *L) {
-  ikcpcb **pp = (ikcpcb **)luaL_checkudata(L, 1, LKCP_META);
-  ikcpcb *p = *pp;
-  luaL_checktype(L, 2, LUA_TSTRING);
-  size_t len = 0;
-  const char *str = lua_tolstring(L, 2, &len);
-  ikcp_input(p, str, len);
-  return 0;
-}
-
-int Lkcp::lkcp_recv(lua_State *L) {
-  ikcpcb **pp = (ikcpcb **)luaL_checkudata(L, 1, LKCP_META);
-  ikcpcb *p = *pp;
-
-  struct Kcp_user *pk = (struct Kcp_user *)p->user;
-  int len = ikcp_recv(p, pk->buf, sizeof(pk->buf));
-  if (len > 0) {
-    lua_pushlstring(L, pk->buf, len);
-    return 1;
-  } else {
-    return 0;
-  }
 }
 
 int Lkcp::netpack_input(lua_State *L) {
@@ -176,9 +150,7 @@ int Lkcp::netpack_pop(lua_State *L) {
 void Lkcp::lkcp_meta(lua_State *L) {
   if (luaL_newmetatable(L, LKCP_META)) {
     luaL_Reg l[] = {{"send", lkcp_send},
-                    {"recv", lkcp_recv},
                     {"update", lkcp_update},
-                    {"input", lkcp_input},
                     {"netpack_input", netpack_input},
                     {"netpack_pop", netpack_pop},
                     {NULL, NULL}};
