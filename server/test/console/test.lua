@@ -132,13 +132,26 @@ local crypt_test = function()
     print(skynet.now() - t1)
 end
 
+local redis_test = function()
+    local db = require "common.service.db"
+    db("set", "hello", "world")
+    local s = skynet.now()
+    local ret
+    for i = 1, 10000 do
+        ret = db("get", "hello")
+    end
+    print(skynet.now() - s, ret)
+    db("flushdb")
+end
+
 skynet.start(function()
     -- test_split()
     -- pack_test()
     -- zstd_test()
     -- dir_require_test()
     -- rank_test()
-    lru_test()
+    -- lru_test()
     -- crypt_test()
+    redis_test()
     skynet.exit()
 end)

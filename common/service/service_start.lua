@@ -55,7 +55,7 @@ skynet.start(function()
         profile.start()
         local func = cmds[cmd]
         if func then
-            skynet.ret(skynet.pack(func(...)))
+            skynet.retpack(func(...))
         else
             skynet.response()(false)
             print(SERVICE_NAME .. " service lua command not found", cmd)
