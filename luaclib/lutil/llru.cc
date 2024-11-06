@@ -8,7 +8,6 @@ static const char *LLRU_META = "LLRU_META";
 
 struct Llru {
   static int update(lua_State *L);
-  static int set_size(lua_State *L);
   static int dump(lua_State *L);
 
   static int lru_gc(lua_State *L);
@@ -44,16 +43,6 @@ int Llru::update(lua_State *L) {
   return 0;
 }
 
-int Llru::set_size(lua_State *L) {
-  auto pp = (Lru **)luaL_checkudata(L, 1, LLRU_META);
-  luaL_checktype(L, 2, LUA_TNUMBER);
-  auto &lru = **pp;
-
-  int size = lua_tointeger(L, 2);
-  lru.cache_size_ = size;
-  return 0;
-}
-
 int Llru::lru_gc(lua_State *L) {
   auto pp = (Lru **)luaL_checkudata(L, 1, LLRU_META);
   delete *pp;
@@ -64,7 +53,6 @@ void Llru::lru_meta(lua_State *L) {
   if (luaL_newmetatable(L, LLRU_META)) {
     luaL_Reg l[] = {
         {"update", update},
-        {"set_size", set_size},
         {"dump", dump},
         {NULL, NULL},
     };
@@ -77,11 +65,14 @@ void Llru::lru_meta(lua_State *L) {
 }
 
 int Llru::create_lru(lua_State *L) {
-  auto p = new Lru();
-  auto pp = (Lru **)lua_newuserdata(L, sizeof(p));
+  luaL_checktype(L, 1, LUA_TNUMBER);
+  int cache_size = lua_tointeger(L, 1);
+
+  Lru *p = new Lru();
+  p->cache_size_ = cache_size;
+  Lru **pp = (Lru **)lua_newuserdata(L, sizeof(p));
   *pp = p;
   lru_meta(L);
-  lua_settop(L, 1);
   return 1;
 }
 

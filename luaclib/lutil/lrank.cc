@@ -12,21 +12,22 @@ struct Lrank {
   static void lrank_meta(lua_State *L);
   static int lrank_gc(lua_State *L);
 
-  static int add_rank(lua_State *L);
-  static int rank_info(lua_State *L);
+  static int add(lua_State *L);
   static int dump(lua_State *L);
-  static int db_data(lua_State *L);
+  static int arr_info(lua_State *L);
 };
 
-int Lrank::db_data(lua_State *L) {
+int Lrank::arr_info(lua_State *L) {
   Rank **pp = (Rank **)luaL_checkudata(L, 1, LRANK_META);
   auto &rank = **pp;
-
+  int num = lua_tointeger(L, 2);
+  if (num == 0) {
+    num = rank.max_num_;
+  }
   auto &ranks = rank.ranks_;
-  if (ranks.size() <= 0) return 0;
 
   int c = 0;
-  lua_createtable(L, ranks.size() * 3, 0);
+  lua_createtable(L, num * 3, 0);
   for (auto &&data : ranks) {
     lua_pushlstring(L, data.uid_.c_str(), data.uid_.size());
     lua_rawseti(L, -2, ++c);
@@ -34,11 +35,14 @@ int Lrank::db_data(lua_State *L) {
     lua_rawseti(L, -2, ++c);
     lua_pushinteger(L, data.time_);
     lua_rawseti(L, -2, ++c);
+    if (c >= 3 * num) {
+      return 1;
+    }
   }
-  return 1;
+  return 0;
 }
 
-int Lrank::add_rank(lua_State *L) {
+int Lrank::add(lua_State *L) {
   Rank **pp = (Rank **)luaL_checkudata(L, 1, LRANK_META);
   auto &rank = **pp;
   luaL_checktype(L, 2, LUA_TSTRING);
@@ -50,44 +54,15 @@ int Lrank::add_rank(lua_State *L) {
   int64_t score = lua_tointeger(L, 3);
   int64_t time = lua_tointeger(L, 4);
   Rank_base base{.uid_ = {id, len}, .score_ = score, .time_ = time};
-  rank.add_rank(base);
+  rank.add(base);
   return 0;
-}
-
-int Lrank::rank_info(lua_State *L) {
-  Rank **pp = (Rank **)luaL_checkudata(L, 1, LRANK_META);
-  auto &rank = **pp;
-
-  int64_t get_num = lua_tointeger(L, 2);
-  size_t len;
-  const char *puid = lua_tolstring(L, 3, &len);
-  vector<Rank_base> ret;
-  int me_rank = 0;
-  rank.get_rank_info(get_num, {puid, len}, ret, me_rank);
-
-  lua_createtable(L, 0, 2);
-  lua_pushinteger(L, me_rank);
-  lua_setfield(L, -2, "me_rank");
-
-  lua_createtable(L, ret.size() * 2, 0);
-  int c = 0;
-  for (auto &&data : ret) {
-    lua_pushlstring(L, data.uid_.c_str(), data.uid_.size());
-    lua_rawseti(L, -2, ++c);
-    lua_pushinteger(L, data.score_);
-    lua_rawseti(L, -2, ++c);
-  }
-  lua_setfield(L, -2, "ranks");
-
-  return 1;
 }
 
 int Lrank::dump(lua_State *L) {
   Rank **pp = (Rank **)luaL_checkudata(L, 1, LRANK_META);
   auto &rank = **pp;
 
-  string ret;
-  rank.dump(ret);
+  string ret = rank.dump();
   lua_pushlstring(L, ret.c_str(), ret.size());
   return 1;
 }
@@ -100,11 +75,8 @@ int Lrank::lrank_gc(lua_State *L) {
 
 void Lrank::lrank_meta(lua_State *L) {
   if (luaL_newmetatable(L, LRANK_META)) {
-    luaL_Reg l[] = {{"add_rank", add_rank},
-                    {"rank_info", rank_info},
-                    {"db_data", db_data},
-                    {"dump", dump},
-                    {NULL, NULL}};
+    luaL_Reg l[] = {
+        {"add", add}, {"arr_info", arr_info}, {"dump", dump}, {NULL, NULL}};
     luaL_newlib(L, l);
     lua_setfield(L, -2, "__index");
     lua_pushcfunction(L, lrank_gc);
@@ -115,7 +87,6 @@ void Lrank::lrank_meta(lua_State *L) {
 
 int Lrank::create_lrank(lua_State *L) {
   int max_num = lua_tointeger(L, 1);
-
   Rank *p = new Rank();
   if (max_num > 0) p->max_num_ = max_num;
   Rank **pp = (Rank **)lua_newuserdata(L, sizeof(p));

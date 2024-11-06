@@ -15,10 +15,8 @@ using std::string;
 using std::unordered_map;
 using std::vector;
 
-using Uid_type = string;
-
 struct Rank_base {
-  Uid_type uid_;
+  string uid_;
   int64_t score_;
   int64_t time_;
 };
@@ -34,26 +32,15 @@ using Rank_set = set<Rank_base, Rank_base_cmp>;
 using Rank_set_it = Rank_set::iterator;
 struct Rank {
   Rank_set ranks_;
-  unordered_map<Uid_type, Rank_set_it> rank_info_;
+  unordered_map<string, Rank_set_it> rank_info_;
   int max_num_;
 
-  void add_rank(const Rank_base &);
+  void add(const Rank_base &);
   void evict();
-  void get_rank_info(int num, Uid_type uid, vector<Rank_base> &ret,
-                     int &me_rank);
-  void dump(string &ret);
+  string dump();
   Rank() : max_num_(999) {}
 };
-void Rank::add_rank(const Rank_base &base) {
-  if (auto rank_info_it = rank_info_.find(base.uid_);
-      rank_info_it != rank_info_.end()) {
-    ranks_.erase(rank_info_it->second);
-    rank_info_.erase(base.uid_);
-  }
-  auto [it, mark] = ranks_.insert(base);
-  if (mark) rank_info_.insert({base.uid_, it});
-  evict();
-}
+
 void Rank::evict() {
   if (rank_info_.size() > max_num_) {
     auto it = ranks_.rbegin();
@@ -63,25 +50,18 @@ void Rank::evict() {
   }
 }
 
-void Rank::get_rank_info(int num, Uid_type uid, vector<Rank_base> &ret,
-                         int &me_rank) {
-  int c = 0;
-  bool find_me = false;
-  if (uid.size() > 0) find_me = true;
-  for (auto it : ranks_) {
-    ++c;
-    if (c <= num) {
-      ret.push_back(it);
-    }
-    if (c >= num && !find_me) return;
-    if (find_me && it.uid_ == uid) {
-      me_rank = c;
-      find_me = false;
-    }
+void Rank::add(const Rank_base &base) {
+  if (auto rank_info_it = rank_info_.find(base.uid_);
+      rank_info_it != rank_info_.end()) {
+    ranks_.erase(rank_info_it->second);
+    rank_info_.erase(base.uid_);
   }
+  auto [it, mark] = ranks_.insert(base);
+  if (mark) rank_info_.insert({base.uid_, it});
+  evict();
 }
 
-void Rank::dump(string &ret) {
+string Rank::dump() {
   ostringstream oss;
   oss << "rank_size : " << ranks_.size() << endl;
   oss << "it_size : " << rank_info_.size() << endl;
@@ -91,7 +71,7 @@ void Rank::dump(string &ret) {
         << "|";
   }
   oss << endl;
-  ret = oss.str();
+  return oss.str();
 }
 
 #endif

@@ -76,21 +76,25 @@ local rank_test = function()
     local rank_mgr = require "common.tool.rank"
     local random = math.random
 
-    local rank = rank_mgr.create_rank(1, 1, 10)
+    local rank = rank_mgr.new_rank(10)
     for i = 1, 1000 do
-        rank.add_rank(tostring(random(20)), random(10), i)
+        rank:add(tostring(random(20)), random(10), i)
     end
-    rank.dump()
-    print_v(rank.info(3))
-    local db_data = rank.db_data()
+    print(rank:dump())
+    print_v(rank:arr_info())
 
-    local nrank = rank_mgr.create_rank(2, 1, 5, db_data)
-
-    for i = 1, 1000 do
-        rank_mgr.trigger_rank(1, tostring(random(20)), random(10))
+    local t = skynet.now()
+    local trank = rank_mgr.new_rank(1000)
+    for i = 1, 1000000 do
+        trank:add(tostring(random(2000)), random(1000), i)
     end
-    rank.dump()
-    nrank.dump()
+    print(skynet.now() - t)
+    t = skynet.now()
+    local ret
+    for i = 1, 10000 do
+        ret = trank:arr_info(100)
+    end
+    print(skynet.now() - t, #ret)
 end
 
 local lru_test = function()
@@ -107,7 +111,7 @@ local lru_test = function()
         data[id] = 1
         lru.update(id)
     end
-    lru.dump()
+    print(lru.dump())
     print_v(data)
 end
 
@@ -149,9 +153,9 @@ skynet.start(function()
     -- pack_test()
     -- zstd_test()
     -- dir_require_test()
-    -- rank_test()
+    rank_test()
     -- lru_test()
     -- crypt_test()
-    redis_test()
+    -- redis_test()
     skynet.exit()
 end)
