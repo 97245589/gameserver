@@ -1,6 +1,6 @@
 ZSTD = zstd/zstd
 
-all : $(ZSTD)
+all : $(ZSTD) install
 
 $(ZSTD):
 	cd ./zstd && make -j$(THREAD_NUM) 
