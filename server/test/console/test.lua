@@ -78,21 +78,22 @@ local rank_test = function()
 
     local rank = rank_mgr.new_rank(10)
     for i = 1, 1000 do
-        rank:add(tostring(random(20)), random(10), i)
+        rank.add(tostring(random(20)), random(10), i)
     end
-    print(rank:dump())
-    print_v(rank:arr_info())
+    print(rank.dump())
+    print_v(rank.arr_info())
+    print_v(rank.arr_info(3))
 
     local t = skynet.now()
     local trank = rank_mgr.new_rank(1000)
     for i = 1, 1000000 do
-        trank:add(tostring(random(2000)), random(1000), i)
+        trank.add(tostring(random(2000)), random(1000), i)
     end
     print(skynet.now() - t)
     t = skynet.now()
     local ret
     for i = 1, 10000 do
-        ret = trank:arr_info(100)
+        ret = trank.arr_info(1000)
     end
     print(skynet.now() - t, #ret)
 end
