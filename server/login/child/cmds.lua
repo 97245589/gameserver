@@ -26,7 +26,8 @@ cmds.login_req = function(args)
 
     if acc_serverid[acc] then
         local serverid = acc_serverid[acc]
-        -- cluser.send("", "", "lua")
+        local addr = "game" .. serverid
+        cluster.send(addr, "@" .. addr, "login_kick", acc)
     end
     acc_serverid[acc] = server
 
