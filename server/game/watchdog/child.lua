@@ -76,8 +76,9 @@ else
     local table, ipairs = table, ipairs
     local M = {}
 
+    local instance = 2
     local childs = {}
-    for i = 1, config.service_num.game_watchdog_child do
+    for i = 1, instance do
         local addr = skynet.newservice("server/game/watchdog/child", "child")
         table.insert(childs, addr)
     end

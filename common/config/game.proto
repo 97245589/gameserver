@@ -6,7 +6,8 @@
 login_req 1 {
     request {
         acc 0 : string
-        server 1 : integer
+        token 1 : string
+        server 2 : integer
     }
     response {
         code 0 : integer

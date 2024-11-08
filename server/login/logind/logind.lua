@@ -35,11 +35,15 @@ if not MODE_FOLLOWER then
         end)
     end)
 else
-    local string, dump = string, dump
+    local string, split, dump = string, split, dump
     local config_load = require "common.service.config_load"
+    local login_common = require "server.login.login_common"
+    local service_config = require "common.service.service_config"
+    local crypt = require "skynet.crypt"
     local proto = config_load.proto()
     local host = proto.host
-    local callchild = require"server.login.login_common".callchild
+    local callchild = login_common.callchild
+    local key = service_config.login_service_key
 
     local send_package = function(fd, pack)
         local package = string.pack(">s2", pack)
@@ -53,15 +57,24 @@ else
         return host:dispatch(msg)
     end
 
+    local verify = function(acc, token)
+        local arr = split(crypt.desdecode(key, token), "|")
+        if acc ~= arr[1] then
+            return
+        end
+        return true
+    end
+
     local handle_req = function(fd, addr)
         socket.limit(fd, 4096)
         local t, cmd, req, res = recv_data(fd)
-        print(t, cmd, dump(req), res)
-        local acc = req.acc
-        if not acc then
+        if not cmd or not req or not req.acc or not req.token then
             return
         end
-
+        local acc, token = req.acc, req.token
+        if not verify(acc, token) then
+            return
+        end
         local data = callchild(acc, cmd, req)
         socket.write(fd, string.pack(">s2", res(data)))
     end

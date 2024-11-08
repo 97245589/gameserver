@@ -24,11 +24,13 @@ local send_request
 local recv_data
 
 local get_game_token = function()
+    local service_config = require "common.service.service_config"
     fd = socket.open("0.0.0.0", 10301)
     print("-------", fd)
     send_request("login_req", {
         acc = acc,
-        server = 1
+        server = 1,
+        token = crypt.desencode(service_config.login_service_key, acc .. "|" .. os.time())
     })
 
     local res, session, res_data = recv_data()

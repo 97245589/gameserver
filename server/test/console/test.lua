@@ -138,12 +138,20 @@ local crypt_test = function()
     local secret = crypt.dhsecret(clientkey, serverkey)
     print(#secret)
 
-    local t1 = skynet.now()
-    for i = 1, 1000000 do
+    local t = skynet.now()
+    for i = 1, 500000 do
         local bin = crypt.desencode(key, str)
         local nstr = crypt.desdecode(key, bin)
     end
-    print(skynet.now() - t1)
+    print(skynet.now() - t)
+
+    local t = skynet.now()
+    for i = 1, 50000 do
+        local clientkey = crypt.randomkey()
+        local serverkey = crypt.randomkey()
+        local secret = crypt.dhsecret(clientkey, serverkey)
+    end
+    print(skynet.now() - t)
 end
 
 local redis_test = function()
