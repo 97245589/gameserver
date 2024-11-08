@@ -49,7 +49,7 @@ local zstd_test = function()
     local obj = {
         hello = "world"
     }
-    for i = 1, 10 do
+    for i = 1, 5 do
         obj[i * 100] = {
             id = i * 100,
             name = "haha"
@@ -58,7 +58,16 @@ local zstd_test = function()
     local bin = encode(obj)
     local tb = decode(bin)
     print(#bin, #skynet.packstring(obj), dump(tb))
-    print_s(obj)
+
+    local item = {}
+    for i = 1, 10000 do
+        item[i] = {
+            id = i,
+            num = i
+        }
+    end
+    local bin = skynet.packstring(item)
+    print(#bin, #zstd.compress(bin))
 end
 
 local dir_require_test = function()
@@ -152,9 +161,9 @@ end
 skynet.start(function()
     -- test_split()
     -- pack_test()
-    -- zstd_test()
+    zstd_test()
     -- dir_require_test()
-    rank_test()
+    -- rank_test()
     -- lru_test()
     -- crypt_test()
     -- redis_test()
