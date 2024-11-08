@@ -3,7 +3,7 @@ local skynet = require "skynet"
 local crc = require "common.tool.crc"
 local config = require "common.service.service_config"
 
-local childnum = config.service_num.default
+local childnum = config.service_num.login_child
 local send2childs = function(...)
     for i = 1, childnum do
         local servicename = "login" .. i

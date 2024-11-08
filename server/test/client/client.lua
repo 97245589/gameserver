@@ -28,7 +28,6 @@ local get_game_token = function()
     print("-------", fd)
     send_request("login_req", {
         acc = acc,
-        playerid = playerid,
         server = 1
     })
 

@@ -13,7 +13,6 @@ local proto
 local host
 local push_req
 local SERVICE_NAME = SERVICE_NAME
-local LOGIN_KEY
 
 local load_proto = function()
     local config_load = require "common.service.config_load"
@@ -48,50 +47,6 @@ local player_enter = function(fd, gate, acc, playerid)
     fd_playerid[fd] = playerid
     playerid_fd[playerid] = fd
     local player = players.get_player(playerid)
-end
-
-local verify = function(acc, token, playerid)
-    if skynet.getenv("local_server") then
-        return true
-    end
-    if not acc or not token or not playerid then
-        skynet.send("watchdog", "lua", "close_conn", fd)
-        return
-    end
-
-    local str = crypt.desdecode(LOGIN_KEY, token)
-    local arr = skynet.unpack(str)
-    local tacc, tt = arr[1], arr[2]
-    if tacc ~= acc then
-        skynet.send("watchdog", "lua", "close_conn", fd)
-        return
-    end
-    return true
-end
-
-local select_player = function(fd, msg, gate)
-    print("select_player", SERVICE_NAME)
-    local type, name, args, res = host:dispatch(msg)
-    local acc, token, playerid = args.acc, args.token, args.playerid
-
-    if not verify(acc, token, playerid) then
-        skynet.send("watchdog", "lua", "close_conn", fd)
-        return
-    end
-
-    local fplayerid = fd_playerid[fd]
-    fd_playerid[fd] = nil
-    if fplayerid then
-        playerid_fd[fplayerid] = nil
-    end
-    game_common.send_player_service("player_enter", playerid, fd, gate, acc)
-    send_package(fd, res {
-        code = 0
-    })
-end
-
-local login_key = function(login_key)
-    LOGIN_KEY = login_key
 end
 
 local push = function(player, name, args)
@@ -134,10 +89,8 @@ skynet.register_protocol({
 
 local M = {
     client_cmds = client_cmds,
-    kick_player = kick_player,
     player_enter = player_enter,
-    select_player = select_player,
-    login_key = login_key,
+    kick_player = kick_player,
     push = push,
     load_proto = load_proto
 }

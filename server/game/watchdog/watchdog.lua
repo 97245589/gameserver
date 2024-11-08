@@ -7,6 +7,7 @@ local crypt = require "skynet.crypt"
 local cmds = require "common.service.cmds"
 local common = require "server.game.game_common"
 local service_config = require "common.service.service_config"
+local child = require "server.game.watchdog.child"
 
 local gate = skynet.newservice("gate")
 skynet.call(gate, "lua", "open", {
@@ -21,6 +22,7 @@ local close_conn = function(fd)
 end
 
 cmds.close_conn = close_conn
+cmds.set_login_key = child.set_login_key
 
 local socket_cmd = {}
 
@@ -50,7 +52,5 @@ socket_cmd.warning = function(fd, size)
 end
 
 socket_cmd.data = function(fd, msg)
-    local num = service_config.service_num.game_player_service
-    local i = random(num)
-    skynet.send("player" .. i, "lua", "select_player", fd, msg, gate)
+    child.data(fd, msg, gate)
 end

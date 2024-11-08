@@ -1,7 +1,9 @@
 return {
     service_num = {
         default = 2,
-        game_player_service = 2
+        game_player_service = 2,
+        game_watchdog_child = 2,
+        login_child = 2
     },
 
     cluster_node = {

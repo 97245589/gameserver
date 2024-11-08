@@ -15,7 +15,17 @@ login_req 1 {
     }
 }
 
-select_player 1001 {
+verify 10010 {
+    request {
+        acc 0 : string
+        token 1 : string
+    }
+    response {
+        code 0 : integer
+    }
+}
+
+select_player 10020 {
     request {
         acc 0 : string
         token 1 : string
@@ -26,7 +36,7 @@ select_player 1001 {
     }
 }
 
-push_test 1002 {
+push_test 10030 {
     request {
         test 0 : integer
     }
