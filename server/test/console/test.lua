@@ -156,14 +156,48 @@ end
 
 local redis_test = function()
     local db = require "common.service.db"
-    db("set", "hello", "world")
-    local s = skynet.now()
-    local ret
-    for i = 1, 10000 do
-        ret = db("get", "hello")
+    for i = 1, 10 do
+        db("set", "hello" .. i, "world" .. i)
     end
-    print(skynet.now() - s, ret)
-    db("flushdb")
+
+    local test = function(n)
+        local t = skynet.now()
+        for i = 1, 10000 do
+            local ret = db("get", "hello" .. n)
+        end
+        print(n, skynet.now() - t)
+    end
+
+    skynet.fork(test, 1)
+    skynet.fork(test, 2)
+end
+
+local co_test = function()
+    local func = function(n)
+        while true do
+            skynet.sleep(n)
+            print(n)
+        end
+    end
+
+    skynet.fork(func, 50)
+    skynet.fork(func, 100)
+end
+
+local gc_test = function()
+    collectgarbage("collect")
+    local item = {}
+    for i = 1, 20000000 do
+        item[i] = {
+            id = i,
+            num = i * 10
+        }
+    end
+    skynet.sleep(1)
+    local m1 = collectgarbage("count")
+    local t = skynet.now()
+    collectgarbage("collect")
+    print(skynet.now() - t, m1)
 end
 
 skynet.start(function()
@@ -173,7 +207,9 @@ skynet.start(function()
     -- dir_require_test()
     -- rank_test()
     -- lru_test()
-    crypt_test()
+    -- crypt_test()
     -- redis_test()
-    skynet.exit()
+    -- co_test()
+    gc_test()
+    -- skynet.exit()
 end)
