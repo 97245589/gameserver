@@ -1,7 +1,6 @@
 local require = require
 local skynet = require "skynet"
 local mgrs = require "server.game.player.mgrs"
-local db = require "common.service.db"
 local zstd = require "common.tool.zstd"
 
 local online_players = {}

@@ -2,7 +2,6 @@ local require, os, print, pcall = require, os, print, pcall
 local next, pairs = next, pairs
 local skynet = require "skynet"
 local zstd = require "common.tool.zstd"
-local db = require "common.service.db"
 local mgrs = require "server.game.player.mgrs"
 
 local profile = require "skynet.profile"

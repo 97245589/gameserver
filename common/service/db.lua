@@ -25,5 +25,20 @@ else
         return skynet.call(addr, "lua", ...)
     end
 
-    return db
+    local traversal = function(match, count, func)
+        local cursor = 0
+        while true do
+            local arr = db("scan", cursor, "MATCH", match, "COUNT", count)
+            cursor = arr[1]
+            func(arr[2])
+            if "0" == cursor then
+                return
+            end
+        end
+    end
+
+    return {
+        db = db,
+        traversal = traversal
+    }
 end

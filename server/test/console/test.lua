@@ -155,8 +155,9 @@ local crypt_test = function()
 end
 
 local redis_test = function()
-    local db = require "common.service.db"
-    for i = 1, 10 do
+    local tdb = require "common.service.db"
+    local db, traversal = tdb.db, tdb.traversal
+    for i = 1, 20 do
         db("set", "hello" .. i, "world" .. i)
     end
 
@@ -168,8 +169,13 @@ local redis_test = function()
         print(n, skynet.now() - t)
     end
 
-    skynet.fork(test, 1)
-    skynet.fork(test, 2)
+    traversal("*", 3, function(arr)
+        print_v(arr)
+    end)
+
+    -- skynet.fork(test, 1)
+    -- skynet.fork(test, 2)
+    db("flushdb")
 end
 
 local co_test = function()
@@ -208,8 +214,8 @@ skynet.start(function()
     -- rank_test()
     -- lru_test()
     -- crypt_test()
-    -- redis_test()
+    redis_test()
     -- co_test()
-    gc_test()
+    -- gc_test()
     -- skynet.exit()
 end)
