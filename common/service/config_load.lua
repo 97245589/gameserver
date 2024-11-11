@@ -13,7 +13,7 @@ M.proto = function()
     if proto_data then
         return proto_data
     end
-    print("config_load proto")
+    -- print("config_load proto")
     local file = io.open("common/config/game.proto", "r")
     local str = file:read("*a")
     file:close()
@@ -32,7 +32,7 @@ M.excel_config = function(name)
         return excel_configs[name]
     end
 
-    print("config_load excel config", name)
+    -- print("config_load excel config", name)
     excel_configs[name] = dofile("common/config/" .. name .. ".lua")
     return excel_configs[name]
 end

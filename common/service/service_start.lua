@@ -24,8 +24,8 @@ local hotreload = function()
     package_reload.remove_hotreload_package()
     package_reload.dir_require(service_dir .. "/cmd")
     package_reload.dir_require(service_dir .. "/mgr")
-    -- print("----------------- hotreload end")
     collectgarbage("collect")
+    -- print(SERVICE_NAME, "memory used", collectgarbage("count") .. "k")
 end
 
 local diff_tm = 0
