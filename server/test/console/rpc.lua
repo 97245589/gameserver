@@ -9,6 +9,7 @@ if child == "child" then
         end)
     end)
 else
+    local db
     local test = function()
         local addr = skynet.newservice(SERVICE_NAME, "child")
 
@@ -20,21 +21,17 @@ else
     end
 
     local test_redis = function()
-        local redis = require "skynet.db.redis"
-        local db = redis.connect({
-            host = "127.0.0.1",
-            port = 6379
-        })
-        db:set("hello", "world")
+        db("set", "hello", "world")
         local t = skynet.now()
         for i = 1, 10000 do
-            local ret = db:get("hello")
+            local ret = db("get", "hello")
         end
         print(skynet.now() - t)
-        db:flushdb()
+        db("flushdb")
     end
 
     skynet.start(function()
+        db = require"common.service.db".db
         test()
         test_redis()
     end)
