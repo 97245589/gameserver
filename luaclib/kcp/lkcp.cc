@@ -61,6 +61,7 @@ void Kcp_user::fill_data(const char *p, int len) {
       if (now_buf_len + len < uncomplete.buf_len) {
         memcpy((void *)(uncomplete.buf.c_str() + now_buf_len), p, len);
         uncomplete.cur_len += len;
+        len = 0;
       } else {
         int recv_len = uncomplete.buf_len - now_buf_len;
         memcpy((void *)(uncomplete.buf.c_str() + now_buf_len), p, recv_len);
