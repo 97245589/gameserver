@@ -11,23 +11,9 @@ extern "C" {
 }
 
 #include <iostream>
-#include <queue>
-#include <string>
-
 using namespace std;
 
 const static char *LKCP_META = "LKCP_META";
-
-struct Kcp_message {
-  int cur_len, buf_len;
-  string buf;
-
-  void reset() {
-    cur_len = buf_len = 0;
-    buf.clear();
-    buf.shrink_to_fit();
-  }
-};
 
 struct Kcp_user {
   struct skynet_context *ctx;
@@ -35,47 +21,9 @@ struct Kcp_user {
   int conv;
   char address[20];
   char buf[2048];
-  Kcp_message uncomplete;
-  queue<string> msgs;
-
-  void fill_data(const char *p, int len);
 };
 
-void Kcp_user::fill_data(const char *p, int len) {
-  while (len > 0) {
-    if (0 == uncomplete.cur_len) {
-      int high = (int)(*p);
-      uncomplete.buf_len += high << 8;
-      ++uncomplete.cur_len;
-      ++p;
-      --len;
-    } else if (1 == uncomplete.cur_len) {
-      int low = (int)(*p);
-      uncomplete.buf_len += low;
-      uncomplete.buf.resize(uncomplete.buf_len);
-      ++uncomplete.cur_len;
-      ++p;
-      --len;
-    } else if (uncomplete.cur_len >= 2) {
-      int now_buf_len = uncomplete.cur_len - 2;
-      if (now_buf_len + len < uncomplete.buf_len) {
-        memcpy((void *)(uncomplete.buf.c_str() + now_buf_len), p, len);
-        uncomplete.cur_len += len;
-        len = 0;
-      } else {
-        int recv_len = uncomplete.buf_len - now_buf_len;
-        memcpy((void *)(uncomplete.buf.c_str() + now_buf_len), p, recv_len);
-        msgs.push(uncomplete.buf);
-        uncomplete.reset();
-        p += recv_len;
-        len -= recv_len;
-      }
-    }
-  }
-}
-
 struct Lkcp {
-  static int netpack_pop(lua_State *L);
   static int netpack_input(lua_State *L);
   static int lkcp_send(lua_State *L);
   static int lkcp_update(lua_State *L);
@@ -92,7 +40,7 @@ struct Lkcp {
 int Lkcp::lkcp_gc(lua_State *L) {
   ikcpcb **pp = (ikcpcb **)luaL_checkudata(L, 1, LKCP_META);
   ikcpcb *p = *pp;
-  delete ((Kcp_user *)(p->user));
+  delete (Kcp_user *)(p->user);
   ikcp_release(p);
   return 0;
 }
@@ -125,25 +73,8 @@ int Lkcp::netpack_input(lua_State *L) {
 
   Kcp_user *pk = (Kcp_user *)p->user;
   int len = ikcp_recv(p, pk->buf, sizeof(pk->buf));
-  while (len > 0) {
-    pk->fill_data(pk->buf, len);
-    len = ikcp_recv(p, pk->buf, sizeof(pk->buf));
-  }
-}
-
-int Lkcp::netpack_pop(lua_State *L) {
-  ikcpcb **pp = (ikcpcb **)luaL_checkudata(L, 1, LKCP_META);
-  ikcpcb *p = *pp;
-
-  Kcp_user *pk = (Kcp_user *)p->user;
-  queue<string> &msgs = pk->msgs;
-  auto &un = pk->uncomplete;
-  if (msgs.empty()) {
-    return 0;
-  } else {
-    const string &str = msgs.front();
-    lua_pushlstring(L, str.c_str(), str.size());
-    msgs.pop();
+  if (len > 0) {
+    lua_pushlstring(L, pk->buf, len);
     return 1;
   }
 }
@@ -153,7 +84,6 @@ void Lkcp::lkcp_meta(lua_State *L) {
     luaL_Reg l[] = {{"send", lkcp_send},
                     {"update", lkcp_update},
                     {"netpack_input", netpack_input},
-                    {"netpack_pop", netpack_pop},
                     {NULL, NULL}};
     luaL_newlib(L, l);
     lua_setfield(L, -2, "__index");
