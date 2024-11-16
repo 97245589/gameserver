@@ -27,7 +27,7 @@ local gen_ids = function(ids, obj)
 end
 
 local offline_player = function(player, playerid)
-    print("save player ...", playerid, zstd.encode(player))
+    print("save player ...", playerid, zstd.pack(player))
     if os.time() > player.role.heartbeat + OFFLINE_TM then
         client_req.kick_player(playerid)
         online_players[playerid] = nil

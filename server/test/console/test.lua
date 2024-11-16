@@ -43,8 +43,6 @@ end
 
 local zstd_test = function()
     local zstd = require "common.tool.zstd"
-    local encode = zstd.encode
-    local decode = zstd.decode
 
     local obj = {
         hello = "world"
@@ -55,8 +53,8 @@ local zstd_test = function()
             name = "haha"
         }
     end
-    local bin = encode(obj)
-    local tb = decode(bin)
+    local bin = zstd.pack(obj)
+    local tb = zstd.unpack(bin)
     print(#bin, #skynet.packstring(obj), dump(tb))
 
     local item = {}
@@ -209,12 +207,12 @@ end
 skynet.start(function()
     -- test_split()
     -- pack_test()
-    -- zstd_test()
+    zstd_test()
     -- dir_require_test()
     -- rank_test()
     -- lru_test()
     -- crypt_test()
-    redis_test()
+    -- redis_test()
     -- co_test()
     -- gc_test()
     -- skynet.exit()

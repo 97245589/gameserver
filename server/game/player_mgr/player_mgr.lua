@@ -5,7 +5,7 @@ local mgrs = require "server.game.player_mgr.mgrs"
 local db_data = {}
 
 local save_db = function()
-    local bin = zstd.encode(db_data)
+    local bin = zstd.pack(db_data)
     -- db:hset("server_data", "data", bin)
 end
 
