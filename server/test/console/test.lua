@@ -189,31 +189,43 @@ local co_test = function()
 end
 
 local gc_test = function()
-    collectgarbage("collect")
-    local item = {}
-    for i = 1, 20000000 do
-        item[i] = {
-            id = i,
-            num = i * 10
-        }
+    local test = function()
+        local item = {}
+        for i = 1, 20000000 do
+            item[i] = {
+                id = i,
+                num = i * 10
+            }
+        end
+        collectgarbage("collect")
+        local t = skynet.now()
+        collectgarbage("collect")
+        print(skynet.now() - t, collectgarbage("count"))
     end
-    skynet.sleep(1)
-    local m1 = collectgarbage("count")
-    local t = skynet.now()
-    collectgarbage("collect")
-    print(skynet.now() - t, m1)
+    local test1 = function()
+        local str = "hello"
+        for i = 1, 28 do
+            str = str .. str
+        end
+        collectgarbage("collect")
+        local t = skynet.now()
+        collectgarbage("collect")
+        print(skynet.now() - t, collectgarbage("count"))
+    end
+    test()
+    -- test1()
 end
 
 skynet.start(function()
     -- test_split()
     -- pack_test()
-    zstd_test()
+    -- zstd_test()
     -- dir_require_test()
     -- rank_test()
     -- lru_test()
     -- crypt_test()
     -- redis_test()
     -- co_test()
-    -- gc_test()
+    gc_test()
     -- skynet.exit()
 end)
