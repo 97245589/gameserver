@@ -67,8 +67,8 @@ skynet.start(function()
     package_reload.dir_require(service_dir)
     package_reload.add_no_hotreaload_package()
     hotreload()
-end);
+end)
 
 skynet.info_func(function()
     return profile_info
-end);
+end)

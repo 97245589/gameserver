@@ -63,11 +63,13 @@ end
 skynet.fork(function()
     local TICK_TIME = 100
     while true do
-        skynet.sleep(TICK_TIME)
-        mgrs.all_tick()
-        tick_save()
-        for playerid, player in pairs(online_players) do
-            mgrs.all_tick_player(player)
-        end
+        pcall(function()
+            skynet.sleep(TICK_TIME)
+            tick_save()
+            mgrs.all_tick()
+            for playerid, player in pairs(online_players) do
+                mgrs.all_tick_player(player)
+            end
+        end)
     end
 end)
