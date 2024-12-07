@@ -27,7 +27,6 @@ local gen_ids = function(ids, obj)
 end
 
 local offline_player = function(player, playerid)
-    print("save player ...", playerid, zstd.pack(player))
     if os.time() > player.role.heartbeat + OFFLINE_TM then
         client_req.kick_player(playerid)
         online_players[playerid] = nil
@@ -39,8 +38,8 @@ local tick_save_player = function()
     playerids = gen_ids(playerids, online_players, 1)
     local i = 1
     for playerid, _ in pairs(playerids) do
-        -- print("tick_save_player", os.time(), playerid)
         local player = online_players[playerid]
+        print("save player ...", playerid, zstd.pack(player))
         offline_player(player, playerid)
         playerids[playerid] = nil
         i = i + 1
