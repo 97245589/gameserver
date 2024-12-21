@@ -2,7 +2,7 @@ require "common.tool.lua_tool"
 local require, print, setmetatable = require, print, setmetatable
 local type, tostring, math = type, tostring, math
 local pairs, next = pairs, next
-local print_v, print_s, dump, split = print_v, print_s, dump, split
+local print_v, dump, split = print_v, dump, split
 local skynet = require "skynet"
 
 local test_split = function()

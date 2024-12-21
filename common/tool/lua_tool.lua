@@ -31,7 +31,7 @@ local tdump = function(root)
     local str = "\n" .. _dump(root, "", "")
     return str
 end
-print_s = function(v)
+print_r = function(v)
     print(tdump(v))
 end
 
