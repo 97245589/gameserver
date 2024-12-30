@@ -1,5 +1,5 @@
 server_name = "test"
-debug_console_port = 8001
+debug_console_port = 10400
 
 root = "./"
 thread = 2

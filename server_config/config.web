@@ -1,6 +1,6 @@
 server_name = "web"
-debug_console_port = 8002
-web_port = 8010
+debug_console_port = 10500
+web_port = 10501
 
 root = "./"
 thread = 2
