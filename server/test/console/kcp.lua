@@ -17,8 +17,8 @@ local function server()
             }
         end
         local kcp = kcps[from].kcp
-        local str = kcp:netpack_input(str)
-        print("recv from", socket.udp_address(from), str, #str)
+        local data = kcp:recv(str)
+        print("recv from", socket.udp_address(from), data, #data)
         kcp:update(i)
         i = i + 1
     end, "127.0.0.1", 8765)
@@ -29,7 +29,7 @@ local function client()
     local host, kcp_cli
     host = socket.udp(function(str, from)
         -- print("client recv", str, from)
-        kcp_cli:netpack_input(str)
+        kcp_cli:recv(str)
     end)
     socket.udp_connect(host, "0.0.0.0", 8765)
     kcp_cli = lkcp.lkcp_client(1, host)

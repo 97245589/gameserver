@@ -24,7 +24,7 @@ struct Kcp_user {
 };
 
 struct Lkcp {
-  static int netpack_input(lua_State *L);
+  static int lkcp_recv(lua_State *L);
   static int lkcp_send(lua_State *L);
   static int lkcp_update(lua_State *L);
 
@@ -63,7 +63,7 @@ int Lkcp::lkcp_update(lua_State *L) {
   return 0;
 }
 
-int Lkcp::netpack_input(lua_State *L) {
+int Lkcp::lkcp_recv(lua_State *L) {
   ikcpcb **pp = (ikcpcb **)luaL_checkudata(L, 1, LKCP_META);
   ikcpcb *p = *pp;
   luaL_checktype(L, 2, LUA_TSTRING);
@@ -83,7 +83,7 @@ void Lkcp::lkcp_meta(lua_State *L) {
   if (luaL_newmetatable(L, LKCP_META)) {
     luaL_Reg l[] = {{"send", lkcp_send},
                     {"update", lkcp_update},
-                    {"netpack_input", netpack_input},
+                    {"recv", lkcp_recv},
                     {NULL, NULL}};
     luaL_newlib(L, l);
     lua_setfield(L, -2, "__index");
