@@ -8,8 +8,8 @@ local test_clients = function()
 end
 
 skynet.start(function()
-    -- skynet.newservice("server/test/console/console")
-    skynet.newservice("server/test/reload/start")
+    skynet.newservice("server/test/console/console")
+    -- skynet.newservice("server/test/reload/start")
 
     -- skynet.newservice("server/test/client/client", "2000", 2000)
     -- test_clients()
