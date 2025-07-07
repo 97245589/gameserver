@@ -4,7 +4,7 @@ local skynet = require "skynet"
 local profile = require "skynet.profile"
 require "skynet.manager"
 local codecache = require "skynet.codecache"
-codecache.mode "EXIST"
+-- codecache.mode "EXIST"
 require "common.tool.lua_tool"
 local cmds = require "common.service.cmds"
 local profile_info = require "common.service.profile"
@@ -20,6 +20,7 @@ local package_reload = require "common.service.service_reload"
 local service_dir = package_reload.get_service_dir()
 -- print("service_dir", service_dir)
 local hotreload = function()
+    -- codecache.clear()
     config_load.reload()
     package_reload.remove_hotreload_package()
     package_reload.dir_require(service_dir .. "/cmd")
