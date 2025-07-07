@@ -20,7 +20,7 @@ local package_reload = require "common.service.service_reload"
 local service_dir = package_reload.get_service_dir()
 -- print("service_dir", service_dir)
 local hotreload = function()
-    -- codecache.clear()
+    codecache.clear()
     config_load.reload()
     package_reload.remove_hotreload_package()
     package_reload.dir_require(service_dir .. "/cmd")
