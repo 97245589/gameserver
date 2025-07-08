@@ -18,14 +18,14 @@ local function server()
         end
         local kcp = kcps[from].kcp
         local data = kcp:recv(str)
-        print("recv from", socket.udp_address(from), data, #data)
+        print("recv from", socket.udp_address(from), data)
         kcp:update(i)
         i = i + 1
     end, "127.0.0.1", 8765)
 
 end
 
-local function client()
+local function client(name)
     local host, kcp_cli
     host = socket.udp(function(str, from)
         -- print("client recv", str, from)
@@ -35,13 +35,29 @@ local function client()
     kcp_cli = lkcp.lkcp_client(1, host)
     for i = 1, 1000 do
         skynet.sleep(1)
-        kcp_cli:send("hello" .. i)
+        kcp_cli:send(name .. "   " .. i)
         kcp_cli:update(i)
     end
 end
 
+local child = ...
+if not child then
+    skynet.start(function()
+        skynet.fork(server)
+        for i = 1, 3 do
+            skynet.newservice("server/test/console/kcp", "child" .. i)
+        end
+    end)
+else
+    skynet.start(function()
+        skynet.fork(client, child)
+    end)
+end
+
+--[[
 skynet.start(function()
     skynet.fork(server)
     skynet.fork(client)
     skynet.fork(client)
 end)
+]]

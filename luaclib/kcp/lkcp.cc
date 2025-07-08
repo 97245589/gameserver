@@ -20,7 +20,6 @@ struct Kcp_user {
   int host;
   int conv;
   char address[20];
-  char buf[2048];
 };
 
 struct Lkcp {
@@ -71,10 +70,10 @@ int Lkcp::lkcp_recv(lua_State *L) {
   const char *str = lua_tolstring(L, 2, &slen);
   ikcp_input(p, str, slen);
 
-  Kcp_user *pk = (Kcp_user *)p->user;
-  int len = ikcp_recv(p, pk->buf, sizeof(pk->buf));
+  char buf[1024 * 4];
+  int len = ikcp_recv(p, buf, sizeof(buf));
   if (len > 0) {
-    lua_pushlstring(L, pk->buf, len);
+    lua_pushlstring(L, buf, len);
     return 1;
   }
 }
