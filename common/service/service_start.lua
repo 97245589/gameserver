@@ -65,9 +65,12 @@ skynet.start(function()
         local cmd_name = "rpc.." .. cmd
         profile_info.add_cmd_profile(cmd_name, time)
     end)
-    package_reload.dir_require(service_dir)
-    package_reload.add_no_hotreaload_package()
-    hotreload()
+
+    skynet.fork(function()
+        package_reload.dir_require(service_dir)
+        package_reload.add_no_hotreaload_package()
+        hotreload()
+    end)
 end)
 
 skynet.info_func(function()
