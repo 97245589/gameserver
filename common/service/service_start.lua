@@ -1,3 +1,4 @@
+require "common.tool.lua_tool"
 local require, collectgarbage, print, string = require, collectgarbage, print, string
 local table, pairs, ipairs, os, type = table, pairs, ipairs, os, type
 local skynet = require "skynet"
@@ -5,7 +6,6 @@ local profile = require "skynet.profile"
 require "skynet.manager"
 local codecache = require "skynet.codecache"
 codecache.mode "EXIST"
-require "common.tool.lua_tool"
 local cmds = require "common.service.cmds"
 local profile_info = require "common.service.profile"
 local config_load = require "common.service.config_load"
@@ -66,9 +66,12 @@ skynet.start(function()
         profile_info.add_cmd_profile(cmd_name, time)
     end)
 
-    package_reload.dir_require(service_dir)
-    package_reload.add_no_hotreaload_package()
-    hotreload()
+    skynet.fork(function()
+        -- print("Service start   " .. SERVICE_NAME)
+        package_reload.dir_require(service_dir)
+        package_reload.add_no_hotreaload_package()
+        hotreload()
+    end)
 end)
 
 skynet.info_func(function()

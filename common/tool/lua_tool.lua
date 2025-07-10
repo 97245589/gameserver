@@ -1,8 +1,5 @@
 local skynet = require "skynet"
-local now_print = function(...)
-    skynet.error(...)
-end
-print = now_print
+print = skynet.error
 
 local print, type, setmetatable, getmetatable = print, type, setmetatable, getmetatable
 local table, pairs, ipairs, tconcat, tinsert, next = table, pairs, ipairs, table.concat, table.insert, next
