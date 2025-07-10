@@ -13,7 +13,7 @@ local init_players = {}
 
 M.add_mgr = function(name, mgr)
     if mgrs[name] then
-        print(SERVICE_NAME, "M name repeated may error", name)
+        print(SERVICE_NAME, "mgr name repeated", name)
     end
     mgrs[name] = mgr
     if mgr.tick then

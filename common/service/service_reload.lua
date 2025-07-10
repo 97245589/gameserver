@@ -34,7 +34,7 @@ load.remove_hotreload_package = function()
             goto package_reload_continue
         end
 
-        print(SERVICE_NAME, "reload package", packname)
+        -- print(SERVICE_NAME, "reload package", packname)
         package.loaded[packname] = nil
         ::package_reload_continue::
     end
