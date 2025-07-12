@@ -1,57 +1,55 @@
 local skynet = require "skynet"
 
-local service_name = ...
+local service_name, load_fork = ...
 
-require "common.tool.lua_tool"
-local require, collectgarbage, print, string = require, collectgarbage, print, string
-local table, pairs, ipairs, os, type = table, pairs, ipairs, os, type
-local skynet = require "skynet"
-local profile = require "skynet.profile"
-require "skynet.manager"
-local codecache = require "skynet.codecache"
-codecache.mode "EXIST"
-local cmds = require "common.service.cmds"
-local profile_info = require "common.service.profile"
-local config_load = require "common.service.config_load"
-local SERVICE_NAME = SERVICE_NAME
+local start_func = function()
+    require "common.tool.lua_tool"
+    local require, collectgarbage, print, string = require, collectgarbage, print, string
+    local table, pairs, ipairs, os, type = table, pairs, ipairs, os, type
+    local profile = require "skynet.profile"
+    require "skynet.manager"
+    local codecache = require "skynet.codecache"
+    codecache.mode "EXIST"
+    local cmds = require "common.service.cmds"
+    local profile_info = require "common.service.profile"
+    local config_load = require "common.service.config_load"
 
-if service_name then
-    skynet.register(service_name)
-end
-
-local package_reload = require "common.service.service_reload"
-local service_dir = package_reload.get_service_dir()
--- print("service_dir", service_dir)
-local hotreload = function()
-    -- codecache.clear()
-    config_load.reload()
-    package_reload.remove_hotreload_package()
-    package_reload.dir_require(service_dir .. "/cmd")
-    package_reload.dir_require(service_dir .. "/mgr")
-    collectgarbage("collect")
-    -- print(SERVICE_NAME, "memory used", collectgarbage("count") .. "k")
-end
-
-local diff_tm = 0
-local set_diff_tm = function(tm)
-    diff_tm = diff_tm + tm
-    print(SERVICE_NAME, "now diff tm", diff_tm)
-end
-local otime = os.time
-os.time = function(p)
-    if p then
-        return otime(p)
+    if service_name then
+        skynet.register(service_name)
     end
-    return otime() + diff_tm
-end
 
-cmds.get_diff_tm = function()
-    return diff_tm
-end
-cmds.set_diff_tm = set_diff_tm
-cmds.hotreload = hotreload
+    local package_reload = require "common.service.service_reload"
+    local service_dir = package_reload.get_service_dir()
+    -- print("service_dir", service_dir)
+    local hotreload = function()
+        -- codecache.clear()
+        config_load.reload()
+        package_reload.remove_hotreload_package()
+        package_reload.dir_require(service_dir .. "/cmd")
+        package_reload.dir_require(service_dir .. "/mgr")
+        collectgarbage("collect")
+        -- print(SERVICE_NAME, "memory used", collectgarbage("count") .. "k")
+    end
 
-skynet.start(function()
+    local diff_tm = 0
+    local set_diff_tm = function(tm)
+        diff_tm = diff_tm + tm
+        print(SERVICE_NAME, "now diff tm", diff_tm)
+    end
+    local otime = os.time
+    os.time = function(p)
+        if p then
+            return otime(p)
+        end
+        return otime() + diff_tm
+    end
+
+    cmds.get_diff_tm = function()
+        return diff_tm
+    end
+    cmds.set_diff_tm = set_diff_tm
+    cmds.hotreload = hotreload
+
     skynet.dispatch("lua", function(_, _, cmd, ...)
         local mqlen = skynet.stat("mqlen")
         -- print(SERVICE_NAME, "mqlen ----", mqlen)
@@ -72,4 +70,12 @@ skynet.start(function()
     package_reload.dir_require(service_dir)
     package_reload.add_no_hotreaload_package()
     hotreload()
+end
+
+skynet.start(function()
+    if load_fork then
+        skynet.fork(start_func)
+    else
+        start_func()
+    end
 end)
