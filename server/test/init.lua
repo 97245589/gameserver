@@ -2,7 +2,7 @@ local require, tostring = require, tostring
 local skynet = require "skynet"
 
 local test_clients = function()
-    for i = 1000, 1020 do
+    for i = 1000, 1100 do
         skynet.newservice("server/test/client/client", tostring(i), i)
     end
 end

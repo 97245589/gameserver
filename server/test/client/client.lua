@@ -87,7 +87,7 @@ local init_func = function()
 
     skynet.fork(function()
         while true do
-            skynet.sleep(100)
+            skynet.sleep(1)
             send_request("push_test", {})
         end
     end)
