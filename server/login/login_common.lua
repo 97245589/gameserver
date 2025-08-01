@@ -1,6 +1,6 @@
 local require = require
 local skynet = require "skynet"
-local crc = require "common.tool.crc"
+local crc = require "skynet.lualib.skynet.db.redis.crc16"
 local config = require "common.service.service_config"
 
 local childnum = config.service_num.login_child
@@ -11,9 +11,8 @@ local send2childs = function(...)
     end
 end
 
-local crc32 = crc.crc32
 local callchild = function(acc, cmd, ...)
-    local balance = crc32(acc) % childnum + 1
+    local balance = crc(acc) % childnum + 1
     local name = "login" .. balance
     return skynet.call(name, "lua", cmd, ...)
 end
