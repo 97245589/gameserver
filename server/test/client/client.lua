@@ -80,8 +80,8 @@ local init_func = function()
     skynet.fork(function()
         while true do
             local p1, p2, p3 = recv_data()
-            print(p1, p2, dump(p3))
-            print("----------")
+            -- print(p1, p2, dump(p3))
+            -- print("----------")
         end
     end)
 
@@ -94,5 +94,5 @@ local init_func = function()
 end
 
 skynet.start(function()
-    init_func()
+    skynet.fork(init_func)
 end)
