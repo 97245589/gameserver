@@ -5,6 +5,7 @@ local skynet = require "skynet"
 local crypt = require "skynet.crypt"
 local socket = require "skynet.socket"
 
+local local_server = 1
 local acc, playerid = ...
 acc = acc or "1993"
 playerid = playerid or 1993
@@ -64,10 +65,11 @@ send_request = function(name, args)
 end
 
 local init_func = function()
-    get_game_token()
+    if not local_server then
+        get_game_token()
+    end
 
     conn_to_server()
-
     send_request("select_player", {
         acc = acc,
         token = game_token or "",
@@ -77,7 +79,9 @@ local init_func = function()
 
     skynet.fork(function()
         while true do
-            print(recv_data())
+            local p1, p2, p3 = recv_data()
+            print(p1, p2, dump(p3))
+            print("----------")
         end
     end)
 

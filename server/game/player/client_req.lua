@@ -32,7 +32,6 @@ local playerid_fd = {}
 
 local kick_player = function(playerid)
     local fd = playerid_fd[playerid]
-    print(SERVICE_NAME, "kick_player", playerid, fd)
     if fd then
         playerid_fd[playerid] = nil
         fd_playerid[fd] = nil
