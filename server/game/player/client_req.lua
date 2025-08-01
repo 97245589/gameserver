@@ -26,7 +26,7 @@ local send_package = function(fd, pack)
     socket.write(fd, string.pack(">s2", pack))
 end
 
-local client_cmds = {}
+local cli_req = {}
 local fd_playerid = {}
 local playerid_fd = {}
 
@@ -62,7 +62,7 @@ local request = function(fd, cmd, args, res)
     end
     local player = players.get_player(playerid)
     player.role.heartbeat = os.time()
-    local cli_func = client_cmds[cmd]
+    local cli_func = cli_req[cmd]
     local ret = cli_func(player, args) or {
         code = -1
     }
@@ -75,20 +75,20 @@ skynet.register_protocol({
     unpack = function(msg, sz)
         return host:dispatch(msg, sz)
     end,
-    dispatch = function(fd, _, type, cli_cmd, ...)
+    dispatch = function(fd, _, type, cmd, ...)
         skynet.ignoreret()
         profile.start()
 
-        send_package(fd, request(fd, cli_cmd, ...))
+        send_package(fd, request(fd, cmd, ...))
 
         local time = profile.stop()
-        local cmd_name = "clireq.." .. cli_cmd
+        local cmd_name = "clireq.." .. cmd
         profile_info.add_cmd_profile(cmd_name, time)
     end
 })
 
 local M = {
-    client_cmds = client_cmds,
+    cli_req = cli_req,
     player_enter = player_enter,
     kick_player = kick_player,
     push = push,
