@@ -1,7 +1,6 @@
 local require, print, string, math = require, print, string, math
 local random = math.random
 local skynet = require "skynet"
-local cluster = require "skynet.cluster"
 local socket = require "skynet.socket"
 local crypt = require "skynet.crypt"
 local cmds = require "common.service.cmds"

@@ -98,11 +98,8 @@ else
     end
     local i = 1
     M.data = function(fd, msg, gate)
+        local i = fd % instance + 1
         skynet.send(childs[i], "lua", "data", fd, msg, gate)
-        i = i + 1
-        if i > #childs then
-            i = 1
-        end
     end
     return M
 end
