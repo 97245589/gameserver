@@ -44,8 +44,8 @@ local check_heartbeat = function()
 end
 
 local start_cluster = function()
-    local mgr = require "common.service.cluster_start"
-    cluster_node = mgr.cluster_node
+    local M = require "common.service.cluster_start"
+    cluster_node = M.get_cluster_node()
 end
 
 skynet.start(function()

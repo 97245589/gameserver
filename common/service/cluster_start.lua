@@ -37,5 +37,7 @@ skynet.fork(function()
 end)
 
 return {
-    cluster_node = cluster_node
+    get_cluster_node = function()
+        return cluster_node
+    end
 }

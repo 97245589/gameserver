@@ -14,10 +14,3 @@ cluster.send("login1", "@login1", "game_login_info", serverid, {
     login_key = login_key,
     host = ip .. ":" .. skynet.getenv("gate_port")
 })
-local heartbeat_tm = config.tm.heartbeat_tm
-skynet.fork(function()
-    while true do
-        cluster.send("login1", "@login1", "game_heartbeat", serverid)
-        skynet.sleep(heartbeat_tm * 100)
-    end
-end)
