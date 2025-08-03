@@ -5,7 +5,7 @@ require "common.tool.lua_tool"
 local skynet = require "skynet"
 local socket = require "skynet.socket"
 require "skynet.manager"
-local config = require "common.service.service_config"
+local gamecommon = require "server.game.game_common"
 
 skynet.register("game_init")
 
@@ -14,7 +14,7 @@ local cmds = {}
 
 local init_services = function()
     local addr
-    for i = 1, config.service_num.game_player_service do
+    for i = 1, gamecommon.player_service_num do
         local service_name = "player" .. i
         addr = skynet.newservice("server/game/player/start", service_name, "load_fork")
         services[service_name] = addr
@@ -32,12 +32,6 @@ local init_rpc = function()
     cmds.reload = function()
         for name, addr in pairs(services) do
             skynet.send(addr, "lua", "hotreload")
-        end
-    end
-
-    cmds.set_diff_tm = function(diff)
-        for name, addr in pairs(services) do
-            skynet.send(addr, "lua", "set_diff_tm", tonumber(diff))
         end
     end
 

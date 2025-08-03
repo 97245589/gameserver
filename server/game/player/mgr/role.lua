@@ -8,7 +8,6 @@ M.init_player = function(player)
         player.role = {}
     end
     local role = player.role
-    role.heartbeat = os.time()
 end
 
 M.tick_player = function(player)

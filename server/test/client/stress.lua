@@ -10,19 +10,19 @@ local test = function()
     local r = c({
         acc = acc,
         playerid = playerid,
-        local_server = false
+        local_server = true
     })
     local send_request = r.send_request
 
     r.set_recvcb(function(p1, p2, p3, p4)
-        print(p1, p2, dump(p3), p4)
+        -- print(p1, p2, dump(p3), p4)
     end)
 
     r.client_start()
 
     skynet.fork(function()
         while true do
-            skynet.sleep(100)
+            skynet.sleep(1)
             send_request("push_test", {})
         end
     end)

@@ -10,9 +10,9 @@ local profile_info = require "common.service.profile"
 local client_req = require "server.game.player.client_req"
 local kick_player = client_req.kick_player
 local players = require "server.game.player.players"
-local online_players = players.online_players
+local players = players.players
 
-local OFFLINE_TM = 10
+local OFFLINE_TM = 10 * 100
 local TICK_SAVE_NUM = 5
 
 local gen_ids = function(ids, obj)
@@ -27,18 +27,18 @@ local gen_ids = function(ids, obj)
 end
 
 local offline_player = function(player, playerid)
-    if os.time() > player.role.heartbeat + OFFLINE_TM then
+    if skynet.now() > player.opttm + OFFLINE_TM then
         client_req.kick_player(playerid)
-        online_players[playerid] = nil
+        players[playerid] = nil
     end
 end
 
 local playerids = {}
 local tick_save_player = function()
-    playerids = gen_ids(playerids, online_players, 1)
+    playerids = gen_ids(playerids, players, 1)
     local i = 1
     for playerid, _ in pairs(playerids) do
-        local player = online_players[playerid]
+        local player = players[playerid]
         -- print("save player ...", playerid, zstd.pack(player))
         offline_player(player, playerid)
         playerids[playerid] = nil
@@ -66,7 +66,7 @@ skynet.fork(function()
         pcall(function()
             tick_save()
             mgrs.all_tick()
-            for playerid, player in pairs(online_players) do
+            for playerid, player in pairs(players) do
                 mgrs.all_tick_player(player)
             end
         end)

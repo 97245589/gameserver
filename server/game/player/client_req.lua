@@ -40,17 +40,17 @@ local kick_player = function(playerid)
 end
 
 local player_enter = function(fd, gate, acc, playerid)
-    print("player_enter", SERVICE_NAME, playerid)
     kick_player(playerid)
     skynet.send(gate, "lua", "forward", fd)
     fd_playerid[fd] = playerid
     playerid_fd[playerid] = fd
     local player = players.get_player(playerid)
+    print("player_enter", SERVICE_NAME, player)
 end
 
 local push = function(player, name, args)
     local str = push_req(name, args, 0)
-    local fd = playerid_fd[player.role.playerid]
+    local fd = playerid_fd[player.playerid]
     send_package(fd, str)
 end
 
@@ -60,7 +60,6 @@ local request = function(fd, cmd, args, res)
         return skynet.send("watchdog", "lua", "close_conn", fd)
     end
     local player = players.get_player(playerid)
-    player.role.heartbeat = os.time()
     local cli_func = cli_req[cmd]
     local ret = cli_func(player, args) or {
         code = -1

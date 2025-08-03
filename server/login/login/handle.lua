@@ -11,7 +11,6 @@ local cluster = require "skynet.cluster"
 local crypt = require "skynet.crypt"
 local skynetps = skynet.packstring
 local desen = crypt.desencode
-local time = os.time()
 
 local game_servers = {}
 local acc_serverid = {}
@@ -37,7 +36,7 @@ local cmds = {
 
         local info = game_servers[server]
         local loginkey = info.loginkey
-        local token = desen(loginkey, skynetps({acc, time}))
+        local token = desen(loginkey, skynetps({acc, skynet.time()}))
         return {
             code = 0,
             host = info.host,

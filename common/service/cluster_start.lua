@@ -60,7 +60,7 @@ skynet.fork(function()
     if "center" ~= skynet.getenv("server_name") then
         while true do
             node_conn_to_center()
-            skynet.sleep(100 * config.tm.heartbeat_tm)
+            skynet.sleep(300)
         end
     end
 end)

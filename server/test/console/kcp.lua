@@ -13,7 +13,7 @@ local function server()
             local kcp = lkcp.create_lkcp(1, host, from)
             kcps[from] = {
                 kcp = kcp,
-                heartbeat = os.time()
+                heartbeat = skynet.now()
             }
         end
         local kcp = kcps[from].kcp

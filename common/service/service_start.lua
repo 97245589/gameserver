@@ -31,23 +31,6 @@ local start_func = function()
         -- print(SERVICE_NAME, "memory used", collectgarbage("count") .. "k")
     end
 
-    local diff_tm = 0
-    local set_diff_tm = function(tm)
-        diff_tm = diff_tm + tm
-        print(SERVICE_NAME, "now diff tm", diff_tm)
-    end
-    local otime = os.time
-    os.time = function(p)
-        if p then
-            return otime(p)
-        end
-        return otime() + diff_tm
-    end
-
-    cmds.get_diff_tm = function()
-        return diff_tm
-    end
-    cmds.set_diff_tm = set_diff_tm
     cmds.hotreload = hotreload
 
     skynet.dispatch("lua", function(_, _, cmd, ...)

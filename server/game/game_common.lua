@@ -1,11 +1,13 @@
 local require = require
 local skynet = require "skynet"
-local config = require "common.service.service_config"
 local crc = require "skynet.db.redis.crc16"
 
-local M = {}
+local player_service_num = 2
 
-local player_service_num = config.service_num.game_player_service
+local M = {
+    player_service_num = player_service_num
+}
+
 local playerserviceid = function(playerid)
     local num = playerid
     -- local num = crc(playerid)

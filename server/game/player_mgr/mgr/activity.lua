@@ -10,7 +10,6 @@ local db_activity = db_data.activity
 local M = {}
 
 M.tick = function()
-    -- print("activity tick", os.time())
 end
 
 local mgrs = require "server.game.player_mgr.mgrs"

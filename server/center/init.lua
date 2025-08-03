@@ -1,6 +1,6 @@
 local require, print, os, pairs = require, print, os, pairs
 require "common.tool.lua_tool"
-local print_v = print_v
+local print_v, dump = print_v, dump
 local skynet = require "skynet"
 local config = require "common.service.service_config"
 
@@ -10,7 +10,7 @@ local cluster_heartbeats = {}
 local cmds = {}
 cmds.heartbeat = function(cluster_name, cluster_host)
     cluster_node[cluster_name] = cluster_host
-    cluster_heartbeats[cluster_name] = os.time()
+    cluster_heartbeats[cluster_name] = skynet.now()
     return cluster_node
 end
 
@@ -26,30 +26,24 @@ local dispatch = function()
     end)
 end
 
-local heartbeat_tmout = config.tm.heartbeat_tmout
 local check_heartbeat = function()
-    skynet.fork(function()
-        while true do
-            skynet.sleep(100)
-            local now_ts = os.time()
-            for cluster_name, tm in pairs(cluster_heartbeats) do
-                if now_ts > tm + heartbeat_tmout then
-                    cluster_heartbeats[cluster_name] = nil
-                    cluster_node[cluster_name] = nil
-                end
+    local tmout = 5 * 100
+    while true do
+        skynet.sleep(100)
+        for cluster_name, tm in pairs(cluster_heartbeats) do
+            if skynet.now() > tm + tmout then
+                cluster_heartbeats[cluster_name] = nil
+                cluster_node[cluster_name] = nil
             end
-            print_v(cluster_node, os.time())
         end
-    end)
-end
-
-local start_cluster = function()
-    local M = require "common.service.cluster_start"
-    cluster_node = M.get_cluster_node()
+        print("cluster node", dump(cluster_node, skynet.now()))
+    end
 end
 
 skynet.start(function()
-    start_cluster()
+    local M = require "common.service.cluster_start"
+    cluster_node = M.get_cluster_node()
+
     dispatch()
-    check_heartbeat()
+    skynet.fork(check_heartbeat)
 end)

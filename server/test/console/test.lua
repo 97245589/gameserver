@@ -216,6 +216,17 @@ local gc_test = function()
     -- test1()
 end
 
+local time_test = function()
+    local n = 1e7
+    local t = skynet.now()
+    for i = 1, n do
+        local s = os.time()
+    end
+    print(skynet.now() - t)
+
+    print(skynet.time(), os.time())
+end
+
 skynet.start(function()
     -- test_split()
     -- pack_test()
@@ -226,6 +237,7 @@ skynet.start(function()
     -- crypt_test()
     -- redis_test()
     -- co_test()
-    gc_test()
-    -- skynet.exit()
+    -- gc_test()
+    time_test()
+    skynet.exit()
 end)
