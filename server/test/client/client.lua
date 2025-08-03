@@ -1,3 +1,13 @@
+local args = ...
+local acc = args.acc or "1993"
+local playerid = args.playerid or 1993
+local local_server = args.local_sever
+local login_host = args.login_host or "0.0.0.0:10301"
+local game_host = args.game_host or "0.0.0.0:10101"
+
+local session = 1
+local gameid = 1
+
 local require, string, print, pairs, os = require, string, print, pairs, os
 require "common.tool.lua_tool"
 local print_v, dump = print_v, dump
@@ -5,26 +15,20 @@ local skynet = require "skynet"
 local crypt = require "skynet.crypt"
 local socket = require "skynet.socket"
 
-local acc, playerid, local_server = ...
-acc = acc or "1993"
-playerid = playerid or 1993
--- print("------ acc playerid", acc, playerid)
-
 local config_load = require "common.service.config_load"
 local proto = config_load.proto()
 local host = proto.host
 local request = proto.push_req
 
 local fd
-local session = 1
-local gameid = 1
 local game_token
-local game_host
 local send_request
 local recv_data
+local recv_cb
 
 local login = function()
     fd = socket.open("0.0.0.0", 10301)
+    print(fd)
 
     send_request("login_key", {
         acc = acc
@@ -47,7 +51,6 @@ local login = function()
 end
 
 local conn_to_game = function()
-    game_host = game_host or "0.0.0.0:10101"
     fd = socket.open(game_host)
 end
 
@@ -70,7 +73,7 @@ send_request = function(name, args)
     send_package(fd, str)
 end
 
-local init_func = function()
+local client_start = function()
     if local_server then
         conn_to_game()
     else
@@ -88,20 +91,19 @@ local init_func = function()
 
     skynet.fork(function()
         while true do
-            local p1, p2, p3 = recv_data()
-            print(p1, p2, dump(p3))
-            print("----------")
-        end
-    end)
-
-    skynet.fork(function()
-        while true do
-            skynet.sleep(1)
-            send_request("push_test", {})
+            if recv_cb then
+                recv_cb(recv_data())
+            else
+                recv_data()
+            end
         end
     end)
 end
 
-skynet.start(function()
-    skynet.fork(init_func)
-end)
+return {
+    client_start = client_start,
+    send_request = send_request,
+    set_recvcb = function(f)
+        recv_cb = f
+    end
+}

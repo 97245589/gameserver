@@ -7,7 +7,8 @@ local M = {}
 
 local player_service_num = config.service_num.game_player_service
 local playerserviceid = function(playerid)
-    local num = crc(playerid)
+    local num = playerid
+    -- local num = crc(playerid)
     return num % player_service_num + 1
 end
 

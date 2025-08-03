@@ -40,7 +40,7 @@ select_player 200 {
     request {
         acc 0 : string
         token 1 : string
-        playerid 2 : string
+        playerid 2 : integer
     }
     response {
         code 0 : integer

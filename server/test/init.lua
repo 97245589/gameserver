@@ -11,7 +11,7 @@ skynet.start(function()
     -- skynet.newservice("server/test/console/console")
     -- skynet.newservice("server/test/reload/start")
 
-    skynet.newservice("server/test/client/client", "2000", 2000)
+    skynet.newservice("server/test/client/ctest")
     -- test_clients()
     skynet.exit()
 end)
