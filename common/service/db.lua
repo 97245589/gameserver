@@ -11,7 +11,7 @@ if child == "child" then
         skynet.dispatch("lua", function(_, _, cmd, ...)
             if not db then
                 db = redis.connect {
-                    host = "127.0.0.1",
+                    host = "0.0.0.0",
                     port = 6379
                 }
             end

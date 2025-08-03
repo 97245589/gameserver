@@ -21,7 +21,7 @@ local function server()
         print("recv from", socket.udp_address(from), data)
         kcp:update(i)
         i = i + 1
-    end, "127.0.0.1", 8765)
+    end, "0.0.0.0", 8765)
 
 end
 

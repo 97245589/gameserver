@@ -3,27 +3,32 @@ if mode ~= "child" then
     return
 end
 
-local require, print, dump, os = require, print, dump, os
+local require, print, os = require, print, os
+require "common.tool.lua_tool"
+local dump = dump
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local crypt = require "skynet.crypt"
+local skynetps = skynet.packstring
+local desen = crypt.desencode
+local time = os.time()
 
 local game_servers = {}
 local acc_serverid = {}
 
 local cmds = {
-    gameserver_info = function(serverid, info)
-        game_servers[serverid] = info
-        print("add gameserver", serverid, dump(info))
+    gameserver_info = function(args)
+        print("add gameserver", dump(args))
+        local serverid = args.serverid
+        game_servers[serverid] = args
     end,
     gameserver_down = function(gameid)
         print("login gameserver down", gameid)
         game_servers[gameid] = nil
     end,
-    login_req = function(args)
-        local acc, server = args.acc, args.server
-
-        if acc_serverid[acc] ~= server then
+    login_req = function(acc, server)
+        local bserver = acc_serverid[acc]
+        if bserver and bserver ~= server then
             local serverid = acc_serverid[acc]
             local addr = "game" .. serverid
             cluster.send(addr, "@" .. addr, "login_kick", acc)
@@ -31,11 +36,12 @@ local cmds = {
         acc_serverid[acc] = server
 
         local info = game_servers[server]
-        local login_key = info.login_key
+        local loginkey = info.loginkey
+        local token = desen(loginkey, skynetps({acc, time}))
         return {
             code = 0,
             host = info.host,
-            token = crypt.desencode(login_key, skynet.packstring({acc, os.time()}))
+            token = token
         }
     end
 

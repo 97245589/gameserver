@@ -9,8 +9,9 @@ skynet.send("watchdog", "lua", "set_login_key", login_key)
 
 local serverid = tonumber(skynet.getenv("server_id"))
 local ip = skynet.getenv("ip")
-cluster.send("login1", "@login1", "gameserver_info", serverid, {
-    login_key = login_key,
+cluster.send("login1", "@login1", "gameserver_info", {
+    serverid = serverid,
+    loginkey = login_key,
     host = ip .. ":" .. skynet.getenv("gate_port")
 })
 

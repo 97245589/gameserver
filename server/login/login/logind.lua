@@ -15,7 +15,7 @@ end
 local id = socket.listen("0.0.0.0", skynet.getenv("gate_port"))
 socket.start(id, function(fd, addr)
     print("logind accept from", addr, fd)
-    local s = crc(addr) % instance + 1
+    local s = addrs[crc(addr) % instance + 1]
     skynet.send(s, "lua", "login", fd, addr)
 end)
 
@@ -29,8 +29,8 @@ for _, addr in ipairs(addrs) do
     skynet.send(addr, "lua", "handle_addrs", handle_addrs)
 end
 
-cmds.gameserver_info = function(id, params)
+cmds.gameserver_info = function(args)
     for _, addr in ipairs(handle_addrs) do
-        skynet.send(addr, "lua", "gameserver_info", params)
+        skynet.send(addr, "lua", "gameserver_info", args)
     end
 end

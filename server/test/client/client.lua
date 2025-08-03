@@ -5,8 +5,7 @@ local skynet = require "skynet"
 local crypt = require "skynet.crypt"
 local socket = require "skynet.socket"
 
-local local_server = 1
-local acc, playerid = ...
+local acc, playerid, local_server = ...
 acc = acc or "1993"
 playerid = playerid or 1993
 -- print("------ acc playerid", acc, playerid)
@@ -24,23 +23,30 @@ local game_host
 local send_request
 local recv_data
 
-local get_game_token = function()
-    local service_config = require "common.service.service_config"
+local login = function()
     fd = socket.open("0.0.0.0", 10301)
-    print("-------", fd)
-    send_request("login_req", {
+
+    send_request("login_key", {
+        acc = acc
+    })
+    local _, _, res = recv_data()
+    print("get login key", dump(res))
+    local key = res.key
+
+    local token = crypt.desencode(key, acc .. "|" .. gameid)
+    send_request("gamekey", {
         acc = acc,
-        server = 1,
-        token = crypt.desencode(service_config.login_service_key, acc .. "|" .. os.time())
+        server = gameid,
+        token = token
     })
 
-    local res, session, res_data = recv_data()
-    print(res, session, dump(res_data))
+    local _, _, res_data = recv_data()
+    print("get login info", dump(res_data))
     game_token, game_host = res_data.token, res_data.host
-    fd = nil
+    socket.close(fd)
 end
 
-local conn_to_server = function()
+local conn_to_game = function()
     game_host = game_host or "0.0.0.0:10101"
     fd = socket.open(game_host)
 end
@@ -65,23 +71,26 @@ send_request = function(name, args)
 end
 
 local init_func = function()
-    if not local_server then
-        get_game_token()
+    if local_server then
+        conn_to_game()
+    else
+        login()
+        conn_to_game()
     end
 
-    conn_to_server()
     send_request("select_player", {
         acc = acc,
         token = game_token or "",
         playerid = playerid
     })
-    print("select_player", recv_data())
+    local _, _, res = recv_data()
+    print("select_player", dump(res))
 
     skynet.fork(function()
         while true do
             local p1, p2, p3 = recv_data()
-            -- print(p1, p2, dump(p3))
-            -- print("----------")
+            print(p1, p2, dump(p3))
+            print("----------")
         end
     end)
 

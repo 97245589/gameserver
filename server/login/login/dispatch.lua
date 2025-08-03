@@ -3,7 +3,10 @@ if mode ~= "child" then
     return
 end
 
-local require, string, split, tonumber = require, string, split, tonumber
+local require, string, tonumber = require, string, tonumber
+require "common.tool.lua_tool"
+local print, split, dump = print, split, dump
+
 local skynet = require "skynet"
 local socket = require "skynet.socket"
 local crypt = require "skynet.crypt"
@@ -64,7 +67,8 @@ local gameserver_key = function(fd)
     end
 
     local haddr = handle_addrs[crc(acc) % handle_num + 1]
-    local ret = skynet.call(haddr, "lua", "")
+    local ret = skynet.call(haddr, "lua", "login_req", acc, server)
+    send_package(fd, res(ret))
     return true
 end
 local login = function(fd, addr)

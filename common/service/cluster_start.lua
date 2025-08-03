@@ -17,20 +17,20 @@ cluster.open(cluster_name)
 cluster.register(cluster_name, skynet.self())
 
 local check_diff = function(t1, t2)
-    local adds
+    local dels
     for k, v in pairs(t1) do
         if not t2[k] then
-            adds = adds or {}
-            adds[k] = 1
-        else
-            t2[k] = nil
+            dels = dels or {}
+            dels[k] = 1
         end
     end
 
-    local dels
+    local adds
     for k, v in pairs(t2) do
-        dels = dels or {}
-        dels[k] = 1
+        if not t1[k] then
+            adds = adds or {}
+            adds[k] = 1
+        end
     end
     return {
         adds = adds,
