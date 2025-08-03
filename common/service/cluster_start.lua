@@ -1,5 +1,5 @@
-local require, print, print_v, dump, pcall = require, print, print_v, dump, pcall
-local pairs, ipairs, table = pairs, ipairs, table
+local require, print, dump, pcall = require, print, dump, pcall
+local pairs, ipairs, table, next = pairs, ipairs, table, next
 
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
@@ -16,15 +16,44 @@ cluster.reload(cluster_node)
 cluster.open(cluster_name)
 cluster.register(cluster_name, skynet.self())
 
+local check_diff = function(t1, t2)
+    local adds
+    for k, v in pairs(t1) do
+        if not t2[k] then
+            adds = adds or {}
+            adds[k] = 1
+        else
+            t2[k] = nil
+        end
+    end
+
+    local dels
+    for k, v in pairs(t2) do
+        dels = dels or {}
+        dels[k] = 1
+    end
+    return {
+        adds = adds,
+        dels = dels
+    }
+end
+
+local diff_func
 local node_conn_to_center = function()
     local ok, ret = pcall(cluster.call, "center1", "@center1", "heartbeat", cluster_name, host)
     if not ok then
         return
     end
-    cluster_node = ret
-    local t1 = skynet.now()
-    cluster.reload(cluster_node)
-    -- print("cluster reload spend tm", skynet.now() - t1, dump(ret))
+
+    local diff = check_diff(cluster_node, ret)
+    if next(diff) then
+        cluster_node = ret
+        cluster.reload(cluster_node)
+        print("diff", dump(diff))
+        if diff_func then
+            diff_func(diff)
+        end
+    end
 end
 
 skynet.fork(function()
@@ -39,5 +68,8 @@ end)
 return {
     get_cluster_node = function()
         return cluster_node
+    end,
+    set_diff_func = function(f)
+        diff_func = f
     end
 }

@@ -39,7 +39,7 @@ local tick_save_player = function()
     local i = 1
     for playerid, _ in pairs(playerids) do
         local player = online_players[playerid]
-        print("save player ...", playerid, zstd.pack(player))
+        -- print("save player ...", playerid, zstd.pack(player))
         offline_player(player, playerid)
         playerids[playerid] = nil
         i = i + 1
