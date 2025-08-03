@@ -51,6 +51,9 @@ end
 local push = function(player, name, args)
     local str = push_req(name, args, 0)
     local fd = playerid_fd[player.playerid]
+    if not fd then
+        return
+    end
     send_package(fd, str)
 end
 
