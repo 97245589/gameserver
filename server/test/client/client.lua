@@ -1,7 +1,7 @@
 local args = ...
 local acc = args.acc or "1993"
 local playerid = args.playerid or 1993
-local local_server = args.local_sever
+local local_server = args.local_server
 local login_host = args.login_host or "0.0.0.0:10301"
 local game_host = args.game_host or "0.0.0.0:10101"
 

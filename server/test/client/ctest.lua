@@ -1,24 +1,28 @@
 local skynet = require "skynet"
 require "common.tool.lua_tool"
 
+local acc, playerid = ...
+acc = acc or "2000"
+playerid = playerid or 2000
+
 local test = function()
     local c = loadfile("server/test/client/client.lua")
     local r = c({
-        acc = "2000",
-        playerid = 2000,
-        local_server = false
+        acc = acc,
+        playerid = playerid,
+        local_server = true
     })
     local send_request = r.send_request
 
     r.set_recvcb(function(p1, p2, p3, p4)
-        print(p1, p2, dump(p3), p4)
+        -- print(p1, p2, dump(p3), p4)
     end)
 
     r.client_start()
 
-    skynet.fork(function ()
+    skynet.fork(function()
         while true do
-            skynet.sleep(100)
+            skynet.sleep(1)
             send_request("push_test", {})
         end
     end)
