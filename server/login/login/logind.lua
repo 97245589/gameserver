@@ -2,7 +2,6 @@ local require, print, table, ipairs = require, print, table, ipairs
 local skynet = require "skynet"
 local socket = require "skynet.socket"
 local crc = require "skynet.db.redis.crc16"
-local cluster_start = require "common.service.cluster_start"
 local cmds = require "common.service.cmds"
 
 local addrs = {}
@@ -29,8 +28,8 @@ for _, addr in ipairs(addrs) do
     skynet.send(addr, "lua", "handle_addrs", handle_addrs)
 end
 
-cmds.gameserver_info = function(args)
+cmds.game_servers = function(args)
     for _, addr in ipairs(handle_addrs) do
-        skynet.send(addr, "lua", "gameserver_info", args)
+        skynet.send(addr, "lua", "game_servers", args)
     end
 end

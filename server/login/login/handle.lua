@@ -3,9 +3,9 @@ if mode ~= "child" then
     return
 end
 
-local require, print, os = require, print, os
+local require = require
 require "common.tool.lua_tool"
-local dump = dump
+local print, dump = print, dump
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local crypt = require "skynet.crypt"
@@ -16,20 +16,14 @@ local game_servers = {}
 local acc_serverid = {}
 
 local cmds = {
-    gameserver_info = function(args)
-        print("add gameserver", dump(args))
-        local serverid = args.serverid
-        game_servers[serverid] = args
-    end,
-    gameserver_down = function(gameid)
-        print("login gameserver down", gameid)
-        game_servers[gameid] = nil
+    game_servers = function(args)
+        game_servers = args
+        -- print("game_servers update", dump(args))
     end,
     login_req = function(acc, server)
         local bserver = acc_serverid[acc]
         if bserver and bserver ~= server then
-            local serverid = acc_serverid[acc]
-            local addr = "game" .. serverid
+            local addr = "game" .. bserver
             cluster.send(addr, "@" .. addr, "login_kick", acc)
         end
         acc_serverid[acc] = server
