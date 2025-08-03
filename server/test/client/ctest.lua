@@ -10,7 +10,7 @@ local test = function()
     local r = c({
         acc = acc,
         playerid = playerid,
-        local_server = false
+        local_server = true
     })
     local send_request = r.send_request
 
