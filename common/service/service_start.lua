@@ -27,7 +27,7 @@ local start_func = function()
         package_reload.remove_hotreload_package()
         package_reload.dir_require(service_dir .. "/cmd")
         package_reload.dir_require(service_dir .. "/mgr")
-        collectgarbage("collect")
+        -- collectgarbage("collect")
         -- print(SERVICE_NAME, "memory used", collectgarbage("count") .. "k")
     end
 
