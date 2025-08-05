@@ -1,17 +1,12 @@
 local require, tostring = require, tostring
 local skynet = require "skynet"
+local socket = require "skynet.socket"
 
-local test_clients = function()
-    for i = 1000, 1100 do
-        skynet.newservice("server/test/client/stress", tostring(i), i)
-    end
-end
+local prefix = "server/test/test"
 
 skynet.start(function()
-    -- skynet.newservice("server/test/console/console")
-    -- skynet.newservice("server/test/reload/start")
-
-    -- skynet.newservice("server/test/client/ctest")
-    test_clients()
+    local stdin = socket.stdin()
+    local cmdline = socket.readline(stdin, "\n")
+    skynet.newservice(prefix .. "/" .. cmdline)
     skynet.exit()
 end)

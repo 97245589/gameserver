@@ -1,16 +1,15 @@
-local print, dump, require = print, dump, require
+local require = require
+local print, dump = print, dump
 local skynet = require "skynet"
-local socket = require "skynet.socket"
 local cmds = require "common.service.cmds"
 local config_load = require "common.service.config_load"
 
-local loop = function()
-    local stdin = socket.stdin()
+skynet.fork(function()
     while true do
-        local cmdline = socket.readline(stdin, "\n")
+        skynet.sleep(300)
+        print("start hotreload ========", skynet.now())
         cmds.hotreload()
-        print("config test", dump(config_load.excel_config("item")))
+        local item = config_load.excel_config("item_test")
+        print("item data:", dump(item))
     end
-end
-
-skynet.fork(loop)
+end)

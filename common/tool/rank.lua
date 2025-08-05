@@ -12,7 +12,7 @@ M.new_rank = function(num)
         dump = function()
             return core:dump()
         end,
-        arr_info = function(num)
+        rankinfo = function(num)
             return core:arr_info(num)
         end
     }

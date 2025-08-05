@@ -27,11 +27,10 @@ int Llru::dump(lua_State *L) {
 
 int Llru::update(lua_State *L) {
   auto pp = (Lru **)luaL_checkudata(L, 1, LLRU_META);
-  luaL_checktype(L, 2, LUA_TSTRING);
   auto &lru = **pp;
 
   size_t len;
-  const char *p = lua_tolstring(L, 2, &len);
+  const char *p = luaL_checklstring(L, 2, &len);
   string evict;
 
   bool b = lru.update({p, len}, evict);
@@ -65,8 +64,7 @@ void Llru::lru_meta(lua_State *L) {
 }
 
 int Llru::create_lru(lua_State *L) {
-  luaL_checktype(L, 1, LUA_TNUMBER);
-  int cache_size = lua_tointeger(L, 1);
+  int cache_size = luaL_checkinteger(L, 1);
 
   Lru *p = new Lru();
   p->cache_size_ = cache_size;

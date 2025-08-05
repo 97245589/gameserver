@@ -45,7 +45,7 @@ if not child then
     skynet.start(function()
         skynet.fork(server)
         for i = 1, 3 do
-            skynet.newservice("server/test/console/kcp", "child" .. i)
+            skynet.newservice("server/test/test/kcp", "child" .. i)
         end
     end)
 else
@@ -53,11 +53,3 @@ else
         skynet.fork(client, child)
     end)
 end
-
---[[
-skynet.start(function()
-    skynet.fork(server)
-    skynet.fork(client)
-    skynet.fork(client)
-end)
-]]

@@ -1,5 +1,5 @@
 local require, string, os, error = require, string, os, error
-local print, split, tonumber = print, split, tonumber
+local print, split, tonumber, format = print, split, tonumber, string.format
 
 local skynet = require "skynet"
 local socket = require "skynet.socket"
@@ -45,7 +45,7 @@ local player_enter = function(fd, gate, acc, playerid)
     fd_playerid[fd] = playerid
     playerid_fd[playerid] = fd
     local player = players.get_player(playerid)
-    print("player_enter", SERVICE_NAME, player)
+    print(format("playerenter fd:%s playerid: %s", fd, playerid), player)
 end
 
 local push = function(player, name, args)

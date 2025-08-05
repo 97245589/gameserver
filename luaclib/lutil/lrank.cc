@@ -45,14 +45,11 @@ int Lrank::arr_info(lua_State *L) {
 int Lrank::add(lua_State *L) {
   Rank **pp = (Rank **)luaL_checkudata(L, 1, LRANK_META);
   auto &rank = **pp;
-  luaL_checktype(L, 2, LUA_TSTRING);
-  luaL_checktype(L, 3, LUA_TNUMBER);
-  luaL_checktype(L, 4, LUA_TNUMBER);
 
   size_t len;
-  const char *id = lua_tolstring(L, 2, &len);
-  int64_t score = lua_tointeger(L, 3);
-  int64_t time = lua_tointeger(L, 4);
+  const char *id = luaL_checklstring(L, 2, &len);
+  int64_t score = luaL_checkinteger(L, 3);
+  int64_t time = luaL_checkinteger(L, 4);
   Rank_base base{.uid_ = {id, len}, .score_ = score, .time_ = time};
   rank.add(base);
   return 0;

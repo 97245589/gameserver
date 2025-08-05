@@ -87,7 +87,7 @@ local client_start = function()
         playerid = playerid
     })
     local _, _, res = recv_data()
-    print("select_player", dump(res))
+    print("select_player", playerid, dump(res))
 
     skynet.fork(function()
         while true do

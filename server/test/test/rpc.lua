@@ -1,8 +1,12 @@
+local mode = ...
+
+require "common.tool.lua_tool"
 local require, print = require, print
 local skynet = require "skynet"
-local child = ...
 
-if child == "child" then
+if mode == "child" then
+    require "skynet.manager"
+    skynet.register("test")
     skynet.start(function()
         skynet.dispatch("lua", function(_, _, ...)
             skynet.retpack("success")
@@ -11,19 +15,26 @@ if child == "child" then
 else
     local db
     local test = function()
-        local addr = skynet.newservice(SERVICE_NAME, "child")
+        local addr = skynet.newservice("server/test/test/rpc", "child")
 
+        local n = 1e5
         local t = skynet.now()
-        for i = 1, 100000 do
+        for i = 1, n do
             local ret = skynet.call(addr, "lua", "hello")
         end
-        print(skynet.now() - t)
+        print("skynet call cost tm", skynet.now() - t)
+
+        t = skynet.now()
+        for i = 1, n do
+            local ret = skynet.call("test", "lua", "hello")
+        end
+        print("skynet namecall cost tm", skynet.now() - t)
     end
 
     local test_redis = function()
         db("set", "hello", "world")
         local t = skynet.now()
-        for i = 1, 10000 do
+        for i = 1, 1e4 do
             local ret = db("get", "hello")
         end
         print(skynet.now() - t)
@@ -35,5 +46,4 @@ else
         test()
         test_redis()
     end)
-
 end

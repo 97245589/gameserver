@@ -47,9 +47,8 @@ int Lkcp::lkcp_gc(lua_State *L) {
 int Lkcp::lkcp_send(lua_State *L) {
   ikcpcb **pp = (ikcpcb **)luaL_checkudata(L, 1, LKCP_META);
   ikcpcb *p = *pp;
-  luaL_checktype(L, 2, LUA_TSTRING);
   size_t len = 0;
-  const char *str = lua_tolstring(L, 2, &len);
+  const char *str = luaL_checklstring(L, 2, &len);
   ikcp_send(p, str, len);
   return 0;
 }
@@ -57,20 +56,19 @@ int Lkcp::lkcp_send(lua_State *L) {
 int Lkcp::lkcp_update(lua_State *L) {
   ikcpcb **pp = (ikcpcb **)luaL_checkudata(L, 1, LKCP_META);
   ikcpcb *p = *pp;
-  luaL_checktype(L, 2, LUA_TNUMBER);
-  ikcp_update(p, lua_tointeger(L, 2) * 10);
+  int64_t i = luaL_checkinteger(L, 2);
+  ikcp_update(p, i * 10);
   return 0;
 }
 
 int Lkcp::lkcp_recv(lua_State *L) {
   ikcpcb **pp = (ikcpcb **)luaL_checkudata(L, 1, LKCP_META);
   ikcpcb *p = *pp;
-  luaL_checktype(L, 2, LUA_TSTRING);
   size_t slen = 0;
-  const char *str = lua_tolstring(L, 2, &slen);
+  const char *str = luaL_checklstring(L, 2, &slen);
   ikcp_input(p, str, slen);
 
-  char buf[1024 * 4];
+  char buf[1024 * 100];
   int len = ikcp_recv(p, buf, sizeof(buf));
   if (len > 0) {
     lua_pushlstring(L, buf, len);
@@ -110,13 +108,11 @@ int Lkcp::create_lkcp(lua_State *L) {
     return luaL_error(L, "Init skynet context first");
   }
 
-  luaL_checktype(L, 1, LUA_TNUMBER);
-  luaL_checktype(L, 2, LUA_TNUMBER);
+  int conv = luaL_checkinteger(L, 1);
+  int host = luaL_checkinteger(L, 2);
   Kcp_user *kuser = new Kcp_user();
   kuser->ctx = ctx;
-  int conv = lua_tointeger(L, 1);
   kuser->conv = conv;
-  int host = lua_tointeger(L, 2);
   kuser->host = host;
   size_t sz = 0;
   const char *str = luaL_checklstring(L, 3, &sz);
@@ -153,13 +149,11 @@ int Lkcp::lkcp_client(lua_State *L) {
     return luaL_error(L, "Init skynet context first");
   }
 
-  luaL_checktype(L, 1, LUA_TNUMBER);
-  luaL_checktype(L, 2, LUA_TNUMBER);
+  int conv = luaL_checkinteger(L, 1);
+  int host = luaL_checkinteger(L, 2);
   struct Kcp_user *kuser = new Kcp_user();
   kuser->ctx = ctx;
-  int conv = lua_tointeger(L, 1);
   kuser->conv = conv;
-  int host = lua_tointeger(L, 2);
   kuser->host = host;
 
   ikcpcb *p = ikcp_create(1, kuser);
