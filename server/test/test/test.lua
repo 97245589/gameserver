@@ -46,25 +46,27 @@ local crypt_test = function()
     local bin = crypt.desencode(key, str)
     print("desdecode", str, crypt.desdecode(key, bin))
 
-    local clientkey = crypt.randomkey()
-    local serverkey = crypt.randomkey()
-    local secret = crypt.dhsecret(clientkey, serverkey)
-    print("dhsecret", crypt.dhsecret(clientkey, serverkey) == crypt.dhsecret(serverkey, clientkey))
+    local ckey = "12345678"
+    local cex = crypt.dhexchange(ckey)
+    local skey = "87654321"
+    local sex = crypt.dhexchange(skey)
+    print("dhsecret test equal:", crypt.dhsecret(sex, ckey) == crypt.dhsecret(cex, skey))
 
     local t = skynet.now()
-    for i = 1, 1e5 do
+    local num = 5e5
+    for i = 1, num do
         local bin = crypt.desencode(key, str)
         local nstr = crypt.desdecode(key, bin)
     end
-    print("des 5e5 times cost", skynet.now() - t)
+    print(format("des %s times cost %s", num, skynet.now() - t))
 
     local t = skynet.now()
-    for i = 1, 1e4 do
-        local clientkey = crypt.randomkey()
-        local serverkey = crypt.randomkey()
-        local secret = crypt.dhsecret(clientkey, serverkey)
+    local num = 5e4
+    for i = 1, num do
+        local sex = crypt.dhexchange(skey)
+        local secret = crypt.dhsecret(cex, skey)
     end
-    print("dhsecret 1e4 cost", skynet.now() - t)
+    print(format("dhsecret %s times cost %s", num, skynet.now() - t))
     skynet.sleep(1)
 end
 

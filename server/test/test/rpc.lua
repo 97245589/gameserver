@@ -3,6 +3,7 @@ local mode = ...
 require "common.tool.lua_tool"
 local require, print = require, print
 local skynet = require "skynet"
+local format = string.format
 
 if mode == "child" then
     require "skynet.manager"
@@ -22,22 +23,23 @@ else
         for i = 1, n do
             local ret = skynet.call(addr, "lua", "hello")
         end
-        print("skynet call cost tm", skynet.now() - t)
+        print(format("skynet call %s times cost: %s", n, skynet.now() - t))
 
         t = skynet.now()
         for i = 1, n do
             local ret = skynet.call("test", "lua", "hello")
         end
-        print("skynet namecall cost tm", skynet.now() - t)
+        print(format("skynet name call %s times cost: %s", n, skynet.now() - t))
     end
 
     local test_redis = function()
         db("set", "hello", "world")
         local t = skynet.now()
-        for i = 1, 1e4 do
+        local n = 1e4
+        for i = 1, n do
             local ret = db("get", "hello")
         end
-        print(skynet.now() - t)
+        print(format("redis call %s times cost: %s", n, skynet.now() - t))
         db("flushdb")
     end
 

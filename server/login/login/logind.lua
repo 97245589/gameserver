@@ -1,35 +1,134 @@
-local require, print, table, ipairs = require, print, table, ipairs
-local skynet = require "skynet"
-local socket = require "skynet.socket"
-local crc = require "skynet.db.redis.crc16"
-local cmds = require "common.service.cmds"
+local mode = ...
 
-local addrs = {}
-local instance = 2
-for i = 1, instance do
-    local addr = skynet.newservice("server/login/login/dispatch", "child")
-    table.insert(addrs, addr)
-end
+if mode == "child" then
+    require "common.tool.lua_tool"
+    local require, string, pcall = require, string, pcall
+    local print, dump = print, dump
 
-local id = socket.listen("0.0.0.0", skynet.getenv("gate_port"))
-socket.start(id, function(fd, addr)
-    print("logind accept from", addr, fd)
-    local s = addrs[crc(addr) % instance + 1]
-    skynet.send(s, "lua", "login", fd, addr)
-end)
+    local skynet = require "skynet"
+    local socket = require "skynet.socket"
+    local crypt = require "skynet.crypt"
+    local crc = require "skynet.db.redis.crc16"
 
-local handle_addrs = {}
-local handle_num = 2
-for i = 1, instance do
-    local addr = skynet.newservice("server/login/login/handle", "child")
-    table.insert(handle_addrs, addr)
-end
-for _, addr in ipairs(addrs) do
-    skynet.send(addr, "lua", "handle_addrs", handle_addrs)
-end
+    local config_load = require "common.service.config_load"
+    local proto = config_load.proto()
+    local host = proto.host
 
-cmds.game_servers = function(args)
-    for _, addr in ipairs(handle_addrs) do
-        skynet.send(addr, "lua", "game_servers", args)
+    local send_package = function(fd, pack)
+        local package = string.pack(">s2", pack)
+        socket.write(fd, package)
     end
+
+    local get_req = function(fd)
+        local len = socket.read(fd, 2)
+        len = len:byte(1) * 256 + len:byte(2)
+        local msg = socket.read(fd, len)
+        return host:dispatch(msg)
+    end
+
+    local exchange = function(fd, spub)
+        local _, name, args, res = get_req(fd)
+
+        local cpub = args.cpub
+        if name ~= "exchange" or not cpub then
+            return
+        end
+        send_package(fd, res({
+            code = 0,
+            spub = spub
+        }))
+        return cpub
+    end
+
+    local verify = function(fd, secret)
+        local _, name, args, res = get_req(fd)
+        local verify = args.verify
+        if name ~= "login_verify" or not verify then
+            return
+        end
+        local v, pv = verify[1], verify[2]
+        if not v or not pv then
+            return
+        end
+        if v ~= crypt.desdecode(secret, pv) then
+            return
+        end
+        send_package(fd, res({
+            code = 0
+        }))
+        return true
+    end
+
+    local choose_gameserver = function(fd, secret)
+        local _, name, args, res = get_req(fd)
+        local acc, server = args.acc, args.server
+        if name ~= "choose_gameserver" or not acc or not server then
+            return
+        end
+
+        local ret = skynet.call("info", "lua", "login_req", acc, server, secret)
+        if not ret then
+            return
+        end
+        send_package(fd, res({ret}))
+        return true
+    end
+
+    local login = function(fd, addr)
+        socket.start(fd)
+        socket.limit(fd, 4096)
+        local spri = crypt.randomkey()
+        local spub = crypt.dhexchange(spri)
+
+        local cpub = exchange(fd, spub)
+        if not cpub then
+            socket.close(fd)
+            return
+        end
+
+        local secret = crypt.dhsecret(cpub, spri)
+        if not verify(fd, secret) then
+            socket.close(fd)
+            return
+        end
+
+        if not choose_gameserver(fd, secret) then
+            socket.close(fd)
+            return
+        end
+
+        socket.close(fd)
+    end
+
+    local cmds = {
+        login = login
+    }
+
+    skynet.start(function()
+        skynet.dispatch("lua", function(_, _, fd, addr)
+            pcall(login, fd, addr)
+            skynet.response()(false)
+        end)
+    end)
+
+else
+    local require, print, table = require, print, table
+    local skynet = require "skynet"
+    local socket = require "skynet.socket"
+    local crc = require "skynet.db.redis.crc16"
+    local cmds = require "common.service.cmds"
+
+    local addrs = {}
+    local instance = 2
+    for i = 1, instance do
+        local addr = skynet.newservice("server/login/login/logind", "child")
+        table.insert(addrs, addr)
+    end
+
+    local id = socket.listen("0.0.0.0", skynet.getenv("gate_port"))
+    socket.start(id, function(fd, addr)
+        print("logind accept from", addr, fd)
+        local s = addrs[crc(addr) % instance + 1]
+        skynet.send(s, "lua", "login", fd, addr)
+    end)
 end

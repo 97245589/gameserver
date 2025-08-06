@@ -2,6 +2,7 @@ require "common.tool.lua_tool"
 local require, math, tostring = require, math, tostring
 local print, print_v, dump = print, print_v, dump
 local skynet = require "skynet"
+local format = string.format
 
 local ranktest = function()
     print("ranttest ===========")
@@ -18,16 +19,18 @@ local ranktest = function()
 
     local t = skynet.now()
     local trank = rank_mgr.new_rank(1000)
-    for i = 1, 1e6 do
+    local n = 1e6
+    for i = 1, n do
         trank.add(tostring(random(2000)), random(1000), i)
     end
-    print("rank insert 1e6 times:", skynet.now() - t)
+    print(format("rank insert %s times cost %s", n, skynet.now() - t))
     t = skynet.now()
     local ret
-    for i = 1, 10000 do
+    n = 1e4
+    for i = 1, n do
         ret = trank.rankinfo(1000)
     end
-    print("rank get info 1e4 times:", skynet.now() - t)
+    print(format("rank getinfo %s times cost %s", n, skynet.now() - t), #ret)
 end
 
 local lrutest = function()
@@ -50,6 +53,6 @@ local lrutest = function()
 end
 
 skynet.start(function()
-    ranktest()
     lrutest()
+    ranktest()
 end)

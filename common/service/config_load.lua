@@ -14,7 +14,7 @@ M.proto = function()
         return proto_data
     end
     -- print("config_load proto")
-    local file = io.open("common/config/game.proto", "r")
+    local file = io.open("common/config/game.sproto", "r")
     local str = file:read("*a")
     file:close()
     local sp = sproto.parse(str)

@@ -2,6 +2,7 @@ require "common.tool.lua_tool"
 local require, print, print_v, dump = require, print, print_v, dump
 local skynet = require "skynet"
 local sproto = require "sproto"
+local format = string.format
 
 local compress_cost = function()
     print("compress cost start ===============")
@@ -119,10 +120,11 @@ local rpc_test = function()
     print("resdata parse:", pt, session, dump(data))
 
     local t = skynet.now()
-    for i = 1, 1e6 do
+    local num = 1e6
+    for i = 1, num do
         host:dispatch(reqdata)
     end
-    print("host dispatch 1e6 times", skynet.now() - t)
+    print(format("hostdispatch %s times cost %s", num, skynet.now() - t))
 end
 
 skynet.start(function()

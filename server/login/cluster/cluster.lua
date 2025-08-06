@@ -9,7 +9,7 @@ local ssub = string.sub
 local game_servers = {}
 
 local send_gameservers = function()
-    skynet.send("login", "lua", "game_servers", game_servers)
+    skynet.send("info", "lua", "game_servers", game_servers)
 end
 
 cluster_start.set_diff_func(function(diff)

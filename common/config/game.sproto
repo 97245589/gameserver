@@ -3,45 +3,50 @@
     session 1 : integer
 }
 
-login_token 20000 {
+exchange 20000 {
     request {
-        acc 0 : string
+        cpub 0 : string
     }
     response {
         code 0 : integer
-        token 1 : string
+        spub 1 : string
     }
 }
 
-gamekey 20001 {
+login_verify 20001 {
     request {
-        acc 0 : string
-        token 1 : string
-        server 2 : string
+        verify 0: *string
     }
     response {
         code 0 : integer
-        token 1 : string
-        host 2 : string
+    }
+}
+
+choose_gameserver 20002 {
+    request {
+        acc 0 : string
+        server 1 : string
+    }
+    response {
+        code 0 : integer
+        host 1 : string
     }
 }
 
 verify 100 {
     request {
         acc 0 : string
-        token 1 : string
+        verify 1 : *string
     }
     response {
         code 0 : integer
-        token 1 : string
     }
 }
 
 select_player 200 {
     request {
         acc 0 : string
-        token 1 : string
-        playerid 2 : string
+        playerid 1 : string
     }
     response {
         code 0 : integer

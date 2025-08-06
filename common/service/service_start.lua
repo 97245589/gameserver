@@ -1,11 +1,8 @@
 local skynet = require "skynet"
 
-local service_name, load_fork = ...
-
-local start_func = function()
+local start_func = function(name)
     require "common.tool.lua_tool"
     local require, collectgarbage, print, string = require, collectgarbage, print, string
-    local table, pairs, ipairs, os, type = table, pairs, ipairs, os, type
     local profile = require "skynet.profile"
     require "skynet.manager"
     local codecache = require "skynet.codecache"
@@ -13,14 +10,14 @@ local start_func = function()
     local cmds = require "common.service.cmds"
     local profile_info = require "common.service.profile"
     local config_load = require "common.service.config_load"
+    local SERVICE_NAME = SERVICE_NAME
 
-    if service_name then
-        skynet.register(service_name)
+    if name then
+        skynet.register(name)
     end
 
     local package_reload = require "common.service.service_reload"
     local service_dir = package_reload.get_service_dir()
-    -- print("service_dir", service_dir)
     local hotreload = function()
         -- codecache.clear()
         config_load.reload()
@@ -52,10 +49,14 @@ local start_func = function()
     hotreload()
 end
 
-skynet.start(function()
-    if load_fork then
-        skynet.fork(start_func)
-    else
-        start_func()
+return {
+    start = function(name, load_fork)
+        skynet.start(function ()
+            if load_fork then
+                skynet.fork(start_func, name)
+            else
+                start_func(name)
+            end
+        end)
     end
-end)
+}
