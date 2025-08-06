@@ -34,9 +34,6 @@ local start_func = function()
     cmds.hotreload = hotreload
 
     skynet.dispatch("lua", function(_, _, cmd, ...)
-        -- local mqlen = skynet.stat("mqlen")
-        -- print(SERVICE_NAME, "mqlen ----", mqlen)
-
         profile.start()
         local func = cmds[cmd]
         if func then

@@ -32,18 +32,22 @@ local verify = function(name, acc, token)
     else
         key = acc_key[acc]
     end
+    print("verify", name, acc, key, LOGIN_KEY)
 
     if not key then
         return
     end
-
+    print("verify", name, acc)
     local arr = zstd.unpack(crypt.desdecode(key, token))
     local tacc, tt = arr[1], arr[2]
     if tacc ~= acc then
         return
     end
-    if tt + 60 * 1000 < skynet.time() * 1000 then
-        return
+    if name == "verify" then
+        print("verify ========", tt, skynet.time())
+        if tt + 60 < skynet.time() then
+            return
+        end
     end
     return true
 end
@@ -57,7 +61,7 @@ local req = {
         fd_acc[fd] = acc
         return {
             code = 0,
-            token = crypt.desencode(key, zstd.pack({acc, skynet.time() * 1000}))
+            token = crypt.desencode(key, zstd.pack({acc, skynet.time()}))
         }
     end,
     select_player = function(args, fd, gate)
@@ -124,11 +128,8 @@ local cmds = {
 
 skynet.start(function()
     skynet.dispatch("lua", function(_, _, cmd, ...)
-        local mqlen = skynet.stat("mqlen")
-        if mqlen > 2000 and cmd == "data" then
-            local fd = ...
-            return
-        end
+        -- local mqlen = skynet.stat("mqlen")
+
         local func = cmds[cmd]
         if func then
             skynet.retpack(func(...))

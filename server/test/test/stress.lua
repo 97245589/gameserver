@@ -1,29 +1,41 @@
 require "common.tool.lua_tool"
 local require, tostring, loadfile = require, tostring, loadfile
 local skynet = require "skynet"
+local print, dump = print, dump
 
 local mode, acc, playerid, local_server = ...
 
 if mode == "child" then
     local cli = function()
-        local c = loadfile("server/test/common/client.lua")
-        local r = c({
+        local client = require "server.test.common.client"
+        local send_request = client.send_request
+        local recv_data = client.recv_data
+
+        client.client_start({
             acc = acc,
             playerid = playerid,
-            local_server = local_server
+            local_server = true
         })
-        local send_request = r.send_request
 
-        r.set_recvcb(function(p1, p2, p3, p4)
-            -- print(p1, p2, dump(p3), p4)
-        end)
-
-        r.client_start()
+        local game_token = client.get_game_token()
+        send_request("select_player", {
+            acc = acc,
+            token = game_token,
+            playerid = playerid
+        })
+        local _, _, res = recv_data()
+        print("select_player", playerid, dump(res))
 
         skynet.fork(function()
             while true do
-                skynet.sleep(1)
+                skynet.sleep(100)
                 send_request("push_test", {})
+            end
+        end)
+
+        skynet.fork(function()
+            while true do
+                local p1, p2, p3 = recv_data()
             end
         end)
     end

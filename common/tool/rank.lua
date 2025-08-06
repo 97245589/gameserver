@@ -7,7 +7,7 @@ M.new_rank = function(num)
     local core = lrank.create_lrank(num)
     return {
         add = function(id, score, time)
-            core:add(id, score, time or skynet.time())
+            core:add(id, score, time or ())
         end,
         dump = function()
             return core:dump()

@@ -3,13 +3,13 @@
     session 1 : integer
 }
 
-login_key 20000 {
+login_token 20000 {
     request {
         acc 0 : string
     }
     response {
         code 0 : integer
-        key 1 : string
+        token 1 : string
     }
 }
 

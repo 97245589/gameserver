@@ -1,4 +1,4 @@
-local require, tonumber, print = require, tonumber, print
+local require, print = require, print
 require "common.service.cluster_start"
 local skynet = require "skynet"
 local crypt = require "skynet.crypt"
@@ -6,9 +6,9 @@ local cluster = require "skynet.cluster"
 local cmds = require "common.service.cmds"
 
 local login_key = crypt.randomkey()
-skynet.send("watchdog", "lua", "set_login_key", login_key)
+skynet.send("watchdogh", "lua", "set_login_key", login_key)
 
-local serverid = tonumber(skynet.getenv("server_id"))
+local serverid = skynet.getenv("server_id")
 local ip = skynet.getenv("ip")
 local gameserver_info = {
     serverid = serverid,

@@ -14,7 +14,7 @@ local test = function()
     client.client_start({
         acc = acc,
         playerid = playerid,
-        local_server = true
+        local_server = false
     })
 
     local game_token = client.get_game_token()

@@ -49,7 +49,7 @@ local crypt_test = function()
     local clientkey = crypt.randomkey()
     local serverkey = crypt.randomkey()
     local secret = crypt.dhsecret(clientkey, serverkey)
-    print("dhsecret", #secret)
+    print("dhsecret", crypt.dhsecret(clientkey, serverkey) == crypt.dhsecret(serverkey, clientkey))
 
     local t = skynet.now()
     for i = 1, 1e5 do

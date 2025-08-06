@@ -18,14 +18,13 @@ local conn_to_login = function()
     fd = socket.open(login_host)
     print("conn to login server", fd)
 
-    send_request("login_key", {
+    send_request("login_token", {
         acc = acc
     })
     local _, _, res = recv_data()
-    print("get login key", dump(res))
-    local key = res.key
+    -- print("get login token", dump(res))
+    local token = res.token
 
-    local token = crypt.desencode(key, acc .. "|" .. gameid)
     send_request("gamekey", {
         acc = acc,
         server = gameid,
@@ -33,7 +32,7 @@ local conn_to_login = function()
     })
 
     local _, _, res_data = recv_data()
-    print("get login info", dump(res_data))
+    -- print("get login info", dump(res_data))
     game_token, game_host = res_data.token, res_data.host
     socket.close(fd)
 end

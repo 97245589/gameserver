@@ -30,7 +30,7 @@ local cmds = {
 
         local info = game_servers[server]
         local loginkey = info.loginkey
-        local token = desencode(loginkey, zstd.pack({acc, skynet.time() * 1000}))
+        local token = desencode(loginkey, zstd.pack({acc, skynet.time()}))
         return {
             code = 0,
             host = info.host,
