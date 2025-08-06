@@ -6,7 +6,7 @@ local mode, acc, playerid, local_server = ...
 
 if mode == "child" then
     local cli = function()
-        local c = loadfile("server/test/client/client.lua")
+        local c = loadfile("server/test/common/client.lua")
         local r = c({
             acc = acc,
             playerid = playerid,
@@ -35,7 +35,7 @@ else
     local client_num = 100
     skynet.start(function()
         for i = 1, client_num do
-            skynet.newservice("server/test/test/stress", "child", tostring(i), i, 1)
+            skynet.newservice("server/test/test/stress", "child", tostring(i), "1_" .. i, 1)
         end
     end)
 end

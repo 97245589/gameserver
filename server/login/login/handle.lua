@@ -9,8 +9,8 @@ local print, dump = print, dump
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local crypt = require "skynet.crypt"
-local skynetps = skynet.packstring
-local desen = crypt.desencode
+local desencode = crypt.desencode
+local zstd = require "common.tool.zstd"
 
 local game_servers = {}
 local acc_serverid = {}
@@ -30,7 +30,7 @@ local cmds = {
 
         local info = game_servers[server]
         local loginkey = info.loginkey
-        local token = desen(loginkey, skynetps({acc, skynet.time()}))
+        local token = desencode(loginkey, zstd.pack({acc, skynet.time() * 1000}))
         return {
             code = 0,
             host = info.host,

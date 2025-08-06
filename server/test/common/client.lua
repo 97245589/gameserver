@@ -1,15 +1,5 @@
-local args = ...
-local acc = args.acc or "1993"
-local playerid = args.playerid or 1993
-local local_server = args.local_server
-local login_host = args.login_host or "0.0.0.0:10301"
-local game_host = args.game_host or "0.0.0.0:10101"
-
-local session = 1
-local gameid = 1
-
-local require, string, print, pairs, os = require, string, print, pairs, os
 require "common.tool.lua_tool"
+local require, string, print, pairs, os = require, string, print, pairs, os
 local print_v, dump = print_v, dump
 local skynet = require "skynet"
 local crypt = require "skynet.crypt"
@@ -20,15 +10,13 @@ local proto = config_load.proto()
 local host = proto.host
 local request = proto.push_req
 
-local fd
-local game_token
-local send_request
-local recv_data
-local recv_cb
+local acc, local_server, login_host, game_host, gameid
+local session = 1
+local fd, game_token, send_request, recv_data, recv_cb
 
-local login = function()
-    fd = socket.open("0.0.0.0", 10301)
-    print(fd)
+local conn_to_login = function()
+    fd = socket.open(login_host)
+    print("conn to login server", fd)
 
     send_request("login_key", {
         acc = acc
@@ -71,39 +59,38 @@ send_request = function(name, args)
     session = session + 1
     local str = request(name, args, session)
     send_package(fd, str)
+    return name, session
 end
 
 local client_start = function()
     if local_server then
         conn_to_game()
     else
-        login()
+        conn_to_login()
         conn_to_game()
     end
+    game_token = game_token or ""
 
-    send_request("select_player", {
+    send_request("verify", {
         acc = acc,
-        token = game_token or "",
-        playerid = playerid
+        token = game_token
     })
     local _, _, res = recv_data()
-    print("select_player", playerid, dump(res))
-
-    skynet.fork(function()
-        while true do
-            if recv_cb then
-                recv_cb(recv_data())
-            else
-                recv_data()
-            end
-        end
-    end)
+    game_token = res.token
 end
 
 return {
-    client_start = client_start,
+    client_start = function(args)
+        acc = args.acc or "1993"
+        local_server = args.local_server
+        login_host = args.login_host or "0.0.0.0:10301"
+        game_host = args.game_host or "0.0.0.0:10101"
+        gameid = gameid or "1"
+        client_start()
+    end,
     send_request = send_request,
-    set_recvcb = function(f)
-        recv_cb = f
+    recv_data = recv_data,
+    get_game_token = function()
+        return game_token
     end
 }

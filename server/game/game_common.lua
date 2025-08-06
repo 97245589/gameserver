@@ -9,9 +9,7 @@ local M = {
 }
 
 local playerserviceid = function(playerid)
-    local num = playerid
-    -- local num = crc(playerid)
-    return num % player_service_num + 1
+    return crc(playerid) % player_service_num + 1
 end
 
 M.send_player_service = function(cmd, playerid, ...)

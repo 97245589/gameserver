@@ -2,12 +2,9 @@ local require, print, string, math = require, print, string, math
 local skynet = require "skynet"
 local cmds = require "common.service.cmds"
 
-local gate = skynet.newservice("gate")
-skynet.call(gate, "lua", "open", {
-    port = skynet.getenv("gate_port"),
-    maxclient = 8888,
-    nodelay = true
-})
+local gate
+
+local close_cb
 
 local close_conn = function(fd)
     print("watchdog close_conn", fd)
@@ -31,6 +28,9 @@ socket_cmd.open = function(fd, addr)
 end
 
 socket_cmd.close = function(fd)
+    if close_cb then
+        close_cb(fd)
+    end
     close_conn(fd)
 end
 
@@ -53,7 +53,20 @@ socket_cmd.data = function(fd, msg)
 end
 
 return {
+    start = function(maxclient)
+        gate = skynet.newservice("gate")
+        skynet.call(gate, "lua", "open", {
+            port = skynet.getenv("gate_port"),
+            maxclient = maxclient or 8888,
+            nodelay = true
+        })
+
+    end,
     set_data_handle = function(func)
         data_handle = func
+    end,
+    close_conn = close_conn,
+    set_socket_cb = function(args)
+        close_cb = args.close_cb
     end
 }

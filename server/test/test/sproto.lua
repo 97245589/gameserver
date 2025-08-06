@@ -117,6 +117,12 @@ local rpc_test = function()
     })
     local pt, session, data = host:dispatch(resdata)
     print("resdata parse:", pt, session, dump(data))
+
+    local t = skynet.now()
+    for i = 1, 1e6 do
+        host:dispatch(reqdata)
+    end
+    print("host dispatch 1e6 times", skynet.now() - t)
 end
 
 skynet.start(function()

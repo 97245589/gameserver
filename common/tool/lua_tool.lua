@@ -1,9 +1,5 @@
 local skynet = require "skynet"
 print = skynet.error
-local mfloor = math.floor
-os.time = function()
-    return mfloor(skynet.time())
-end
 
 local print, type, setmetatable, getmetatable = print, type, setmetatable, getmetatable
 local table, pairs, ipairs, tconcat, tinsert, next = table, pairs, ipairs, table.concat, table.insert, next

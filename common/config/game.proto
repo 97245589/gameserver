@@ -17,7 +17,7 @@ gamekey 20001 {
     request {
         acc 0 : string
         token 1 : string
-        server 2 : integer
+        server 2 : string
     }
     response {
         code 0 : integer
@@ -33,6 +33,7 @@ verify 100 {
     }
     response {
         code 0 : integer
+        token 1 : string
     }
 }
 
@@ -40,7 +41,7 @@ select_player 200 {
     request {
         acc 0 : string
         token 1 : string
-        playerid 2 : integer
+        playerid 2 : string
     }
     response {
         code 0 : integer
