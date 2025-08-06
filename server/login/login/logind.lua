@@ -50,7 +50,8 @@ if mode == "child" then
         if not v or not pv then
             return
         end
-        if v ~= crypt.desdecode(secret, pv) then
+        pv = crypt.desdecode(secret, pv)
+        if v ~= pv then
             return
         end
         send_package(fd, res({
@@ -70,7 +71,7 @@ if mode == "child" then
         if not ret then
             return
         end
-        send_package(fd, res({ret}))
+        send_package(fd, res(ret))
         return true
     end
 
@@ -127,8 +128,7 @@ else
 
     local id = socket.listen("0.0.0.0", skynet.getenv("gate_port"))
     socket.start(id, function(fd, addr)
-        print("logind accept from", addr, fd)
-        local s = addrs[crc(addr) % instance + 1]
-        skynet.send(s, "lua", "login", fd, addr)
+        local s = addrs[fd % instance + 1]
+        skynet.send(s, "lua", fd, addr)
     end)
 end

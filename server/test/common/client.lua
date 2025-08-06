@@ -1,6 +1,6 @@
 require "common.tool.lua_tool"
-local require, string, print, pairs, os = require, string, print, pairs, os
-local print_v, dump = print_v, dump
+local require, string, tostring = require, string, tostring
+local print, dump = print, dump
 local skynet = require "skynet"
 local crypt = require "skynet.crypt"
 local socket = require "skynet.socket"
@@ -12,28 +12,38 @@ local request = proto.push_req
 
 local acc, local_server, login_host, game_host, gameid
 local session = 1
-local fd, game_token, send_request, recv_data, recv_cb
+local fd, game_key, send_request, recv_data
 
 local conn_to_login = function()
     fd = socket.open(login_host)
-    print("conn to login server", fd)
+    -- print("conn to login server", fd)
 
-    send_request("login_token", {
-        acc = acc
+    local cpri = crypt.randomkey()
+    local cpub = crypt.dhexchange(cpri)
+
+    send_request("exchange", {
+        cpub = cpub
     })
     local _, _, res = recv_data()
-    -- print("get login token", dump(res))
-    local token = res.token
+    local spub = res.spub
+    print("exchange key ======", #spub)
 
-    send_request("gamekey", {
-        acc = acc,
-        server = gameid,
-        token = token
+    game_key = crypt.dhsecret(spub, cpri)
+
+    local v = tostring(skynet.time())
+    send_request("login_verify", {
+        verify = {v, crypt.desencode(game_key, v)},
     })
+    recv_data()
+    print("verify success ======")
 
-    local _, _, res_data = recv_data()
-    -- print("get login info", dump(res_data))
-    game_token, game_host = res_data.token, res_data.host
+    send_request("choose_gameserver", {
+        acc = acc,
+        server = gameid
+    })
+    local _, _, res = recv_data()
+    game_host = res.host
+    print("choose gameserver success get host:", game_host)
     socket.close(fd)
 end
 
@@ -68,14 +78,13 @@ local client_start = function()
         conn_to_login()
         conn_to_game()
     end
-    game_token = game_token or ""
 
+    local v = crypt.randomkey()
     send_request("verify", {
         acc = acc,
-        token = game_token
+        verify = {v, crypt.desencode(game_key, v)}
     })
-    local _, _, res = recv_data()
-    game_token = res.token
+    recv_data()
 end
 
 return {
@@ -88,8 +97,5 @@ return {
         client_start()
     end,
     send_request = send_request,
-    recv_data = recv_data,
-    get_game_token = function()
-        return game_token
-    end
+    recv_data = recv_data
 }

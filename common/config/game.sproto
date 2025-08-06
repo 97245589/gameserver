@@ -45,7 +45,6 @@ verify 100 {
 
 select_player 200 {
     request {
-        acc 0 : string
         playerid 1 : string
     }
     response {

@@ -3,19 +3,13 @@ local skynet = require "skynet"
 local crc = require "skynet.db.redis.crc16"
 
 local player_service_num = 2
-local verify_service_num = 2
 
 local M = {
-    player_service_num = player_service_num,
-    verify_service_num = verify_service_num
+    player_service_num = player_service_num
 }
 
 local playerserviceid = function(playerid)
     return crc(playerid) % player_service_num + 1
-end
-
-local verifyserviceid = function(acc)
-    return crc(acc) % verify_service_num + 1
 end
 
 M.send_player_service = function(cmd, playerid, ...)
@@ -32,16 +26,6 @@ M.send_all_player_service = function(...)
     for i = 1, player_service_num do
         skynet.send("player" .. i, "lua", ...)
     end
-end
-
-M.send_verify_service = function(cmd, acc, ...)
-    local id = verifyserviceid(acc)
-    skynet.send("verify" .. id, "lua", cmd, acc, ...)
-end
-
-M.call_verify_service = function(cmd, acc, ...)
-    local id = verifyserviceid(acc)
-    return skynet.call("verify" .. id, "lua", cmd, acc, ...)
 end
 
 return M

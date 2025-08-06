@@ -1,4 +1,5 @@
-local require, string, print, type = require, string, print, type
+local require, string, type, pcall = require, string, type, pcall
+local print, dump = print, dump
 local skynet = require "skynet"
 local socket = require "skynet.socket"
 local crypt = require "skynet.crypt"
@@ -11,22 +12,36 @@ local host = proto.host
 
 local acc_key = {}
 local acc_fd = {}
+local fd_acc = {}
 local close_fd = function(fd)
     skynet.send("watchdog", "lua", "close_conn", fd)
 end
 
 local save_fd = function(acc, fd)
-    skynet.send("watchdog", "lua", "fd_acc", fd, acc)
+    local bfd = acc_fd[acc]
+    if bfd then
+        fd_acc[bfd] = nil
+        close_fd(bfd)
+    end
+
     acc_fd[acc] = fd
+    fd_acc[fd] = acc
 end
 
 local clear_acc = function(acc)
+    local fd = acc_fd[acc]
+    if fd then
+        fd_acc[fd] = nil
+        close_fd(fd)
+    end
     acc_key[acc] = nil
     acc_fd[acc] = nil
 end
 
-local verify = function(acc, verify)
+local verify = function(acc, verify, fd)
+    print("verify ======", acc, verify, fd)
     if skynet.getenv("local_server") then
+        save_fd(acc, fd)
         return true
     end
 
@@ -46,15 +61,12 @@ local verify = function(acc, verify)
         return
     end
 
+    save_fd(acc, fd)
     return true
 end
 
 local req = {
     verify = function(acc, args, fd, gate)
-        if not verify(acc, args.verify) then
-            return
-        end
-        save_fd(acc, fd)
         return {
             code = 0
         }
@@ -68,15 +80,19 @@ local req = {
     end
 }
 
-cmds.data = function(acc, fd, msg, gate)
-    local _, name, args, res = host:dispatch(msg)
+cmds.data = function(fd, msg, gate)
+    local ok, _, name, args, res = pcall(function()
+        return host:dispatch(msg)
+    end)
 
-    if name ~= "verify" then
-        if acc_fd[acc] ~= fd then
+    local acc = fd_acc[fd]
+    if not acc then
+        if not verify(args.acc, args.verify, fd) then
             close_fd(fd)
             return
         end
     end
+
     local func = req[name]
     if not func then
         print("watchdog illegal req", name)
@@ -108,6 +124,5 @@ cmds.close = function(acc)
 end
 
 cmds.set_loginkey = function(acc, key)
-    print("verify set key", acc)
     acc_key[acc] = key
 end

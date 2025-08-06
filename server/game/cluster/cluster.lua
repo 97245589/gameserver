@@ -15,8 +15,8 @@ local gameserver_info = {
 cluster.send("login1", "@login1", "gameserver_info", gameserver_info)
 
 cmds.login_kick = function(acc)
-    print("login_kick", acc)
-    gamecommon.send_verify_service("acc_offline", acc)
+    -- print("login_kick", acc)
+    skynet.send("verify", "lua", "acc_offline", acc)
 end
 
 cmds.gameserver_info = function()
@@ -24,5 +24,5 @@ cmds.gameserver_info = function()
 end
 
 cmds.set_loginkey = function(acc, key)
-    gamecommon.send_verify_service("set_loginkey", acc, key)
+    skynet.send("verify", "lua", "set_loginkey", acc, key)
 end

@@ -1,5 +1,5 @@
 require "common.tool.lua_tool"
-local require, print, dump = require, print, dump
+local require, print, dump, tostring = require, print, dump, tostring
 local skynet = require "skynet"
 
 local acc, playerid = ...
@@ -17,10 +17,8 @@ local test = function()
         local_server = false
     })
 
-    local game_token = client.get_game_token()
     send_request("select_player", {
         acc = acc,
-        token = game_token,
         playerid = playerid
     })
     local _, _, res = recv_data()

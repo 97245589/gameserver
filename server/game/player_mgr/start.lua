@@ -1,2 +1,2 @@
-local main = loadfile("common/service/service_start.lua")
-main(...)
+local start = require "common.service.service_start"
+start.start(...)

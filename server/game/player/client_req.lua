@@ -45,6 +45,7 @@ local player_enter = function(fd, gate, acc, playerid)
     fd_playerid[fd] = playerid
     playerid_fd[playerid] = fd
     local player = players.get_player(playerid)
+    player.acc = acc
     print(format("playerenter fd:%s playerid: %s", fd, playerid), player)
 end
 
