@@ -27,7 +27,7 @@ if mode == "child" then
         skynet.fork(function()
             while true do
                 skynet.sleep(100)
-                for i = 1, 100 do
+                for i = 1, 800 do
                     send_request("push_test", {})
                 end
             end
@@ -44,7 +44,7 @@ if mode == "child" then
         skynet.fork(cli)
     end)
 else
-    local client_num = 50
+    local client_num = 20
     skynet.start(function()
         for i = 1, client_num do
             skynet.newservice("server/test/test/stress", "child", tostring(i), "1_" .. i, 1)
