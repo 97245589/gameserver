@@ -14,7 +14,7 @@ local test = function()
     client.client_start({
         acc = acc,
         playerid = playerid,
-        local_server = false
+        local_server = true
     })
 
     send_request("select_player", {

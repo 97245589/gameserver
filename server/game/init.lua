@@ -16,7 +16,7 @@ local init_services = function()
     local addr
     for i = 1, gamecommon.player_service_num do
         local service_name = "player" .. i
-        addr = skynet.newservice("server/game/player/start", service_name, "load_fork")
+        addr = skynet.newservice("server/game/player/start", service_name, 1)
         services[service_name] = addr
     end
 

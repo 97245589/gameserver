@@ -30,17 +30,19 @@ local cli_req = {}
 local fd_playerid = {}
 local playerid_fd = {}
 
-local kick_player = function(playerid)
+local kick_player = function(playerid, noclose)
     local fd = playerid_fd[playerid]
     if fd then
         playerid_fd[playerid] = nil
         fd_playerid[fd] = nil
-        skynet.send("watchdog", "lua", "close_conn", fd)
+        if not noclose then
+            skynet.send("watchdog", "lua", "close_conn", fd)
+        end
     end
 end
 
-local player_enter = function(fd, gate, acc, playerid)
-    kick_player(playerid)
+local player_enter = function(playerid, fd, gate, acc)
+    kick_player(playerid, 1)
     skynet.send(gate, "lua", "forward", fd)
     fd_playerid[fd] = playerid
     playerid_fd[playerid] = fd

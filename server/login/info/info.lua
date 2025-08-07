@@ -18,7 +18,7 @@ cmds.login_req = function(acc, server, secret)
     end
 
     local serverid = acc_serverid[acc]
-    if serverid then
+    if serverid and serverid ~= server then
         local dest = "game" .. serverid
         cluster.send(dest, "@" .. dest, "login_kick", acc)
     end

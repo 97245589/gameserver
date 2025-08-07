@@ -28,18 +28,20 @@ local save_fd = function(acc, fd)
     fd_acc[fd] = acc
 end
 
-local clear_acc = function(acc)
+local clear_acc = function(acc, noclose)
     local fd = acc_fd[acc]
     if fd then
         fd_acc[fd] = nil
-        close_fd(fd)
+        if not noclose then
+            close_fd(fd)
+        end
     end
     acc_key[acc] = nil
     acc_fd[acc] = nil
 end
 
 local verify = function(acc, verify, fd)
-    print("verify ======", acc, verify, fd)
+    -- print("verify ======", acc, verify, fd)
     if skynet.getenv("local_server") then
         save_fd(acc, fd)
         return true
@@ -111,16 +113,12 @@ end
 
 cmds.acc_offline = function(acc)
     print("verify acc_offline", acc)
-    local fd = acc_fd[acc]
-    if fd then
-        close_fd(fd)
-    end
     clear_acc(acc)
 end
 
 cmds.close = function(acc)
     print("verify close ...", acc)
-    clear_acc(acc)
+    clear_acc(acc, 1)
 end
 
 cmds.set_loginkey = function(acc, key)
