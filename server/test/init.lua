@@ -7,6 +7,7 @@ local prefix = "server/test/test"
 skynet.start(function()
     local stdin = socket.stdin()
     local cmdline = socket.readline(stdin, "\n")
+    socket.close(stdin)
     skynet.newservice(prefix .. "/" .. cmdline)
     skynet.exit()
 end)

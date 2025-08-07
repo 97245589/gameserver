@@ -1,6 +1,8 @@
 require "common.tool.lua_tool"
 local require, print, dump, tostring = require, print, dump, tostring
+local pcall, load = pcall, load
 local skynet = require "skynet"
+local socket = require "skynet.socket"
 
 local acc, playerid = ...
 acc = acc or "2000"
@@ -27,7 +29,7 @@ local test = function()
     skynet.fork(function()
         while true do
             skynet.sleep(100)
-            send_request("push_test", {})
+            -- send_request("push_test", {})
         end
     end)
 
@@ -37,6 +39,18 @@ local test = function()
             print("recv:", p1, p2, dump(p3))
         end
     end)
+
+    skynet.fork(function()
+        local stdin = socket.stdin()
+        while true do
+            local cmdline = socket.readline(stdin, "\n")
+            local ok, cmd, p = pcall(load("return " .. cmdline))
+            if ok then
+                send_request(cmd, p)
+            end
+        end
+    end)
+
 end
 
 skynet.start(function()
