@@ -122,7 +122,10 @@ local rpc_test = function()
     local t = skynet.now()
     local num = 1e6
     for i = 1, num do
-        host:dispatch(reqdata)
+        local _, _, _, res = host:dispatch(reqdata)
+        res({
+            res = 0
+        })
     end
     print(format("hostdispatch %s times cost %s", num, skynet.now() - t))
 end
