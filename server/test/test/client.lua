@@ -29,7 +29,7 @@ local test = function()
     skynet.fork(function()
         while true do
             skynet.sleep(100)
-            -- send_request("push_test", {})
+            send_request("push_test", {})
         end
     end)
 
