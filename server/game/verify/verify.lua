@@ -21,6 +21,7 @@ local save_fd = function(acc, fd)
     local bfd = acc_fd[acc]
     if bfd then
         fd_acc[bfd] = nil
+        -- print("==== save id close", bfd)
         close_fd(bfd)
     end
 
@@ -28,20 +29,30 @@ local save_fd = function(acc, fd)
     fd_acc[fd] = acc
 end
 
-local clear_acc = function(acc, noclose)
+local clear_fd = function(fd)
+    local acc = fd_acc[fd]
+    if acc then
+        acc_key[acc] = nil
+        acc_fd[acc] = nil
+    end
+    fd_acc[fd] = nil
+end
+
+local clear_acc = function(acc)
     local fd = acc_fd[acc]
     if fd then
         fd_acc[fd] = nil
-        if not noclose then
-            close_fd(fd)
-        end
+        close_fd(fd)
     end
     acc_key[acc] = nil
     acc_fd[acc] = nil
 end
 
 local verify = function(acc, verify, fd)
-    -- print("verify ======", acc, verify, fd)
+    -- print("verify ====", acc, verify, fd)
+    if not acc then
+        return
+    end
     if skynet.getenv("local_server") then
         save_fd(acc, fd)
         return true
@@ -68,12 +79,12 @@ local verify = function(acc, verify, fd)
 end
 
 local req = {
-    verify = function(acc, args, fd, gate)
+    verify = function(args, fd, gate)
         return {
             code = 0
         }
     end,
-    select_player = function(acc, args, fd, gate)
+    select_player = function(args, fd, gate)
         local acc, playerid = args.acc, args.playerid
         game_common.call_player_service("player_enter", playerid, fd, gate, acc)
         return {
@@ -87,8 +98,12 @@ cmds.data = function(fd, msg, gate)
         return host:dispatch(msg)
     end)
 
-    local acc = fd_acc[fd]
-    if not acc then
+    if not ok then
+        close_fd(fd)
+        return
+    end
+
+    if not fd_acc[fd] then
         if not verify(args.acc, args.verify, fd) then
             close_fd(fd)
             return
@@ -101,7 +116,7 @@ cmds.data = function(fd, msg, gate)
         close_fd(fd)
         return
     end
-    local ret = func(acc, args, fd, gate)
+    local ret = func(args, fd, gate)
     if ret then
         socket.write(fd, string.pack(">s2", res(ret)))
         return
@@ -116,9 +131,9 @@ cmds.acc_offline = function(acc)
     clear_acc(acc)
 end
 
-cmds.close = function(acc)
-    print("verify close ...", acc)
-    clear_acc(acc, 1)
+cmds.close = function(fd)
+    -- print("verify close ...", fd)
+    clear_fd(fd)
 end
 
 cmds.set_loginkey = function(acc, key)

@@ -17,10 +17,8 @@ if mode == "child" then
             local_server = true
         })
 
-        local game_token = client.get_game_token()
         send_request("select_player", {
             acc = acc,
-            token = game_token,
             playerid = playerid
         })
         local _, _, res = recv_data()
@@ -29,13 +27,15 @@ if mode == "child" then
         skynet.fork(function()
             while true do
                 skynet.sleep(100)
-                send_request("push_test", {})
+                for i = 1, 100 do
+                    send_request("push_test", {})
+                end
             end
         end)
 
         skynet.fork(function()
             while true do
-                local p1, p2, p3 = recv_data()
+                recv_data()
             end
         end)
     end
@@ -44,7 +44,7 @@ if mode == "child" then
         skynet.fork(cli)
     end)
 else
-    local client_num = 100
+    local client_num = 50
     skynet.start(function()
         for i = 1, client_num do
             skynet.newservice("server/test/test/stress", "child", tostring(i), "1_" .. i, 1)

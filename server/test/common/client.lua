@@ -32,7 +32,7 @@ local conn_to_login = function()
 
     local v = tostring(skynet.time())
     send_request("login_verify", {
-        verify = {v, crypt.desencode(game_key, v)},
+        verify = {v, crypt.desencode(game_key, v)}
     })
     recv_data()
     print("verify success ======")
@@ -74,17 +74,20 @@ end
 local client_start = function()
     if local_server then
         conn_to_game()
+        send_request("verify", {
+            acc = acc
+        })
+        recv_data()
     else
         conn_to_login()
         conn_to_game()
+        local v = crypt.randomkey()
+        send_request("verify", {
+            acc = acc,
+            verify = {v, crypt.desencode(game_key, v)}
+        })
+        recv_data()
     end
-
-    local v = crypt.randomkey()
-    send_request("verify", {
-        acc = acc,
-        verify = {v, crypt.desencode(game_key, v)}
-    })
-    recv_data()
 end
 
 return {

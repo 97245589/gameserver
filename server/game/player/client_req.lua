@@ -33,12 +33,12 @@ local playerid_fd = {}
 local kick_player = function(playerid, noclose)
     local fd = playerid_fd[playerid]
     if fd then
-        playerid_fd[playerid] = nil
         fd_playerid[fd] = nil
         if not noclose then
             skynet.send("watchdog", "lua", "close_conn", fd)
         end
     end
+    playerid_fd[playerid] = nil
 end
 
 local player_enter = function(playerid, fd, gate, acc)
