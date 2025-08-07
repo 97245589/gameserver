@@ -9,15 +9,29 @@ if mode == "child" then
     require "skynet.manager"
     skynet.register("test")
     skynet.start(function()
-        skynet.dispatch("lua", function(_, _, ...)
-            skynet.retpack("success")
+        local i = 0
+        skynet.dispatch("lua", function()
+            skynet.retpack("success" .. i)
+            i = i + 1
         end)
     end)
 else
-    local db
-    local test = function()
-        local addr = skynet.newservice("server/test/test/rpc", "child")
+    local addr
 
+    local calltest = function()
+        print("calltest ==========")
+        local test = function(name, n)
+            for i = 1, n do
+                local ret = skynet.call(addr, "lua", "hello")
+                print(name, ret)
+            end
+        end
+        skynet.fork(test, 1, 10)
+        skynet.fork(test, 2, 10)
+        skynet.sleep(10)
+    end
+
+    local test = function()
         local n = 1e5
         local t = skynet.now()
         for i = 1, n do
@@ -33,6 +47,7 @@ else
     end
 
     local test_redis = function()
+        local db = require"common.service.db".db
         db("set", "hello", "world")
         local t = skynet.now()
         local n = 1e4
@@ -44,7 +59,8 @@ else
     end
 
     skynet.start(function()
-        db = require"common.service.db".db
+        addr = skynet.newservice("server/test/test/rpc", "child")
+        calltest()
         test()
         test_redis()
     end)

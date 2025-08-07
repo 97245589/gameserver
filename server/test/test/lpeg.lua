@@ -1,10 +1,9 @@
 local require = require
 require "common.tool.lua_tool"
 local print, print_v, dump = print, print_v, dump
-local parse_enum = require "common.tool.parse_enum"
+local type, table, ipairs, pairs, load = type, table, ipairs, pairs, load
 
 local skynet = require "skynet"
-
 local lpeg = require "lpeg"
 
 local simple = function()
@@ -33,6 +32,49 @@ local simple = function()
     mul_pair:match("hello = world, test = testt")
 end
 
+local parse_enum = function(str)
+    lpeg.locale(lpeg)
+    local space = lpeg.space ^ 0
+
+    local var_name_first = (lpeg.alpha + "_") ^ 1
+    local var_name_next = (lpeg.alpha + lpeg.alnum + "_") ^ 0
+    local var_name = space * lpeg.C(var_name_first * var_name_next) * space
+
+    local enum_start = space * "enum" * space
+
+    local sep = lpeg.S(",\n")
+    local elem = lpeg.C((1 - sep) ^ 0)
+    local enum_equ = space * "=" * space * elem * space
+    local one_enum = lpeg.Ct(var_name * enum_equ ^ 0 * space)
+    local enums = one_enum * (sep * one_enum) ^ 0
+
+    local enum_exp = enum_start * var_name * "{" * enums * (lpeg.space + lpeg.S(",};")) ^ 1
+
+    local enum_list = enum_exp ^ 0
+    local infos = table.pack(enum_list:match(str))
+    return infos
+end
+
+local infos_2_enum = function(infos)
+    local enums = {}
+    local e_str, now_v, checks
+    for _, v in ipairs(infos) do
+        if type(v) == "string" then
+            e_str = v
+            now_v = 0
+            enums[e_str] = {}
+        elseif type(v) == "table" then
+            local name, str = table.unpack(v)
+            if str then
+                now_v = load("return " .. str)()
+            end
+            enums[e_str][name] = now_v
+            now_v = now_v + 1
+        end
+    end
+    return enums
+end
+
 local enum_parse = function()
     local enum_str = [[
         enum ATTR {
@@ -45,18 +87,14 @@ local enum_parse = function()
             ON=1,CLOSE
         };
     ]]
-
-    local enums_table = parse_enum.parse_enum(enum_str)
-    print(dump(enums_table, "enums"))
-end
-
-local gen_enums = function()
-    parse_enum.gen_enums()
+    local infos = parse_enum(enum_str)
+    print("enum infos", dump(infos))
+    local enums = infos_2_enum(infos)
+    print("enums", dump(enums))
 end
 
 skynet.start(function()
     simple()
     enum_parse()
-    -- gen_enums()
     skynet.exit()
 end)
