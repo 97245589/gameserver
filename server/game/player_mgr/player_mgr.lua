@@ -1,22 +1,27 @@
+local pcall = pcall
 local skynet = require "skynet"
 local zstd = require "common.tool.zstd"
-local mgrs = require "server.game.player_mgr.mgrs"
 
 local db_data = {}
+local tickfunc = {}
 
 local save_db = function()
-    local bin = zstd.pack(db_data)
-    -- db:hset("server_data", "data", bin)
 end
 
 skynet.fork(function()
     while true do
         skynet.sleep(100)
-        save_db()
-        mgrs.all_tick()
+        pcall(function()
+            save_db()
+        end)
     end
 end)
 
 return {
-    db_data = db_data
+    get_db_data = function()
+        return db_data
+    end,
+    add_tick = function(name, func)
+
+    end
 }

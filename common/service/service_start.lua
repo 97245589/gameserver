@@ -2,7 +2,7 @@ local skynet = require "skynet"
 
 local start_func = function(name)
     require "common.tool.lua_tool"
-    local require, print, string = require, print, string
+    local require, print, string, pcall = require, print, string, pcall
     local profile = require "skynet.profile"
     require "skynet.manager"
     local codecache = require "skynet.codecache"
@@ -32,7 +32,12 @@ local start_func = function(name)
         profile.start()
         local func = cmds[cmd]
         if func then
-            skynet.retpack(func(...))
+            local ok, ret = pcall(func, ...)
+            if ok then
+                skynet.retpack(func(...))
+            else
+                skynet.response()(false)
+            end
         else
             skynet.response()(false)
             print(SERVICE_NAME .. " service lua command not found", cmd)

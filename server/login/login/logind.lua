@@ -75,29 +75,22 @@ if mode == "child" then
     end
 
     local login = function(fd, addr)
-        socket.start(fd)
-        socket.limit(fd, 4096)
         local spri = crypt.randomkey()
         local spub = crypt.dhexchange(spri)
 
         local cpub = exchange(fd, spub)
         if not cpub then
-            socket.close(fd)
             return
         end
 
         local secret = crypt.dhsecret(cpub, spri)
         if not verify(fd, secret) then
-            socket.close(fd)
             return
         end
 
         if not choose_gameserver(fd, secret) then
-            socket.close(fd)
             return
         end
-
-        socket.close(fd)
     end
 
     local cmds = {
@@ -106,7 +99,10 @@ if mode == "child" then
 
     skynet.start(function()
         skynet.dispatch("lua", function(_, _, fd, addr)
+            socket.start(fd)
+            socket.limit(fd, 4096)
             pcall(login, fd, addr)
+            socket.close(fd)
             skynet.response()(false)
         end)
     end)
