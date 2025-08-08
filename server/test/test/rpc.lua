@@ -26,8 +26,8 @@ else
                 print(name, ret)
             end
         end
-        skynet.fork(test, 1, 10)
-        skynet.fork(test, 2, 10)
+        skynet.fork(test, 1, 5)
+        skynet.fork(test, 2, 5)
         skynet.sleep(10)
     end
 
@@ -47,15 +47,14 @@ else
     end
 
     local test_redis = function()
-        local db = require"common.service.db".db
-        db("set", "hello", "world")
+        local db = require "common.service.db"
+        local call = db.call
         local t = skynet.now()
         local n = 1e4
         for i = 1, n do
-            local ret = db("get", "hello")
+            local ret = call("get", "hello")
         end
         print(format("redis call %s times cost: %s", n, skynet.now() - t))
-        db("flushdb")
     end
 
     skynet.start(function()
@@ -63,5 +62,6 @@ else
         calltest()
         test()
         test_redis()
+        skynet.exit()
     end)
 end

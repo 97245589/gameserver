@@ -8,7 +8,6 @@ if mode == "child" then
     local skynet = require "skynet"
     local socket = require "skynet.socket"
     local crypt = require "skynet.crypt"
-    local crc = require "skynet.db.redis.crc16"
 
     local config_load = require "common.service.config_load"
     local proto = config_load.proto()
@@ -116,7 +115,6 @@ else
     local require, print, table = require, print, table
     local skynet = require "skynet"
     local socket = require "skynet.socket"
-    local crc = require "skynet.db.redis.crc16"
     local cmds = require "common.service.cmds"
 
     local addrs = {}

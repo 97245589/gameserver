@@ -2,7 +2,7 @@ local skynet = require "skynet"
 
 local start_func = function(name)
     require "common.tool.lua_tool"
-    local require, collectgarbage, print, string = require, collectgarbage, print, string
+    local require, print, string = require, print, string
     local profile = require "skynet.profile"
     require "skynet.manager"
     local codecache = require "skynet.codecache"
@@ -24,8 +24,6 @@ local start_func = function(name)
         package_reload.remove_hotreload_package()
         package_reload.dir_require(service_dir .. "/cmd")
         package_reload.dir_require(service_dir .. "/mgr")
-        -- collectgarbage("collect")
-        -- print(SERVICE_NAME, "memory used", collectgarbage("count") .. "k")
     end
 
     cmds.hotreload = hotreload
@@ -51,7 +49,7 @@ end
 
 return {
     start = function(name, load_fork)
-        skynet.start(function ()
+        skynet.start(function()
             if load_fork then
                 skynet.fork(start_func, name)
             else

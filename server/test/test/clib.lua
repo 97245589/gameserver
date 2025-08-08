@@ -7,7 +7,7 @@ local format = string.format
 local ranktest = function()
     print("ranttest ===========")
 
-    local rank_mgr = require "common.tool.rank"
+    local rank_mgr = require "common.func.rank"
     local random = math.random
 
     local rank = rank_mgr.new_rank(10)
@@ -36,7 +36,7 @@ end
 local lrutest = function()
     print("lrutest ===========")
 
-    local lru_mgr = require "common.tool.lru"
+    local lru_mgr = require "common.func.lru"
 
     local data = {}
     local lru = lru_mgr.create_lru(10, function(id)

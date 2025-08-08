@@ -95,9 +95,13 @@ local rpc_test = function()
             session 1 : integer
         }
 
+        .Test {
+            test 0 : integer
+        }
+
         test 1 {
             request {
-                req 0 : integer
+                req 0 : Test
             }
             response {
                 res 0 : integer
@@ -105,11 +109,18 @@ local rpc_test = function()
         }
     ]]
 
+    local bin = sp:pencode("Test", {
+        test = 10
+    })
+    print("rpc sp decode test", dump(sp:pdecode("Test", bin)))
+
     local host = sp:host("package")
     local req = host:attach(sp)
 
     local reqdata = req("test", {
-        req = 10
+        req = {
+            test = 0
+        }
     }, 0)
     local pt, name, data, pfunc = host:dispatch(reqdata)
     print("reqdata parse:", pt, name, dump(data), pfunc)
