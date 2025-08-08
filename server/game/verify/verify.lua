@@ -137,5 +137,6 @@ cmds.close = function(fd)
 end
 
 cmds.set_loginkey = function(acc, key)
+    -- print("verify loginkey", acc, key)
     acc_key[acc] = key
 end

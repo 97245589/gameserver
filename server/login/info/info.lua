@@ -25,7 +25,7 @@ cmds.login_req = function(acc, server, secret)
     acc_serverid[acc] = server
 
     local dest = "game" .. server
-    cluster.send(dest, "@" .. dest, "set_loginkey", acc, secret)
+    cluster.call(dest, "@" .. dest, "set_loginkey", acc, secret)
     return {
         code = 0,
         host = game.host

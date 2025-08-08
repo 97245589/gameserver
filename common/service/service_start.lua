@@ -34,7 +34,7 @@ local start_func = function(name)
         if func then
             local ok, ret = pcall(func, ...)
             if ok then
-                skynet.retpack(func(...))
+                skynet.retpack(ret)
             else
                 skynet.response()(false)
             end
