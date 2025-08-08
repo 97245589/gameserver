@@ -93,10 +93,6 @@ if mode == "child" then
         end
     end
 
-    local cmds = {
-        login = login
-    }
-
     skynet.start(function()
         skynet.dispatch("lua", function(_, _, fd, addr)
             socket.start(fd)
