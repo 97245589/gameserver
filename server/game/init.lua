@@ -3,20 +3,19 @@ local pairs = pairs
 local ipairs = ipairs
 
 skynet.start(function()
-    local start_service = {{"watchdog", 1, 0}, {"player", 5, 10}}
-    local service_num = {}
+    local service_num = {
+        player = 5,
+        watchdog = 1
+    }
     local addrs = {}
 
-    for idx, info in ipairs(start_service) do
-        local service, num, tmout = info[1], info[2], info[3]
-        service_num[service] = num
-
+    for service, num in pairs(service_num) do
         local init = "server/game/" .. service .. "/init"
         if num == 1 then
-            addrs[service] = skynet.newservice(init, tmout)
+            addrs[service] = skynet.newservice(init)
         else
             for i = 1, num do
-                addrs[service .. i] = skynet.newservice(init, tmout)
+                addrs[service .. i] = skynet.newservice(init)
             end
         end
     end

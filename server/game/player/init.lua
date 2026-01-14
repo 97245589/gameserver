@@ -1,3 +1,14 @@
-local init = require "common.service.init"
-init(...)
-require "server.game.rpc"
+local require = require
+local skynet = require "skynet"
+local start = require "common.service.start"
+
+local require_files = function()
+    require "server.game.player.req"
+    require "server.game.player.role"
+    require "server.game.player.rpc"
+end
+
+start(function()
+    require "server.game.rpc"
+    skynet.timeout(0, require_files)
+end)
