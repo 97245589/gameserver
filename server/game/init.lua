@@ -5,7 +5,8 @@ local ipairs = ipairs
 skynet.start(function()
     local service_num = {
         player = 5,
-        watchdog = 1
+        watchdog = 1,
+        mgr = 1
     }
     local addrs = {}
 

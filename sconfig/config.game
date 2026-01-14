@@ -1,8 +1,9 @@
+debug_console_port = 10102
 cluster_port = 10100
 gate_port = 10101
-debug_console_port = 10102
 server_name = "game"
 server_id = 1
+server_mark = server_name .. server_id
 
 thread = 3
 harbor = 0
@@ -13,5 +14,5 @@ lua_path = "skynet/lualib/?.lua;?.lua"
 lua_cpath = "skynet/luaclib/?.so;luaclib/?.so"
 cpath = "skynet/cservice/?.so"
 
---logger = "run/" .. server_name .. server_id .. ".log"
---daemon = "run/" .. server_name .. server_id .. ".pid"
+--logger = "run/" .. server_mark .. ".log"
+--daemon = "run/" .. server_mark .. ".pid"

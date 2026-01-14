@@ -7,6 +7,7 @@ local M = {}
 local inits = {}
 local ticks = {}
 local cfgs = {}
+M.ticks = ticks
 
 M.reload_cfg = function(cfgname)
     cfg.reload_cfg(cfgname, function(mnames)
