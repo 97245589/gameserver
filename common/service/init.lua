@@ -1,7 +1,7 @@
+require "common.tool.tool"
 local skynet = require "skynet"
 local load = require "common.service.load"
-
-local cmds = {}
+local cmds = require "common.service.cmds"
 
 local init = function()
     skynet.start(function()
@@ -14,11 +14,8 @@ local init = function()
             end
         end)
 
-        load.load()
+        skynet.timeout(30, load.load)
     end)
 end
 
-return {
-    init = init,
-    cmds = cmds
-}
+return init

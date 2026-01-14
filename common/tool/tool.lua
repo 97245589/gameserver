@@ -1,6 +1,5 @@
 local string = string
 local table = table
-local print = print
 local tconcat = table.concat
 local tinsert = table.insert
 local srep = string.rep
@@ -8,6 +7,9 @@ local type = type
 local pairs = pairs
 local tostring = tostring
 local next = next
+local skynet = require "skynet"
+
+print = skynet.error
 
 dump = function(root)
     local cache = {
@@ -29,8 +31,7 @@ dump = function(root)
         end
         return tconcat(temp, "\n" .. space)
     end
-    local str = "\n" .. _dump(root, "", "")
-    return str
+    return _dump(root, "", "") .. "$ \n"
 end
 
 clone = function(object)
@@ -60,7 +61,6 @@ split = function(str, sp)
     end
 
     local patt = string.format("[^%s]+", sp)
-    -- print(patt)
     local arr = {}
     for k in string.gmatch(str, patt) do
         table.insert(arr, k)

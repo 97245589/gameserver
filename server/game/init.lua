@@ -1,13 +1,27 @@
 local skynet = require "skynet"
-
-local service_cfg = {
-    game = 5,
-    watchdog = 1
-}
+local pairs = pairs
 
 skynet.start(function()
-    skynet.newservice("server/game/watchdog/init")
-    for i = 1, 10 do
-        skynet.newservice("server/game/player/init")
+    local service_num = {
+        player = 5,
+        watchdog = 1
+    }
+    local addrs = {}
+
+    for service, num in pairs(service_num) do
+        local init = "server/game/" .. service .. "/init"
+        if num == 1 then
+            addrs[service] = skynet.newservice(init)
+        else
+            for i = 1, num do
+                addrs[service .. i] = skynet.newservice(init)
+            end
+        end
     end
+
+    for name, addr in pairs(addrs) do
+        skynet.send(addr, "lua", "service_addrs", addrs, service_num)
+    end
+
+    skynet.exit()
 end)

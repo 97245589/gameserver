@@ -1,2 +1,3 @@
 local init = require "common.service.init"
-init.init(...)
+init(...)
+require "server.game.rpc"
