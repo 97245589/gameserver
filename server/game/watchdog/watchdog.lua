@@ -1,8 +1,9 @@
 local require = require
 local print = print
 local skynet = require "skynet"
-local proto = require "common.func.proto"
 local cmds = require "common.service.cmds"
+local child = require "server.game.watchdog.child"
+local rpc = require "server.game.rpc"
 
 local gate = skynet.newservice("gate")
 skynet.call(gate, "lua", "open", {
@@ -11,7 +12,6 @@ skynet.call(gate, "lua", "open", {
     nodelay = true
 })
 
-local host = proto.host
 local acc_key = {}
 local acc_fd = {}
 local fd_acc = {}
@@ -29,21 +29,25 @@ cmds.acc_key = function(acc, key)
     acc_key[acc] = key
 end
 
-cmds.close_conn = close_conn
-
-local reqhandle = {
-    verify = function()
-    end,
-    choose_player = function()
-    end
-}
-local req = function(fd, msg)
-    local t, name, args, res = host:dispatch(msg)
-    if not name then
-        close_conn(fd)
-        return
-    end
+cmds.get_key = function(acc)
+    return acc_key[acc]
 end
+
+cmds.fd_acc = function(fd, acc)
+    local bfd = acc_fd[acc]
+    if bfd then
+        fd_acc[bfd] = nil
+        skynet.send(gate, "lua", "kick", fd)
+    end
+    acc_fd[acc] = fd
+    fd_acc[fd] = acc
+end
+
+cmds.choose_player = function(fd, acc, playerid)
+    rpc.rpc_send_id("player", "user_enter", playerid, acc, gate)
+end
+
+cmds.close_conn = close_conn
 
 local socket_cmds = {
     open = function(fd, addr)
@@ -59,13 +63,14 @@ local socket_cmds = {
     warning = function(fd, size)
         print("socket warning", fd, size)
     end,
-    data = req
+    data = function(fd, msg)
+        local acc = fd_acc[fd]
+        child.data(fd, msg, acc)
+    end
 }
 cmds.socket = function(cmd, ...)
     local func = socket_cmds[cmd]
     if func then
         func(...)
-    else
-        print("watchdog socket cmds err", cmd)
     end
 end
