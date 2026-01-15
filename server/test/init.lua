@@ -1,7 +1,6 @@
 local skynet = require "skynet"
 
 skynet.start(function ()
-    print("test init ===")
-    skynet.newservice("server/test/rank")
+    skynet.newservice("server/test/test")
     skynet.exit()
 end)

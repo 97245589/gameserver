@@ -8,5 +8,5 @@ end
 
 start(function()
     require "server.game.rpc"
-    skynet.timeout(10, require_files)
+    skynet.timeout(0, require_files)
 end)

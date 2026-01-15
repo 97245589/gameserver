@@ -1,5 +1,5 @@
 local require = require
-require "common.tool.tool"
+require "common.func.tool"
 local skynet = require "skynet"
 local codecache = require "skynet.codecache"
 codecache.mode "OFF"
