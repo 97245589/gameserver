@@ -44,7 +44,7 @@ cmds.fd_acc = function(fd, acc)
 end
 
 cmds.choose_player = function(fd, acc, playerid)
-    rpc.rpc_send_id("player", "user_enter", playerid, acc, gate)
+    rpc.rpc_send_id("player", "player_enter", playerid, acc, gate)
 end
 
 cmds.close_conn = close_conn

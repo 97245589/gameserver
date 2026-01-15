@@ -1,25 +1,9 @@
-local skynet = require "skynet"
+local require = require
+local role = require "server.game.player.mgr.role"
+local req = {}
 
-local playerid_fd = {}
-local fd_playerid = {}
-local reqs = {}
-
-local M = {
-    reqs = reqs
-}
-
-local send_package = function(fd, pack)
-
+req.test = function(player)
+    
 end
 
-skynet.register_protocol({
-    name = "client",
-    id = skynet.PTYPE_CLIENT,
-    unpack = function(msg, sz)
-    end,
-    dispatch = function(fd, _, type, cmd, ...)
-        skynet.ignoreret()
-    end
-})
-
-return M
+return req

@@ -3,9 +3,11 @@ local skynet = require "skynet"
 local start = require "common.service.start"
 
 local require_files = function()
-    require "server.game.player.req"
-    require "server.game.player.role"
     require "server.game.player.rpc"
+    require "server.game.player.client"
+    require "server.game.player.tick"
+
+    require "server.game.player.mgr.role"
 end
 
 start(function()
