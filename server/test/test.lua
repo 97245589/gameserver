@@ -19,5 +19,12 @@ local cfg = function()
     end
 end
 
+local ip = function()
+    local ip = require "common.func.ip"
+    print(ip.private())
+    print(ip.public())
+end
+
 skynet.start(function()
+    ip()
 end)
