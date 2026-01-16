@@ -3,6 +3,7 @@ local skynet = require "skynet"
 local socket = require "skynet.socket"
 local proto = require "common.func.proto"
 local req = require "server.game.player.req"
+local rpc = require "server.game.rpc"
 local player_mgr = require "server.game.player.player_mgr"
 
 local spack = string.pack
@@ -11,18 +12,33 @@ local M = {}
 local fd_playerid = {}
 local playerid_fd = {}
 
-local host = proto.host
+local proto_host = proto.host
+local proto_push = proto.push
+
+local close_conn = function(fd)
+    local playerid = fd_playerid[fd]
+    if playerid then
+        playerid_fd[playerid] = nil
+    end
+    fd_playerid[fd] = nil
+    rpc.send("watchdog", "close_conn", fd)
+end
+player_mgr.kick_player = function(playerid)
+    local fd = playerid_fd[playerid]
+    if fd then
+        close_conn(fd)
+    end
+end
 
 local send_package = function(fd, pack)
-    local ret = socket.write(fd, spack(">s2", pack))
-    if not ret then
-    end
+    socket.write(fd, spack(">s2", pack))
 end
 
 local request = function(fd, cmd, args, res)
     local playerid = fd_playerid[fd]
     if not playerid then
-        skynet.send("watchdog", "lua", "close_conn", fd)
+        close_conn(fd)
+        return
     end
 
     local player = player_mgr.get_player(playerid)
@@ -33,15 +49,33 @@ local request = function(fd, cmd, args, res)
     return res(ret)
 end
 
-M.player_enter = function()
+M.push = function(playerid, name, args)
+    local fd = playerid_fd[playerid]
+    if not fd then
+        return
+    end
+    local str = proto_push(name, args, 0)
+    send_package(fd, str)
+end
 
+M.player_enter = function(playerid, fd, acc, gate)
+    local bfd = playerid_fd[playerid]
+    if bfd then
+        close_conn(bfd)
+        return
+    end
+
+    skynet.send(gate, "lua", "forward", fd)
+    fd_playerid[fd] = playerid
+    playerid_fd[playerid] = fd
+    local player = player_mgr.get_player(playerid)
 end
 
 skynet.register_protocol({
     name = "client",
     id = skynet.PTYPE_CLIENT,
     unpack = function(msg, sz)
-        return host:dispatch(msg, sz)
+        return proto_host:dispatch(msg, sz)
     end,
     dispatch = function(fd, _, type, cmd, ...)
         send_package(fd, request(fd, cmd, ...))

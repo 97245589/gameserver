@@ -63,7 +63,7 @@ if mode == "child" then
             if not ret then
                 close(fd)
             end
-            skynet.retpack()
+            skynet.response()(false)
         end)
     end)
 else

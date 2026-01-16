@@ -10,7 +10,7 @@ local cfgs = {}
 M.ticks = ticks
 
 M.reload_cfg = function(cfgname)
-    cfg.reload_cfg(cfgname, function(mnames)
+    cfg.reload(cfgname, function(mnames)
         for name in pairs(mnames) do
             cfgs[name]()
         end

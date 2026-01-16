@@ -11,11 +11,11 @@ cmds.service_addrs = function(addrs_, service_num_)
     service_num = service_num_
 end
 
-M.rpc_send = function(name, cmd, ...)
+M.send = function(name, cmd, ...)
     skynet.send(addrs[name], "lua", cmd, ...)
 end
 
-M.rpc_call = function(name, cmd, ...)
+M.call = function(name, cmd, ...)
     return skynet.call(addrs[name], "lua", cmd, ...)
 end
 
@@ -29,12 +29,12 @@ local idx_addr = function(name, id)
     end
 end
 
-M.rpc_send_id = function(name, cmd, id, ...)
+M.send_id = function(name, cmd, id, ...)
     local addr = idx_addr(name, id)
     skynet.send(addr, "lua", cmd, id, ...)
 end
 
-M.rpc_call_id = function(name, cmd, id, ...)
+M.call_id = function(name, cmd, id, ...)
     local addr = idx_addr(name, id)
     return skynet.call(addr, "lua", cmd, id, ...)
 end

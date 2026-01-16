@@ -1,10 +1,10 @@
-local mgrs = require "server.game.player.mgr.mgrs"
+local mgrs = require "server.game.player.mgrs"
 local cfg = require "common.func.cfg"
 
 local M = {}
 
 M.cfg = function()
-    local item = cfg.load_cfg("item")
+    local item = cfg.get("item")
 end
 
 M.init = function(player)
