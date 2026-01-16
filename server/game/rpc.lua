@@ -11,6 +11,10 @@ cmds.service_addrs = function(addrs_, service_num_)
     service_num = service_num_
 end
 
+M.get_addrs = function()
+    return addrs
+end
+
 M.send = function(name, cmd, ...)
     skynet.send(addrs[name], "lua", cmd, ...)
 end

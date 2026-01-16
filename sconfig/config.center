@@ -1,12 +1,9 @@
-debug_console_port = 10010
-cluster_port = 10011
-gate_port = 10012
-server_name = "game"
-server_id = 1
-server_mark = server_name .. server_id
-local_server = 1
+cluster_port = 10020
+gate_port = 10021
+server_name = "center"
+server_mark = server_name
 
-thread = 5
+thread = 1
 harbor = 0
 start = "server/main"	-- main script
 luaservice = "skynet/service/?.lua;?.lua"

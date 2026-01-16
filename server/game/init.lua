@@ -1,12 +1,14 @@
-local skynet = require "skynet"
+local require = require
 local pairs = pairs
 local ipairs = ipairs
+local skynet = require "skynet"
+require "common.func.tool"
 
 skynet.start(function()
     local service_num = {
         player = 5,
         watchdog = 1,
-        mgr = 1
+        cluster = 1
     }
     local addrs = {}
 
@@ -20,10 +22,10 @@ skynet.start(function()
             end
         end
     end
-
     for name, addr in pairs(addrs) do
         skynet.send(addr, "lua", "service_addrs", addrs, service_num)
     end
 
+    -- print("rpc addrs", dump(addrs))
     skynet.exit()
 end)
