@@ -12,7 +12,7 @@ local acc_gameserver = {}
 cmds.acc_gameserver = function(acc, server)
     local bserver = acc_gameserver[acc]
     if bserver then
-        skynet.send(cluster_addr, "lua", "kick_player", server, acc)
+        skynet.send(cluster_addr, "lua", "kick_acc", server, acc)
     end
     acc_gameserver[acc] = acc_gameserver
 end

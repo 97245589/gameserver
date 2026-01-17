@@ -17,12 +17,12 @@ cmds.acc_key = function(server, acc, key)
     return info.host
 end
 
-cmds.kick_player = function(server, acc)
+cmds.kick_acc = function(server, acc)
     local info = gameserver_info[server]
     if not info then
         return
     end
-    cluster.send(server, info.watchdog, "kick_player", acc)
+    cluster.send(server, info.watchdog, "kick_acc", acc)
 end
 
 local cluster_diff_func = function(server_host)

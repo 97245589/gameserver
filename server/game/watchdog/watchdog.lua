@@ -29,7 +29,7 @@ cmds.acc_key = function(acc, key)
     acc_key[acc] = key
 end
 
-cmds.kick_player = function(acc)
+cmds.kick_acc = function(acc)
     local fd = acc_fd[acc]
     if fd then
         close_conn(fd)
