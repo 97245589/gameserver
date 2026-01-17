@@ -2,14 +2,13 @@ local require = require
 local skynet = require "skynet"
 local start = require "common.service.start"
 local fip = require "common.func.ip"
-local rpc = require "server.game.rpc"
 local cmds = require "common.service.cmds"
 
 local watchdog
 local game_host
 
 start(function()
-    require "server.game.rpc"
+    local rpc = require "server.game.rpc"
     local lserver = skynet.getenv("local_server")
     if lserver then
         return
