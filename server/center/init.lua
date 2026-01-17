@@ -24,7 +24,7 @@ start(function()
             skynet.sleep(100)
             local nowtm = os.time()
             for server, tm in pairs(server_hearbeat) do
-                if nowtm > tm + 600 then
+                if nowtm > tm + 6 then
                     server_host[server] = nil
                     server_hearbeat[server] = nil
                 end

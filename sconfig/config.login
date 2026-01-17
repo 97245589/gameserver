@@ -1,8 +1,9 @@
-cluster_port = 10020
-server_name = "center"
+cluster_port = 10030
+gate_port = 10031
+server_name = "login"
 server_mark = server_name
 
-thread = 1
+thread = 3
 harbor = 0
 start = "server/main"	-- main script
 luaservice = "skynet/service/?.lua;?.lua"

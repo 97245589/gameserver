@@ -29,6 +29,13 @@ cmds.acc_key = function(acc, key)
     acc_key[acc] = key
 end
 
+cmds.kick_player = function(acc)
+    local fd = acc_fd[acc]
+    if fd then
+        close_conn(fd)
+    end
+end
+
 cmds.get_key = function(acc)
     return acc_key[acc]
 end

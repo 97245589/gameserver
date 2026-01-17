@@ -80,8 +80,7 @@ else
     end
 
     M.data = function(fd, msg, acc)
-        local idx = fd % childnum + 1
-        local addr = addrs[idx]
+        local addr = addrs[fd % childnum + 1]
         skynet.send(addr, "lua", fd, msg, acc)
     end
 
