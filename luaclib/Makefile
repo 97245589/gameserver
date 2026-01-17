@@ -5,7 +5,7 @@ COMMON_FLAGS := -O2 -fPIC -shared -I$(LUA_DIR) $(3RDFLAG) -std=c++17 -lzstd
 
 all : lgame.so
 
-GAME_SRCS := $(shell find ./ -name "*.cc")
+GAME_SRCS := $(shell find ./game -name "*.cc")
 lgame.so : $(GAME_SRCS)
 	g++ -o $@ $^ $(COMMON_FLAGS)
 
