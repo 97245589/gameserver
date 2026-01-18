@@ -5,9 +5,7 @@ extern "C" {
 #include <cstdint>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-#include <iostream>
 #include <unordered_map>
-#include <sstream>
 #include <string>
 
 struct Rankele {
@@ -32,17 +30,6 @@ struct Rank {
   ordered_set<Rankele> ranks_;
   std::unordered_map<std::string, ordered_set<Rankele>::iterator> id_it_;
   int32_t max_;
-
-  void dump() {
-    std::ostringstream oss;
-    oss << "rankdump:" << max_ << " " << ranks_.size() << " " << id_it_.size();
-    oss << std::endl;
-    for (auto &ele : ranks_) {
-      oss << ele.id_ << " " << ele.score_ << " " << ele.tm_;
-      oss << std::endl;
-    }
-    std::cout << oss.str() << std::endl;
-  }
 
   void add(const Rankele &ele) {
     if (auto it = id_it_.find(ele.id_); it != id_it_.end()) {
