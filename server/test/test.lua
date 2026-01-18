@@ -25,11 +25,12 @@ local leveldb = function()
     print(#str)
 
     local t = skynet.now()
-    for i = 1, 1000 do
+    for i = 1, 3000 do
         db:hmset("test" .. i, "info", str)
-        db:compact()
     end
     print(skynet.now() - t)
+    skynet.sleep(1)
+    db:compact()
 end
 
 local cfg = function()
@@ -48,5 +49,4 @@ local ip = function()
 end
 
 skynet.start(function()
-    leveldb()
 end)
