@@ -44,7 +44,7 @@ local save_kick = function(tm)
     local i = 0
     for playerid in pairs(playerids) do
         local player = players[playerid]
-        -- redis.send("hmset", "pl:"..playerid, "info", zstd.code(player))
+        -- redis.send("hmset", "pl:"..playerid, "info", zstd.encode(player))
         if tm > player.gettm + 60 then
             players[playerid] = nil
             M.kick_player(playerid)

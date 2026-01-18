@@ -1,3 +1,5 @@
+local type = type
+local require = require
 local skynet = require "skynet"
 local cmds = require "common.service.cmds"
 local crc16 = require "skynet.db.redis.crc16"
@@ -28,7 +30,10 @@ local idx_addr = function(name, id)
     if num == 1 then
         return addrs[name]
     else
-        local idx = crc16(id) % num + 1
+        if type(id) == "string" then
+            id = crc16(id)
+        end
+        local idx = id % num + 1
         return addrs[name .. idx]
     end
 end

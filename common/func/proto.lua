@@ -1,6 +1,6 @@
 local sproto = require "sproto"
 
-local file = io.open("config/game.sproto", "r")
+local file = io.open("config/game.sproto")
 local str = file:read("*a")
 file:close()
 local sp = sproto.parse(str)

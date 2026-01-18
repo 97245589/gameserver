@@ -36,7 +36,7 @@ if mode == "child" then
             if not playerid then
                 return
             end
-            skynet.call(watchdog, "lua", "choose_player", fd, acc, playerid)
+            skynet.send(watchdog, "lua", "choose_player", fd, acc, playerid)
             return {
                 code = 0
             }

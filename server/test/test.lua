@@ -8,13 +8,18 @@ end
 
 local zstd = function()
     local zstd = require "common.func.zstd"
+    local bin = zstd.encode({
+        hello = "world"
+    })
+    print(dump(zstd.decode(bin)))
 end
 
 local leveldb = function()
-    -- local db = require "common.func.leveldb"
-    -- db.call("hmset", "test", 1, 10, 2, 20)
-    -- print(dump(db.call("hgetall", "test")))
+    local db = require "common.func.leveldb"
+    db.call("hmset", "test", 1, 10, 2, 20)
+    print(dump(db.call("hgetall", "test")))
 
+    --[[
     local ldb = require "lgame.leveldb"
     local db = ldb.create("db/test")
 
@@ -31,6 +36,7 @@ local leveldb = function()
     print(skynet.now() - t)
     skynet.sleep(1)
     db:compact()
+    ]]
 end
 
 local cfg = function()
