@@ -10,6 +10,28 @@ local zstd = function()
     local zstd = require "common.func.zstd"
 end
 
+local leveldb = function()
+    -- local db = require "common.func.leveldb"
+    -- db.call("hmset", "test", 1, 10, 2, 20)
+    -- print(dump(db.call("hgetall", "test")))
+
+    local ldb = require "lgame.leveldb"
+    local db = ldb.create("db/test")
+
+    local str = ""
+    for i = 1, 10000 do
+        str = str .. "helloworld"
+    end
+    print(#str)
+
+    local t = skynet.now()
+    for i = 1, 1000 do
+        db:hmset("test" .. i, "info", str)
+        db:compact()
+    end
+    print(skynet.now() - t)
+end
+
 local cfg = function()
     local cfg = require "common.func.cfg"
     while true do
@@ -26,5 +48,5 @@ local ip = function()
 end
 
 skynet.start(function()
-    ip()
+    leveldb()
 end)

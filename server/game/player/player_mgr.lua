@@ -4,7 +4,6 @@ local pairs = pairs
 local table = table
 local next = next
 local skynet = require "skynet"
-local redis = require "common.func.redis"
 local mgrs = require "server.game.player.mgrs"
 local zstd = require "common.func.zstd"
 
@@ -14,7 +13,7 @@ local players = {}
 M.players = players
 
 local get_player_from_db = function(playerid)
-    -- local bin = redis.call("hget", "pl:" .. playerid, "info")
+    -- local bin = db.call("hmget", "pl:" .. playerid, "info")
     if players[playerid] then
         return players[playerid]
     end
@@ -45,7 +44,7 @@ local save_kick = function(tm)
     local i = 0
     for playerid in pairs(playerids) do
         local player = players[playerid]
-        -- redis.send("hset", "pl:"..playerid, "info", zstd.code(player))
+        -- redis.send("hmset", "pl:"..playerid, "info", zstd.code(player))
         if tm > player.gettm + 60 then
             players[playerid] = nil
             M.kick_player(playerid)

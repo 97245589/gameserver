@@ -1,5 +1,5 @@
 server_name = "test"
-server_id = 1
+server_mark = server_name
 
 thread = 2
 harbor = 0
