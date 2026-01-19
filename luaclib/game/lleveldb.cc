@@ -32,7 +32,7 @@ struct Lleveldb {
   static int compact(lua_State* L);
 
   static void search_key(
-      leveldb::DB*& db, string str,
+      leveldb::DB*& db, const string& str,
       function<void(const string&, const string&, const string&)> func);
 
   const static char split_ = 0xff;
@@ -62,7 +62,7 @@ int Lleveldb::hdel(lua_State* L) {
 }
 
 void Lleveldb::search_key(
-    leveldb::DB*& db, string str,
+    leveldb::DB*& db, const string& str,
     function<void(const string&, const string&, const string&)> func) {
   string start = str + split_;
   string end = start + char(0xff);
