@@ -1,6 +1,4 @@
 local require = require
-local print = print
-local dump = dump
 require "common.func.tool"
 local skynet = require "skynet"
 
