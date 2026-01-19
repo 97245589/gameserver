@@ -1,4 +1,6 @@
 local require = require
+local print = print
+local dump = dump
 require "common.func.tool"
 local skynet = require "skynet"
 
@@ -16,8 +18,13 @@ end
 
 local leveldb = function()
     local db = require "common.func.leveldb"
-    db.call("hmset", "test", 1, 10, 2, 20)
+    db.call("hmset", "test", 1, 10, 2, 20, 3, 30)
     print(dump(db.call("hgetall", "test")))
+    print("keys", dump(db.call("keys", "*")))
+    db.call("hdel", "test", 2)
+    print(dump(db.call("hgetall", "test")))
+    db.call("del", "test")
+    print(dump(db.call("keys", "*")))
 
     --[[
     local ldb = require "lgame.leveldb"

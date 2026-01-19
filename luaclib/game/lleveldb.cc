@@ -53,8 +53,8 @@ int Lleveldb::hdel(lua_State* L) {
   const char* pk = luaL_checklstring(L, 2, &lk);
   size_t lhk;
   const char* phk = luaL_checklstring(L, 3, &lhk);
-  string key{pk, lk};
-  string hkey{phk, lhk};
+  string key(pk, lk);
+  string hkey(phk, lhk);
   key = key + split_ + hkey;
 
   db->Delete(leveldb::WriteOptions(), key);
@@ -93,7 +93,7 @@ int Lleveldb::keys(lua_State* L) {
 
   size_t len;
   const char* ppat = luaL_checklstring(L, 2, &len);
-  string patt{ppat, len};
+  string patt(ppat, len);
 
   vector<string> keys;
   leveldb::Iterator* it = db->NewIterator(leveldb::ReadOptions());
@@ -125,7 +125,7 @@ int Lleveldb::del(lua_State* L) {
 
   size_t len;
   const char* ps = luaL_checklstring(L, 2, &len);
-  string str = {ps, len};
+  string str(ps, len);
 
   leveldb::WriteBatch batch;
 
@@ -144,7 +144,7 @@ int Lleveldb::hgetall(lua_State* L) {
 
   size_t len;
   const char* ps = luaL_checklstring(L, 2, &len);
-  string str = {ps, len};
+  string str(ps, len);
 
   lua_createtable(L, 0, 0);
   int i = 0;
@@ -169,17 +169,17 @@ int Lleveldb::hmset(lua_State* L) {
   }
   size_t lk;
   const char* pk = luaL_checklstring(L, 2, &lk);
-  string key{pk, lk};
+  string key(pk, lk);
 
   leveldb::WriteBatch batch;
   for (int i = 3; i < pnum; i += 2) {
     size_t lhk;
     const char* phk = luaL_checklstring(L, i, &lhk);
-    string hkey{phk, lhk};
+    string hkey(phk, lhk);
     string rkey = key + split_ + hkey;
     size_t lv;
     const char* pv = luaL_checklstring(L, i + 1, &lv);
-    string val{pv, lv};
+    string val(pv, lv);
     batch.Put(rkey, val);
   }
   db->Write(leveldb::WriteOptions(), &batch);
@@ -197,12 +197,12 @@ int Lleveldb::hmget(lua_State* L) {
 
   size_t lk;
   const char* pk = luaL_checklstring(L, 2, &lk);
-  string key{pk, lk};
+  string key(pk, lk);
   lua_createtable(L, pnum - 2, 0);
   for (int i = 3; i <= pnum; ++i) {
     size_t lhk;
     const char* phk = luaL_checklstring(L, i, &lhk);
-    string hkey{phk, lhk};
+    string hkey(phk, lhk);
     string rkey = key + split_ + hkey;
     string val;
     leveldb::Status s = db->Get(leveldb::ReadOptions(), rkey, &val);
