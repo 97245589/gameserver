@@ -8,6 +8,9 @@ local decompress = zstd.decompress
 
 local M = {}
 
+M.compress = compress
+M.decompress = decompress
+
 M.encode = function(val)
     return compress(pack(val))
 end
