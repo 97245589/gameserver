@@ -5,10 +5,6 @@ local dump = dump
 local skynet = require "skynet"
 require "skynet.manager"
 
-local rank = function()
-    local lrank = require "lgame.rank"
-end
-
 local zstd = function()
     local zstd = require "common.func.zstd"
     local bin = zstd.encode({
