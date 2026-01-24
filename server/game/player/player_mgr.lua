@@ -62,9 +62,6 @@ skynet.fork(function()
         skynet.sleep(100)
         local tm = os.time()
         save_kick(tm)
-        for playerid, player in pairs(players) do
-            mgrs.all_tick(player, tm)
-        end
     end
 end)
 
