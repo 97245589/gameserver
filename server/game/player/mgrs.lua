@@ -6,6 +6,7 @@ local M = {}
 
 local inits = {}
 local cfgs = {}
+local ticks = {}
 
 M.reload_cfg = function(cfgname)
     cfg.reload(cfgname, function(mnames)
@@ -16,12 +17,18 @@ M.reload_cfg = function(cfgname)
 end
 
 M.add_mgr = function(mgr, name, init_level)
-    init_level = init_level or 1
-    inits[init_level] = inits[init_level] or {}
-    inits[init_level][name] = mgr.init
+    if mgr.init then
+        init_level = init_level or 1
+        inits[init_level] = inits[init_level] or {}
+        inits[init_level][name] = mgr.init
+    end
 
-    cfgs[name] = mgr.cfg
-    cfg.cfg_func(name, mgr.cfg)
+    ticks[name] = mgr.tick
+
+    if mgr.cfg then
+        cfgs[name] = mgr.cfg
+        cfg.cfg_func(name, mgr.cfg)
+    end
 end
 
 M.all_init = function(player)
@@ -29,6 +36,12 @@ M.all_init = function(player)
         for name, func in pairs(inits) do
             func(player)
         end
+    end
+end
+
+M.all_tick = function(player, tm)
+    for name, func in pairs(ticks) do
+        func(player, tm)
     end
 end
 

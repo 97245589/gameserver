@@ -37,22 +37,20 @@ local playerids = {}
 local save_kick = function(tm)
     if not next(playerids) then
         for playerid in pairs(players) do
-            playerids[playerid] = 1
+            table.insert(playerid)
         end
     end
 
-    local i = 0
-    for playerid in pairs(playerids) do
+    for i = 1, 3 do
+        if not next(playerids) then
+            return
+        end
+        local playerid = table.remove(playerids)
         local player = players[playerid]
-        -- redis.send("hmset", "pl:"..playerid, "info", zstd.encode(player))
+        -- db.send("hmset", "pl:"..playerid, "info", zstd.encode(player))
         if tm > player.gettm + 60 then
             players[playerid] = nil
             M.kick_player(playerid)
-        end
-        playerids[playerid] = nil
-        i = i + 1
-        if i >= 3 then
-            break
         end
     end
 end
@@ -62,6 +60,9 @@ skynet.fork(function()
         skynet.sleep(100)
         local tm = os.time()
         save_kick(tm)
+        for playerid, player in pairs(players) do
+            mgrs.all_tick(player, tm)
+        end
     end
 end)
 
