@@ -22,25 +22,6 @@ local leveldb = function()
     print(dump(db.call("hgetall", "test")))
     db.call("del", "test")
     print(dump(db.call("keys", "*")))
-
-    --[[
-    local ldb = require "lgame.leveldb"
-    local db = ldb.create("db/test")
-
-    local str = ""
-    for i = 1, 10000 do
-        str = str .. "helloworld"
-    end
-    print(#str)
-
-    local t = skynet.now()
-    for i = 1, 3000 do
-        db:hmset("test" .. i, "info", str)
-    end
-    print(skynet.now() - t)
-    skynet.sleep(1)
-    db:compact()
-    ]]
 end
 
 local cfg = function()
