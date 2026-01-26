@@ -67,7 +67,6 @@ if mode == "child" then
         end)
     end)
 else
-    local watchdog = skynet.self()
     local childnum = 3
     local addrs = {}
 
