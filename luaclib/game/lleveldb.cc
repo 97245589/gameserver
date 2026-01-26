@@ -112,7 +112,7 @@ int Lleveldb::keys(lua_State* L) {
 
   lua_createtable(L, keys.size(), 0);
   int i = 0;
-  for (auto key : keys) {
+  for (string& key : keys) {
     lua_pushlstring(L, key.c_str(), key.size());
     lua_rawseti(L, -2, ++i);
   }
