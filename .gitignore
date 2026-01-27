@@ -1,8 +1,4 @@
 *.o
 *.so
 *.vscode
-run
-3rd
 skynet
-db
-config
