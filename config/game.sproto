@@ -33,7 +33,7 @@ choose_gameserver 20002 {
     }
 }
 
-verify 100 {
+verify 1 {
     request {
         acc 0 : string
         verify 1 : *string
@@ -43,7 +43,7 @@ verify 100 {
     }
 }
 
-select_player 200 {
+select_player 2 {
     request {
         playerid 1 : string
     }
