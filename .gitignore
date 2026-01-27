@@ -3,6 +3,5 @@
 *.vscode
 skynet
 3rd
-config
 run
 db
