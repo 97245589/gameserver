@@ -2,18 +2,18 @@ local require = require
 local skynet = require "skynet"
 local socket = require "skynet.socket"
 local proto = require "common.func.proto"
-local req = require "server.game.player.req"
 local rpc = require "server.game.rpc"
 local player_mgr = require "server.game.player.player_mgr"
 
 local spack = string.pack
-
-local M = {}
 local fd_playerid = {}
 local playerid_fd = {}
-
 local proto_host = proto.host
 local proto_push = proto.push
+
+local M = {}
+local req = {}
+M.req = req
 
 local close_conn = function(fd)
     local playerid = fd_playerid[fd]
@@ -23,15 +23,42 @@ local close_conn = function(fd)
     fd_playerid[fd] = nil
     rpc.send("watchdog", "close_conn", fd)
 end
-player_mgr.kick_player = function(playerid)
+
+local send_package = function(fd, pack)
+    socket.write(fd, spack(">s2", pack))
+end
+
+M.kick_player = function(playerid)
     local fd = playerid_fd[playerid]
     if fd then
         close_conn(fd)
     end
+    playerid_fd[playerid] = nil
 end
 
-local send_package = function(fd, pack)
-    socket.write(fd, spack(">s2", pack))
+M.push = function(playerid, name, args, idx)
+    local fd = playerid_fd[playerid]
+    if not fd then
+        return
+    end
+    local str = proto_push(name, args, idx or 0)
+    send_package(fd, str)
+end
+
+M.player_enter = function(playerid, fd, acc, gate)
+    local bfd = playerid_fd[playerid]
+    if bfd then
+        close_conn(bfd)
+        return
+    end
+
+    skynet.send(gate, "lua", "forward", fd)
+    fd_playerid[fd] = playerid
+    playerid_fd[playerid] = fd
+    local player = player_mgr.get_player(playerid)
+    if not player then
+        close_conn(fd)
+    end
 end
 
 local request = function(fd, cmd, args, res)
@@ -48,29 +75,6 @@ local request = function(fd, cmd, args, res)
     }
     return res(ret)
 end
-
-M.push = function(playerid, name, args)
-    local fd = playerid_fd[playerid]
-    if not fd then
-        return
-    end
-    local str = proto_push(name, args, 0)
-    send_package(fd, str)
-end
-
-M.player_enter = function(playerid, fd, acc, gate)
-    local bfd = playerid_fd[playerid]
-    if bfd then
-        close_conn(bfd)
-        return
-    end
-
-    skynet.send(gate, "lua", "forward", fd)
-    fd_playerid[fd] = playerid
-    playerid_fd[playerid] = fd
-    local player = player_mgr.get_player(playerid)
-end
-
 skynet.register_protocol({
     name = "client",
     id = skynet.PTYPE_CLIENT,

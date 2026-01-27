@@ -6,7 +6,7 @@ require "common.func.tool"
 
 skynet.start(function()
     local service_num = {
-        player = 5,
+        player = 6,
         watchdog = 1,
         cluster = 1
     }
