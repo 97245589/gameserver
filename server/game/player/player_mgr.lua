@@ -22,11 +22,8 @@ local player_db = function(playerid)
     return player
 end
 
-M.get_player = function(playerid, load)
-    local player = players[playerid]
-    if not player and load then
-        player = player_db(playerid)
-    end
+M.get_player = function(playerid)
+    local player = players[playerid] or player_db(playerid)
     if not player then
         return
     end

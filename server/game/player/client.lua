@@ -68,7 +68,7 @@ local request = function(fd, cmd, args, res)
         return
     end
 
-    local player = player_mgr.get_player(playerid)
+    local player = player_mgr.players[playerid]
     local func = req[cmd]
     local ret = func(player, args) or {
         code = -1
