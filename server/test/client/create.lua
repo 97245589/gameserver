@@ -1,7 +1,5 @@
-require "common.func.tool"
 local require = require
-local print = print
-local dump = dump
+local io = io
 local string = string
 local skynet = require "skynet"
 local socket = require "skynet.socket"
@@ -19,8 +17,8 @@ local load_proto = function()
     return host, req
 end
 local host, req_pack = load_proto()
-local session = 0
 
+local session = 0
 local request = function(fd, name, args)
     session = session + 1
     local str = req_pack(name, args, session)
@@ -35,31 +33,29 @@ local recv_data = function(fd)
     return host:dispatch(msg)
 end
 
-local print_proto = function(tp, sid, tb)
-    print(tp, sid, dump(tb))
-end
+local login = function(args)
+    local login_server = function()
+    end
 
-local conn_gameserver = function()
-    local acc = "acc"
-    local playerid = "100"
-    local fd = socket.open("127.0.0.1", 10012)
+    local acc = args.acc or "acc"
+    local playerid = args.playerid or "100"
+    local ipport = args.host or "127.0.0.1:10012"
+
+    local fd = socket.open(ipport)
     request(fd, "verify", {
         acc = acc
     })
-    print_proto(recv_data(fd))
+    recv_data(fd)
     request(fd, "select_player", {
         playerid = playerid
     })
-    print_proto(recv_data(fd))
-
-    request(fd, "get_data", {})
-    skynet.fork(function()
-        while true do
-            print_proto(recv_data(fd))
-        end
-    end)
+    recv_data(fd)
+    skynet.sleep(2)
+    return fd
 end
 
-skynet.start(function()
-    conn_gameserver()
-end)
+return {
+    request = request,
+    recv_data = recv_data,
+    login = login,
+}

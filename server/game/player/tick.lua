@@ -13,7 +13,7 @@ local playerids = {}
 local save_kick = function(tm)
     if not next(playerids) then
         for playerid in pairs(players) do
-            table.insert(playerid)
+            table.insert(playerids, playerid)
         end
     end
 

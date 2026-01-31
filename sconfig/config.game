@@ -4,7 +4,7 @@ gate_port = 10012
 server_name = "game"
 server_id = 1
 server_mark = server_name .. server_id
-local_server = 1
+gametype = 1 --1local 2private 3public
 
 thread = 5
 harbor = 0

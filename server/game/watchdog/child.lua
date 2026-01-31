@@ -1,4 +1,4 @@
-local mode, watchdog = ...
+local mode, watchdog, gametype = ...
 local require = require
 local skynet = require "skynet"
 
@@ -7,7 +7,6 @@ if mode == "child" then
     local socket = require "skynet.socket"
     local proto = require "common.func.proto"
     local host = proto()
-    local islocal = skynet.getenv("local_server")
 
     local close = function(fd)
         skynet.send(watchdog, "lua", "close_conn", fd)
@@ -16,7 +15,7 @@ if mode == "child" then
     local handle = {
         verify = function(args, _, fd)
             local acc = args.acc
-            if not islocal then
+            if gametype == 1 then
                 local key = skynet.call(watchdog, "lua", "get_key", acc)
                 if not key then
                     return
@@ -67,14 +66,17 @@ if mode == "child" then
         end)
     end)
 else
+    local tonumber = tonumber
+    local table = table
     local childnum = 3
     local addrs = {}
 
     local M = {}
 
-    local watchdog = skynet.self()
+    watchdog = skynet.self()
+    local gametype = tonumber(skynet.getenv("gametype"))
     for i = 1, childnum do
-        local addr = skynet.newservice("server/game/watchdog/child", "child", watchdog)
+        local addr = skynet.newservice("server/game/watchdog/child", "child", watchdog, gametype)
         table.insert(addrs, addr)
     end
 

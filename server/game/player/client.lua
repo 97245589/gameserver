@@ -50,7 +50,6 @@ M.player_enter = function(playerid, fd, acc, gate)
     local bfd = playerid_fd[playerid]
     if bfd then
         close_conn(bfd)
-        return
     end
 
     skynet.send(gate, "lua", "forward", fd)
@@ -70,8 +69,12 @@ local handle_req = function(fd, cmd, args, res)
         close_conn(fd)
         return
     end
-
     local player = player_mgr.players[playerid]
+    if not player then
+        close_conn(fd)
+        return
+    end
+
     local func = req[cmd]
     local ret = func(player, args) or {
         code = -1

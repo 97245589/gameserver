@@ -22,6 +22,7 @@ local close_conn = function(fd)
         acc_fd[acc] = nil
         fd_acc[fd] = nil
     end
+    print("closeconn", fd, acc)
     skynet.send(gate, "lua", "kick", fd)
 end
 
@@ -41,7 +42,7 @@ cmds.get_key = function(acc)
 end
 
 cmds.fd_acc = function(fd, acc)
-    -- print("rpc fdacc", fd, acc)
+    -- print("verify success", fd, acc)
     local bfd = acc_fd[acc]
     if bfd then
         fd_acc[bfd] = nil
@@ -52,7 +53,7 @@ cmds.fd_acc = function(fd, acc)
 end
 
 cmds.select_player = function(fd, acc, playerid)
-    print("chooseplayer", fd, acc, playerid)
+    -- print("select_player", fd, acc, playerid)
     rpc.send_id("player", "player_enter", playerid, fd, acc, gate)
 end
 
