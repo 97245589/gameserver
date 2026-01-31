@@ -41,6 +41,7 @@ cmds.get_key = function(acc)
 end
 
 cmds.fd_acc = function(fd, acc)
+    -- print("rpc fdacc", fd, acc)
     local bfd = acc_fd[acc]
     if bfd then
         fd_acc[bfd] = nil
@@ -50,7 +51,8 @@ cmds.fd_acc = function(fd, acc)
     fd_acc[fd] = acc
 end
 
-cmds.choose_player = function(fd, acc, playerid)
+cmds.select_player = function(fd, acc, playerid)
+    print("chooseplayer", fd, acc, playerid)
     rpc.send_id("player", "player_enter", playerid, fd, acc, gate)
 end
 

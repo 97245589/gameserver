@@ -48,4 +48,15 @@ M.call_id = function(name, cmd, id, ...)
     return skynet.call(addr, "lua", cmd, id, ...)
 end
 
+M.send_all = function(name, cmd, ...)
+    local num = service_num[name]
+    if num == 1 then
+        skynet.send(addrs[name], "lua", cmd, ...)
+    else
+        for i = 1, num do
+            skynet.send(addrs[name .. i], "lua", cmd, ...)
+        end
+    end
+end
+
 return M

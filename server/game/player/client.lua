@@ -1,4 +1,5 @@
 local require = require
+local print = print
 local skynet = require "skynet"
 local socket = require "skynet.socket"
 local proto = require "common.func.proto"
@@ -8,8 +9,7 @@ local player_mgr = require "server.game.player.player_mgr"
 local spack = string.pack
 local fd_playerid = {}
 local playerid_fd = {}
-local proto_host = proto.host
-local proto_push = proto.push
+local proto_host, proto_push = proto()
 
 local M = {}
 local req = {}
@@ -36,16 +36,17 @@ M.kick_player = function(playerid)
     playerid_fd[playerid] = nil
 end
 
-M.push = function(playerid, name, args, idx)
+M.push = function(playerid, name, args)
     local fd = playerid_fd[playerid]
     if not fd then
         return
     end
-    local str = proto_push(name, args, idx or 0)
+    local str = proto_push(name, args, 0)
     send_package(fd, str)
 end
 
 M.player_enter = function(playerid, fd, acc, gate)
+    print("player_enter", playerid, fd, acc, gate)
     local bfd = playerid_fd[playerid]
     if bfd then
         close_conn(bfd)
@@ -59,9 +60,11 @@ M.player_enter = function(playerid, fd, acc, gate)
     if not player then
         close_conn(fd)
     end
+    player.id = playerid
+    player.acc = acc
 end
 
-local request = function(fd, cmd, args, res)
+local handle_req = function(fd, cmd, args, res)
     local playerid = fd_playerid[fd]
     if not playerid then
         close_conn(fd)
@@ -82,7 +85,8 @@ skynet.register_protocol({
         return proto_host:dispatch(msg, sz)
     end,
     dispatch = function(fd, _, type, cmd, ...)
-        send_package(fd, request(fd, cmd, ...))
+        skynet.ignoreret()
+        send_package(fd, handle_req(fd, cmd, ...))
     end
 })
 

@@ -15,7 +15,7 @@ local player_db = function(playerid)
     if players[playerid] then
         return players[playerid]
     end
-    -- local player = zstd.decode(bin) 
+    -- local player = zstd.decode(bin)
     local player = {}
     mgrs.all_init(player)
     players[playerid] = player
@@ -27,7 +27,7 @@ M.get_player = function(playerid)
     if not player then
         return
     end
-    player.playerid = playerid
+    player.id = playerid
     player.gettm = os.time()
     return player
 end

@@ -6,7 +6,8 @@ if mode == "child" then
     local string = string
     local socket = require "skynet.socket"
     local proto = require "common.func.proto"
-    local host = proto.host
+    local host = proto()
+    local islocal = skynet.getenv("local_server")
 
     local close = function(fd)
         skynet.send(watchdog, "lua", "close_conn", fd)
@@ -14,21 +15,20 @@ if mode == "child" then
 
     local handle = {
         verify = function(args, _, fd)
-            local verify = args.verify
-            local acc = verify[1]
-            if not acc then
-                return
+            local acc = args.acc
+            if not islocal then
+                local key = skynet.call(watchdog, "lua", "get_key", acc)
+                if not key then
+                    return
+                end
             end
-            local key = skynet.call(watchdog, "lua", "get_key", acc)
-            if not key then
-                return
-            end
+
             skynet.send(watchdog, "lua", "fd_acc", fd, acc)
             return {
                 code = 0
             }
         end,
-        choose_player = function(args, acc, fd)
+        select_player = function(args, acc, fd)
             if not acc then
                 return
             end
@@ -36,7 +36,7 @@ if mode == "child" then
             if not playerid then
                 return
             end
-            skynet.send(watchdog, "lua", "choose_player", fd, acc, playerid)
+            skynet.send(watchdog, "lua", "select_player", fd, acc, playerid)
             return {
                 code = 0
             }

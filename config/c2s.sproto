@@ -36,7 +36,6 @@ choose_gameserver 20002 {
 verify 1 {
     request {
         acc 0 : string
-        verify 1 : *string
     }
     response {
         code 0 : integer
@@ -47,6 +46,13 @@ select_player 2 {
     request {
         playerid 1 : string
     }
+    response {
+        code 0 : integer
+    }
+}
+
+get_data 3 {
+    request {}
     response {
         code 0 : integer
     }

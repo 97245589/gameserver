@@ -1,13 +1,13 @@
-local sproto = require "sproto"
+return function()
+    local sproto  = require "sproto"
 
-local file = io.open("config/game.sproto")
-local str = file:read("*a")
-file:close()
-local sp = sproto.parse(str)
-local host = sp:host("package")
-
-return {
-    sp = sp,
-    host = host,
-    push = host:attach(sp)
-}
+    local c2s_f   = io.open("config/c2s.sproto")
+    local s2c_f   = io.open("config/s2c.sproto")
+    local c2s_str = c2s_f:read("*a")
+    local s2c_str = s2c_f:read("*a")
+    c2s_f:close()
+    s2c_f:close()
+    local host = sproto.parse(c2s_str):host("package")
+    local req = host:attach(sproto.parse(s2c_str))
+    return host, req
+end

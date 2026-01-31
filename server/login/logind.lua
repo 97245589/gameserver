@@ -9,7 +9,7 @@ if mode == "child" then
     local proto = require "common.func.proto"
     local crypt = require "skynet.crypt"
 
-    local host = proto.host
+    local host = proto()
     local spack = string.pack
 
     local send_package = function(fd, pack)

@@ -3,6 +3,6 @@
     session 1 : integer
 }
 
-heartbeat 1 {
+pushtest 1 {
     request {}
 }

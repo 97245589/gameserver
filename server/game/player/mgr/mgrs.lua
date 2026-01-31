@@ -33,7 +33,7 @@ end
 
 M.all_init = function(player)
     for idx, funcs in ipairs(inits) do
-        for name, func in pairs(inits) do
+        for name, func in pairs(funcs) do
             func(player)
         end
     end
