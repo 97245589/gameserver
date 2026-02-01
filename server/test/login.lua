@@ -13,12 +13,7 @@ local request = client.request
 local conn = function(args)
     skynet.fork(function()
         local fd = login(args)
-        skynet.fork(function()
-            while true do
-                skynet.sleep(100)
-                request(fd, "get_data", {})
-            end
-        end)
+        request(fd, "get_data", {})
 
         skynet.fork(function()
             while true do

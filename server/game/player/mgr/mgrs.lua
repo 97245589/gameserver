@@ -1,6 +1,8 @@
-local cfg = require "common.func.cfg"
+local require = require
 local pairs = pairs
 local ipairs = ipairs
+local pcall = pcall
+local cfg = require "common.func.cfg"
 
 local M = {}
 

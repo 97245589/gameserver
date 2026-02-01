@@ -6,7 +6,7 @@ server_id = 1
 server_mark = server_name .. server_id
 gametype = 1 --1local 2private 3public
 
-thread = 5
+thread = 6
 harbor = 0
 start = "server/main"	-- main script
 luaservice = "skynet/service/?.lua;?.lua"

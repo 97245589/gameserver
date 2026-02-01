@@ -23,11 +23,11 @@ local save_kick = function(tm)
         end
         local playerid = table.remove(playerids)
         local player = players[playerid]
-        -- db.send("hmset", "pl:"..playerid, "info", zstd.encode(player))
-        if tm > player.gettm + 60 then
+        if tm > player.role.gettm + 10 then
             players[playerid] = nil
             client.kick_player(playerid)
         end
+        player_mgr.save_player(player)
     end
 end
 
@@ -37,7 +37,9 @@ skynet.fork(function()
         local tm = os.time()
         save_kick(tm)
         for playerid, player in pairs(players) do
-            mgrs.all_tick(player, tm)
+            if player.role.online then
+                mgrs.all_tick(player, tm)
+            end
         end
     end
 end)

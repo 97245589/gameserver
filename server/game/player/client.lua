@@ -60,8 +60,10 @@ M.player_enter = function(playerid, fd, acc, gate)
         close_conn(fd)
         return
     end
-    player.id = playerid
-    player.acc = acc
+    local prole = player.role
+    prole.online = 1
+    prole.playerid = playerid
+    prole.acc = acc
 end
 
 local handle_req = function(fd, cmd, args, res)
