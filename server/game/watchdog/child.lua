@@ -48,6 +48,9 @@ if mode == "child" then
             return
         end
         local func = handle[name]
+        if not func then
+            return
+        end
         local ret = func(args, acc, fd)
         if not ret then
             return
@@ -68,7 +71,7 @@ if mode == "child" then
 else
     local tonumber = tonumber
     local table = table
-    local childnum = 3
+    local childnum = 2
     local addrs = {}
 
     local M = {}
