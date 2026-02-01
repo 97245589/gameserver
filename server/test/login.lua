@@ -11,17 +11,25 @@ local recv_data = client.recv_data
 local request = client.request
 
 local conn = function(args)
-    local fd = login(args)
-    request(fd, "get_data", {})
     skynet.fork(function()
-        while true do
-            print(fd, recv_data(fd))
-        end
+        local fd = login(args)
+        skynet.fork(function()
+            while true do
+                skynet.sleep(100)
+                request(fd, "get_data", {})
+            end
+        end)
+
+        skynet.fork(function()
+            while true do
+                print(fd, recv_data(fd))
+            end
+        end)
     end)
 end
 
 skynet.start(function()
-    for i = 1, 10 do
+    for i = 1, 1 do
         conn({
             acc = "acc" .. i,
             playerid = tostring(i),

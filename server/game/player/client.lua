@@ -46,7 +46,7 @@ M.push = function(playerid, name, args)
 end
 
 M.player_enter = function(playerid, fd, acc, gate)
-    print("player_enter", playerid, fd, acc, gate)
+    print("player_enter", playerid, fd, acc)
     local bfd = playerid_fd[playerid]
     if bfd then
         close_conn(bfd)
