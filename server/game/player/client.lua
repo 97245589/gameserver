@@ -58,6 +58,7 @@ M.player_enter = function(playerid, fd, acc, gate)
     local player = player_mgr.get_player(playerid)
     if not player then
         close_conn(fd)
+        return
     end
     player.id = playerid
     player.acc = acc
@@ -69,11 +70,7 @@ local handle_req = function(fd, cmd, args, res)
         close_conn(fd)
         return
     end
-    local player = player_mgr.players[playerid]
-    if not player then
-        close_conn(fd)
-        return
-    end
+    local player = player_mgr.get_player(playerid)
 
     local func = req[cmd]
     local ret = func(player, args) or {
