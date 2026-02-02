@@ -3,7 +3,7 @@
     session 1 : integer
 }
 
-exchange 20000 {
+exchange 30000 {
     request {
         cpub 0 : string
     }
@@ -13,7 +13,7 @@ exchange 20000 {
     }
 }
 
-login_verify 20001 {
+login_verify 30001 {
     request {
         verify 0: *string
     }
@@ -22,7 +22,7 @@ login_verify 20001 {
     }
 }
 
-choose_gameserver 20002 {
+choose_gameserver 30002 {
     request {
         acc 0 : string
         server 1 : string
