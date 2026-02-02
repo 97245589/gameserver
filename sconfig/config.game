@@ -1,3 +1,5 @@
+include "config.path"
+
 debug_console_port = 10010
 cluster_port = 10011
 gate_port = 10012
@@ -7,13 +9,5 @@ server_mark = server_name .. server_id
 gametype = 1 --1local 2private 3public
 
 thread = 6
-harbor = 0
-start = "server/main"	-- main script
-luaservice = "skynet/service/?.lua;?.lua"
-lualoader = "skynet/lualib/loader.lua"
-lua_path = "skynet/lualib/?.lua;?.lua"
-lua_cpath = "skynet/luaclib/?.so;luaclib/?.so"
-cpath = "skynet/cservice/?.so"
-
 --logger = "run/" .. server_mark .. ".log"
 --daemon = "run/" .. server_mark .. ".pid"

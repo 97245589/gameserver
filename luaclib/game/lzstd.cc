@@ -10,7 +10,7 @@ static int compress(lua_State* L) {
 
   int buff_len = ZSTD_compressBound(cont_len);
   void* pbuff = malloc(buff_len);
-  int len = ZSTD_compress(pbuff, buff_len, pcont, cont_len, 3);
+  int len = ZSTD_compress(pbuff, buff_len, pcont, cont_len, 1);
 
   lua_pushlstring(L, (const char*)pbuff, len);
   free(pbuff);

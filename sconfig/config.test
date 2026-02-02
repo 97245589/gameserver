@@ -1,12 +1,7 @@
+include "config.path"
+
 server_name = "test"
 server_mark = server_name
 test = "$TEST"
 
 thread = 2
-harbor = 0
-start = "server/main"
-luaservice = "skynet/service/?.lua;?.lua"
-lualoader = "skynet/lualib/loader.lua"
-lua_path = "skynet/lualib/?.lua;?.lua"
-lua_cpath = "skynet/luaclib/?.so;luaclib/?.so"
-cpath = "skynet/cservice/?.so"
