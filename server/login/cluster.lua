@@ -1,7 +1,6 @@
 local require = require
 local pairs = pairs
 local string = string
-local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local start = require "common.service.start"
 local cmds = require "common.service.cmds"

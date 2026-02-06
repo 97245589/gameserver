@@ -1,10 +1,7 @@
 local require = require
-local pairs = pairs
-local string = string
 local skynet = require "skynet"
 local cmds = require "common.service.cmds"
 local start = require "common.service.start"
-local cluster = require "skynet.cluster"
 
 local cluster_addr
 local acc_gameserver = {}

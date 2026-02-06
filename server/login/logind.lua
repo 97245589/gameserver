@@ -1,4 +1,4 @@
-local mode, login, cluster_addr = ...
+local mode, loginaddr, cluster_addr = ...
 local require = require
 require "common.func.tool"
 local skynet = require "skynet"
@@ -65,7 +65,7 @@ if mode == "child" then
         if not host then
             return
         end
-        skynet.send(login, "lua", "acc_gameserver", acc, server)
+        skynet.send(loginaddr, "lua", "acc_gameserver", acc, server)
         send_package(fd, res({
             code = 0,
             host = host
@@ -102,15 +102,15 @@ if mode == "child" then
             skynet.response()(false)
         end)
     end)
-
 else
     local table = table
     local addrs = {}
-    local childnum = 3
+    local childnum = 10
 
     local start = function(cluster_addr)
+        local lattr = skynet.self()
         for i = 1, childnum do
-            local addr = skynet.newservice("server/login/logind", "child", skynet.self(), cluster_addr)
+            local addr = skynet.newservice("server/login/logind", "child", lattr, cluster_addr)
             table.insert(addrs, addr)
         end
 
