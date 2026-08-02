@@ -1,3 +1,6 @@
 clib/**/*.so
 clib/**/*.o
 skynet
+*.pid
+run/db
+run/log
