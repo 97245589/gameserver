@@ -1,4 +1,5 @@
 local skynet = require "skynet"
+require "server.func.print"
 local toolf = require "server.func.tool"
 
 local tool = function()
@@ -15,7 +16,7 @@ local tool = function()
     local ntb = toolf.clone(tb)
     print(tb, ntb, dump(ntb))
 
-    print(dump(toolf.split("h e l 1 2 3")))
+    print(dump(toolf.split("h e/l/ /1//2", " /")))
 end
 
 skynet.start(function()

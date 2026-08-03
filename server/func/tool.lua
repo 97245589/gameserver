@@ -1,11 +1,9 @@
-local skynet = require "skynet"
 local ltool = require "lgame.tool"
-print = skynet.error
-dump = ltool.dump
 
 return {
     clone = ltool.clone,
     tblen = ltool.tblen,
+    crc16 = ltool.crc16,
     split = function(str, sp)
         sp = sp or " "
         if type(sp) == "number" then
