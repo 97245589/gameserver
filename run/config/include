@@ -3,5 +3,5 @@ start = "server/main"	-- main script
 luaservice = "skynet/service/?.lua;?.lua"
 lualoader = "skynet/lualib/loader.lua"
 lua_path = "skynet/lualib/?.lua;?.lua"
-lua_cpath = "skynet/luaclib/?.so;luaclib/?.so;3rd/?.so"
+lua_cpath = "skynet/luaclib/?.so;clib/?.so;3rd/?.so"
 cpath = "skynet/cservice/?.so"
