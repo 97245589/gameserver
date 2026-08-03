@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local cmds = require "server.func.cmds"
+local CMD = require "server.func.cmd"
 require "server.func.print"
 
 return function(func, name)
@@ -7,10 +7,11 @@ return function(func, name)
         if name then
             require "skynet.manager"
             skynet.register(name)
+            -- print("reg name", name)
         end
 
         skynet.dispatch("lua", function(_, _, cmd, ...)
-            local f = cmds[cmd]
+            local f = CMD[cmd]
             if f then
                 skynet.retpack(f(...))
             else
@@ -19,6 +20,6 @@ return function(func, name)
             end
         end)
 
-        func()
+        skynet.fork(func)
     end)
 end

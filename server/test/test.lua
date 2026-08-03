@@ -17,8 +17,20 @@ local tool = function()
     print(tb, ntb, dump(ntb))
 
     print(dump(toolf.split("h e/l/ /1//2", " /")))
+
+    local lcrc16 = require "skynet.db.redis.crc16"
+    local str = "qweasd123"
+    print(toolf.crc16(str), lcrc16(str))
+end
+
+local clib = function()
+    local rank = function()
+
+    end
+    rank()
 end
 
 skynet.start(function()
-    tool()
+    clib()
+    -- tool()
 end)
