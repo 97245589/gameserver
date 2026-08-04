@@ -5,12 +5,11 @@ skynet.start(function()
 
     local pathf = "server/game/%s/init"
     for name, num in pairs(service.service) do
+        local path = string.format("server/game/%s/init", name)
         if num <= 1 then
-            local path = string.format(pathf, name)
             skynet.newservice(path, name)
         else
             for i = 1, num do
-                local path = string.format(pathf, name)
                 skynet.newservice(path, name .. i)
             end
         end
