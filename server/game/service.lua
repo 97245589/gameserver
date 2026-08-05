@@ -4,7 +4,7 @@ local crc16 = require "server.func.tool".crc16
 local M = {}
 
 local service_num = {
-    player = 3,
+    character = 3,
     watchdog = 1
 }
 M.service = service_num

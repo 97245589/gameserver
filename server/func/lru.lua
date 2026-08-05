@@ -1,7 +1,7 @@
 local llru = require "lgame.lru"
 
 return function(num)
-    local lru = llru.create(num)
+    local core = llru.create(num)
 
     local obj = {
         __INFO = {}
@@ -10,18 +10,18 @@ return function(num)
         __index = function(tb, k)
             local v = tb.__INFO[k]
             if v then
-                lru:update(k)
+                core:update(k)
             end
             return v
         end,
         __newindex = function(tb, k, v)
             if v ~= nil then
-                local evict = lru:update(k)
+                local evict = core:update(k)
                 if evict then
                     tb.__INFO[evict] = nil
                 end
             else
-                lru:del(k)
+                core:del(k)
             end
             tb.__INFO[k] = v
         end,

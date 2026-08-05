@@ -3,9 +3,9 @@ extern "C" {
 }
 
 #include <cstdint>
-#include <iostream>
 #include <list>
 #include <sstream>
+#include <tuple>
 #include <unordered_map>
 using namespace std;
 
@@ -15,19 +15,19 @@ struct Lru {
   unordered_map<int64_t, list<int64_t>::iterator> idit_;
   int max_;
 
-  int64_t update(int64_t id) {
+  tuple<bool, int64_t> update(int64_t id) {
     del(id);
     ids_.push_front(id);
     idit_[id] = ids_.begin();
     return evict();
   }
 
-  int64_t evict() {
-    if (ids_.size() <= max_) return 0;
+  tuple<bool, int64_t> evict() {
+    if (ids_.size() <= max_) return make_tuple(false, 0);
     int64_t id = ids_.back();
     idit_.erase(id);
     ids_.pop_back();
-    return id;
+    return make_tuple(true, id);
   }
 
   void del(int64_t id) {
@@ -77,10 +77,13 @@ int Llru::update(lua_State* L) {
   Lru** pp = (Lru**)luaL_checkudata(L, 1, META);
   int64_t id = luaL_checkinteger(L, 2);
   Lru& lru = **pp;
-  int64_t evict = lru.update(id);
-  if (0 == evict) return 0;
-  lua_pushinteger(L, evict);
-  return 1;
+  auto [evi, val] = lru.update(id);
+  if (evi) {
+    lua_pushinteger(L, val);
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 int Llru::gc(lua_State* L) {
