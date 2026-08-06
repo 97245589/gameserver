@@ -1,0 +1,12 @@
+struct role {
+    level:integer
+}
+
+struct player {
+    role_info:role
+}
+
+proto enter {
+    {characterid:integer}
+    {player:player}
+}

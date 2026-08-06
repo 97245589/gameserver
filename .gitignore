@@ -4,3 +4,5 @@ skynet
 *.pid
 run/db
 run/log
+.vscode
+server/config/proto/*.proto
