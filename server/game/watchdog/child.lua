@@ -2,22 +2,35 @@ local skynet = require "skynet"
 local mode, watchdog, gate = ...
 
 if mode == "child" then
-    print = skynet.error
+    require "server.func.print"
     local service = require "server.game.service"
+    local socket = require "skynet.socket"
+    local proto = require "server.func.proto"
+
+    local host = proto.host
+    local close_conn = function(fd)
+        skynet.send(watchdog, "lua", "close_conn", fd)
+    end
 
     local handle = {
-        verify = function(args, fd, acc)
-            skynet.send(watchdog, "lua", "verify_success", fd, acc)
+        verify = function(args, fd)
+            skynet.call(watchdog, "lua", "verify_success", fd, args.acc)
+            return { code = 1 }
         end,
-        choose = function(args, fd, acc)
-            local chid = args.chid
-            service.call_id("character", "enter", chid, fd, acc)
-        end,
-        create_player = function(args, fd, acc)
+        select_character = function(args, fd, acc)
+            local characterid = args.characterid
+            service.call_id("character", "character_enter", characterid, acc, fd, gate)
+            return { code = 1 }
         end
     }
     skynet.start(function()
         skynet.dispatch("lua", function(_, _, fd, msg, acc)
+            local _, cmd, args, resf = host:dispatch(msg)
+            local f = handle[cmd]
+            local ret = f(args, fd, acc) or {
+                code = -1
+            }
+            socket.write(fd, string.pack(">s2", resf(ret)))
         end)
     end)
 else

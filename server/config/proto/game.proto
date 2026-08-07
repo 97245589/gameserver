@@ -1,0 +1,39 @@
+.package {
+    type 0 : integer
+    session 1 : integer
+}
+
+verify 1 {
+    request {
+        acc 1 : string
+        token 2 : string
+    }
+    response {
+        code 0 : integer
+    }
+}
+
+select_character 2 {
+    request {
+        characterid 1 : integer
+    }
+    response {
+        code 0 : integer
+    }
+}
+
+req_test 3 {
+    request {
+        req 1 : string
+    }
+    response {
+        code 0 : integer
+    }
+}
+
+push_test 4 {
+    request {
+        push 1 : string
+    }
+    response {}
+}

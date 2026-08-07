@@ -1,4 +1,4 @@
 local cmd = require "server.func.cmd"
+local client = require "server.game.character.client"
 
-cmd.player_in = function(playerid, fd)
-end
+cmd.character_enter = client.character_enter

@@ -26,6 +26,7 @@ end
 cmd.close_conn = close_conn
 
 cmd.verify_success = function(fd, acc)
+    -- print("verify success", fd, acc)
     local bfd = acc_fd[acc]
     if bfd then
         fd_acc[bfd] = nil

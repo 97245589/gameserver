@@ -47,13 +47,11 @@ local h = {
         return string.format(pstr, t[2], pidx, gen_pairs(t[3], 2), gen_pairs(t[4], 2))
     end
 }
-local pname = "server/config/proto/game.proto"
-os.remove(pname)
-local pf = io.open(pname, "a")
+
 local cp_cb = function(s, pos, t)
     -- print(dump(t))
     local r = h[t[1]](t)
-    pf:write(r)
+    print(r)
     return true
 end
 
@@ -74,14 +72,15 @@ local parse_proto = function()
     local ele = lpeg.Cmt(lpeg.Ct(struct + proto), cp_cb)
     local eles = ele ^ 0
 
-    local f = io.open("server/config/proto/proto.base")
-    local str = f:read("*a")
-    f:close()
+    local str = [[
+    struct test { arr:int[] map:obj[id] int:int }
+    proto enter {
+        {}
+        {code:integer info:player}
+    }]]
     eles:match(str)
 end
 
 skynet.start(function()
     parse_proto()
-    pf:close()
-    skynet.abort()
 end)

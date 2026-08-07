@@ -1,6 +1,0 @@
-struct test { arr:int[] map:obj[id] int:int }
-
-proto enter {
-    {}
-    {code:integer info:player}
-}
