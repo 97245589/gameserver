@@ -1,12 +1,6 @@
-struct role {
-    level:integer
-}
-
-struct player {
-    role_info:role
-}
+struct test { arr:int[] map:obj[id] int:int }
 
 proto enter {
-    {characterid:integer}
-    {player:player}
+    {}
+    {code:integer info:player}
 }
