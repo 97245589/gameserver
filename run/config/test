@@ -2,6 +2,7 @@ include "include"
 
 --debug_console_port = 10050
 server_name = "test"
+server_mark = "test"
 param = "$PARAM"
 
 thread = 2

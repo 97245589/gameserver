@@ -1,9 +1,12 @@
 local ltool = require "lgame.tool"
+local lutil = require "lgame.util"
 
 return {
     clone = ltool.clone,
     tblen = ltool.tblen,
-    crc16 = ltool.crc16,
+    crc16 = lutil.crc16,
+    compress = lutil.zstd_compress,
+    decompress = lutil.zstd_decompress,
     split = function(str, sp)
         sp = sp or " "
         if type(sp) == "number" then

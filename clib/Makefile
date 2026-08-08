@@ -11,7 +11,7 @@ GAMESRC_C := $(shell find ./game -name "*.c")
 GAME_O := $(GAMESRC_CC:.cc=.o) $(GAMESRC_C:.c=.o)
 
 lgame.so : $(GAME_O)
-	g++ -o $@ $^ $(3RDFLAG) $(LINK)
+	g++ -o $@ $^ $(3RDFLAG) $(LINK) -lleveldb
 
 %.o : %.cc
 	g++ -o $@ -c $< $(CXX_FLAGS)

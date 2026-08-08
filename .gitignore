@@ -1,7 +1,8 @@
-clib/**/*.so
-clib/**/*.o
-skynet
+*.o
+*.so
 *.pid
+.vscode
+3rd
+skynet
 run/db
 run/log
-.vscode
