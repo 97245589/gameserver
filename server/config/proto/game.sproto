@@ -3,8 +3,9 @@
     session 1 : integer
 }
 
+#comment-test
 verify 1 {
-    request {
+    request { #comment-test
         acc 1 : string
         token 2 : string
     }

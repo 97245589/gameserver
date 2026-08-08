@@ -1,6 +1,6 @@
 local sproto = require "sproto"
 
-local pf = io.open("server/config/proto/game.proto")
+local pf = io.open("server/config/proto/game.sproto")
 local str = pf:read("*a")
 pf:close()
 

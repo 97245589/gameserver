@@ -3,7 +3,7 @@ require "server.func.print"
 
 local sort_sp = function()
     local string = string
-    local fname = "server/config/proto/game.proto"
+    local fname = "server/config/proto/game.sproto"
     local arr = {}
 
     local idx = 1
