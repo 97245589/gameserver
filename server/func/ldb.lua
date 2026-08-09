@@ -5,20 +5,17 @@ local mode = ...
 
 if mode == "child" then
     skynet.start(function()
-        local print = skynet.error
-
-        local pdb = leveldb.create("run/db/" .. skynet.getenv("server_mark"))
-
-        -- ldb.release(pdb)
+        require "server.func.print"
+        local pdb = leveldb.create("run/db/" .. skynet.getenv("server_mark")) -- ldb.release(pdb)
 
         skynet.dispatch("lua", function(_, _, cmd, ...)
             skynet.retpack(leveldb[cmd](pdb, ...))
         end)
     end)
 else
-    local addr = skynet.uniqueservice("common/func/ldb", "child")
+    local addr = skynet.uniqueservice("server/func/ldb", "child")
 
-    -- del keys hgetall hmset hget hmget hdel compact
+    -- del keys hgetall hkeys hset hmset hget hmget hdel compact
     return {
         send = function(cmd, ...)
             skynet.send(addr, "lua", cmd, ...)

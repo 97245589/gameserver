@@ -53,10 +53,42 @@ local clib = function()
         local bin = core:encode(tb)
         print(dump(lmsgpack.decode(bin)))
     end
-    msgpack()
+
+    local zstd = function()
+        local obj = {}
+        for i = 1, 5 do
+            obj[i * 10] = tb
+        end
+        local bin = skynet.packstring(obj)
+        local cbin = toolf.compress(bin)
+        local nbin = toolf.decompress(cbin)
+        print(#bin, #cbin, #nbin)
+        local nobj = skynet.unpack(nbin)
+        print(dump(nobj, 2))
+    end
+end
+
+local leveldb = function()
+    local db = require "server.func.ldb"
+
+    db.call("del", "test")
+    db.call("hmset", "test", 10, 100, 20, 200)
+    print(dump(db.call("hgetall", "test")))
+
+    local t = skynet.now()
+    for i = 1, 100000 do
+        db.call("hmset", "test", i, i * 10)
+    end
+    print(skynet.now() - t)
+    print(db.call("hget", "test", 38888))
+    -- db.call("del", "test")
+    -- print(dump(db.call("hgetall", "test")))
+    db.call("compact")
+    print("compact end")
 end
 
 skynet.start(function()
     clib()
     -- tool()
+    -- leveldb()
 end)
