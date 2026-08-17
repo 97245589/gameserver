@@ -1,11 +1,12 @@
+local mod = require "server.game.character.mod"
+
 local M = {}
 
-M.init = function(player)
-    player.role = player.role or {}
-    local role = player.role
-    role.level = role.level or 1
+M.init = function(character)
+    character.role = character.role or {}
+    local crole = character.role
+    crole.level = 1
 end
 
-local mod = require "server.game.player.mod"
 mod.add_module(M, "role")
 return M

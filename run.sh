@@ -18,6 +18,4 @@ do
 	esac
 done
 
-echo "$SERVER"
-echo "$PARAM"
 ./skynet/skynet ./run/config/$SERVER
