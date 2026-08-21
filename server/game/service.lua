@@ -9,14 +9,6 @@ local service_num = {
 }
 M.service = service_num
 
-M.send = function(name, ...)
-    skynet.send(name, "lua", ...)
-end
-
-M.call = function(name, ...)
-    return skynet.call(name, "lua", ...)
-end
-
 local get_name = function(name, id)
     local num = service_num[name]
     if not num then
