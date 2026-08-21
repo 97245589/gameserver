@@ -7,10 +7,12 @@ local tb = {
     si = -10,
     dou = -10.101,
     arr = { "hello", 2, 3 },
-    map = { [100] = { id = 100 }, [200] = { 10, 20, 30 } }
+    map = { [100] = { id = 100 }, [200] = { 10, 20, 30 } },
+    [10] = 100,
 }
 local tool = function()
-    print(dump(tb), toolf.tblen(tb))
+    print(toolf.tblen(tb))
+    print(dump(toolf.keys(tb)), dump(toolf.keys(tb, 1)))
     -- print(dump(_G, 1))
 
     local ntb = toolf.clone(tb)
@@ -88,7 +90,7 @@ local leveldb = function()
 end
 
 skynet.start(function()
-    clib()
-    -- tool()
+    -- clib()
+    tool()
     -- leveldb()
 end)

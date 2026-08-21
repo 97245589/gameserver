@@ -147,7 +147,7 @@ static int clone(lua_State* L) {
 }
 
 static int tblen(lua_State* L) {
-  if (!lua_istable(L, 1)) return 0;
+  luaL_checktype(L, 1, LUA_TTABLE);
   int len = 0;
   lua_traversal(
       L, 1,
@@ -160,10 +160,34 @@ static int tblen(lua_State* L) {
   return 1;
 }
 
+static int keys(lua_State* L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  bool ismap = lua_toboolean(L, 2);
+  lua_createtable(L, 8, 8);
+  int ridx = lua_gettop(L);
+  lua_pushnil(L);
+  int i = 0;
+  while (lua_next(L, 1) != 0) {
+    if (ismap) {
+      lua_pushvalue(L, -2);
+      lua_pushinteger(L, 1);
+      lua_settable(L, ridx);
+    } else {
+      lua_pushvalue(L, -2);
+      lua_rawseti(L, ridx, ++i);
+    }
+    lua_pop(L, 1);
+  }
+  return 1;
+}
+
 extern "C" {
 LUAMOD_API int luaopen_lgame_tool(lua_State* L) {
-  luaL_Reg l[] = {
-      {"tblen", tblen}, {"dump", dump}, {"clone", clone}, {NULL, NULL}};
+  luaL_Reg l[] = {{"tblen", tblen},
+                  {"keys", keys},
+                  {"dump", dump},
+                  {"clone", clone},
+                  {NULL, NULL}};
   luaL_newlib(L, l);
   return 1;
 }

@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 local db = require "server.func.ldb"
 local mod = require "server.game.character.mod"
+local toolf = require "server.func.tool"
 local timerf = require "server.func.timer"
 local msgpack = require "lgame.msgpack"
 
@@ -37,12 +38,15 @@ M.add_timer_func = function(fid, func)
     timer_func[fid] = func
 end
 
+M.character_leave = function(id)
+    characters[id] = nil
+    timer.delid(id)
+end
+
 local db_cids = {}
 local tick_db = function()
     if not next(db_cids) then
-        for cid, _ in pairs(characters) do
-            db_cids[cid] = 1
-        end
+        db_cids = toolf.keys(characters, 1)
     end
     local i = 1
     for cid, _ in pairs(db_cids) do
@@ -59,9 +63,11 @@ end
 skynet.fork(function()
     while true do
         skynet.sleep(100)
-        local n = os.time()
-        tick_db()
-        timer.expire(n)
+        pcall(function()
+            local n = os.time()
+            tick_db()
+            timer.expire(n)
+        end)
     end
 end)
 
