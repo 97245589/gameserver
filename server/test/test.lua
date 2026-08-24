@@ -82,9 +82,8 @@ local leveldb = function()
         db.call("hmset", "test", i, i * 10)
     end
     print(skynet.now() - t)
-    print(db.call("hget", "test", 38888))
-    -- db.call("del", "test")
-    -- print(dump(db.call("hgetall", "test")))
+    print(db.call("hget", "test", 12345))
+    db.call("del", "test")
     db.call("compact")
     print("compact end")
 end

@@ -110,14 +110,17 @@ int Lrank::info(lua_State* L) {
   int ub = luaL_checkinteger(L, 3);
   if (lb < 0) lb = 0;
   if (ub > ranks.size()) ub = ranks.size();
-  if (lb > ub) return luaL_error(L, "rank info err");
-  lua_createtable(L, (ub - lb) * 3, 0);
-  int c = 0;
-  for (auto it = ranks.find_by_order(lb); it != ranks.find_by_order(ub); ++it) {
+  int size = ub - lb;
+  if (size <= 0) return luaL_error(L, "rank info err");
+  lua_createtable(L, size * 2, 0);
+  auto it = ranks.find_by_order(lb);
+  for (int i = 0; i < size; ++i) {
+    if (it == ranks.end()) break;
     lua_pushinteger(L, it->id_);
-    lua_rawseti(L, -2, ++c);
+    lua_rawseti(L, -2, i * 2 + 1);
     lua_pushinteger(L, it->score_);
-    lua_rawseti(L, -2, ++c);
+    lua_rawseti(L, -2, i * 2 + 2);
+    ++it;
   }
   return 1;
 }
