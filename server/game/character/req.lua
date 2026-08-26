@@ -1,5 +1,5 @@
 local client = require "server.game.character.client"
-local rolem = require "server.game.character.mod.role"
+local role = require "server.game.character.mod.role"
 local req = client.req
 
 req.req_test = function(character, args)

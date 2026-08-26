@@ -1,21 +1,32 @@
 local skynet = require "skynet"
-local db = require "server.func.ldb"
+local squeue = require "skynet.queue"
+local ldb = require "server.func.ldb"
 local mod = require "server.game.character.mod"
 local toolf = require "server.func.tool"
 local timerf = require "server.func.timer"
 local msgpack = require "lgame.msgpack"
+local msgpack_core = msgpack.create(1024 * 500)
 
-local M = {}
+local M = { kick = nil }
 local characters = {}
 
+local cs = squeue()
 M.get_character = function(cid)
     local character = characters[cid]
-    if character then
-        return character
+    if not character then
+        cs(function()
+            character = characters[cid]
+            if not character then
+                -- local bin = ldb.call("hget", "character", cid)
+                -- character = msgpack.decode(bin)
+                character = {}
+                mod.init_character(character)
+                characters[cid] = character
+            end
+        end)
     end
-    character = {}
-    mod.init_character(character)
-    characters[cid] = character
+    character.id = cid
+    character.tm = os.time()
     return character
 end
 
@@ -44,13 +55,19 @@ M.character_leave = function(id)
 end
 
 local db_cids = {}
-local tick_db = function()
+local tick_save = function()
     if not next(db_cids) then
         db_cids = toolf.keys(characters, 1)
     end
+    local tm = os.time()
     local i = 1
     for cid, _ in pairs(db_cids) do
         local character = characters[cid]
+        -- ldb.send("hset", "character", cid, msgpack_core:encode(character))
+        if tm >= character.tm + 10 then
+            M.kick(cid)
+            characters[cid] = nil
+        end
 
         db_cids[cid] = nil
         i = i + 1
@@ -63,11 +80,14 @@ end
 skynet.fork(function()
     while true do
         skynet.sleep(100)
-        pcall(function()
+        local ok, err = pcall(function()
             local n = os.time()
-            tick_db()
+            tick_save()
             timer.expire(n)
         end)
+        if not ok then
+            print("tick err", err)
+        end
     end
 end)
 

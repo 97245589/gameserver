@@ -20,9 +20,10 @@ M.kick = function(cid)
     cid_fd[cid] = nil
     if fd then
         fd_cid[fd] = nil
-        service.send("watchdog", "close_conn", fd)
+        skynet.send("watchdog", "lua", "close_conn", fd)
     end
 end
+mgr.kick = M.kick
 
 M.character_enter = function(cid, acc, fd, gate)
     print("character enter", cid, acc, fd, gate)
@@ -31,7 +32,6 @@ M.character_enter = function(cid, acc, fd, gate)
     cid_fd[cid] = fd
     fd_cid[fd] = cid
     local character = mgr.get_character(cid)
-    character.id = cid
 end
 
 M.push = function(cid, name, args)

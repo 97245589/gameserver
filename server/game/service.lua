@@ -5,7 +5,8 @@ local M = {}
 
 local service_num = {
     character = 3,
-    watchdog = 1
+    watchdog = 1,
+    game = 1,
 }
 M.service = service_num
 
