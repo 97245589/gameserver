@@ -17,10 +17,9 @@ local get_name = function(name, id)
     elseif 1 == num then
         return name
     else
-        --[[
         if type(id) == "string" then
             id = crc16(id)
-        end ]]
+        end
         local idx = id % num + 1
         return name .. idx
     end

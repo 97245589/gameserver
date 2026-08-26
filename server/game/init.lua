@@ -3,7 +3,6 @@ local skynet = require "skynet"
 skynet.start(function()
     local service = require "server.game.service"
 
-    local pathf = "server/game/%s/init"
     for name, num in pairs(service.service) do
         local path = string.format("server/game/%s/init", name)
         if num <= 1 then
