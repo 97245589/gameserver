@@ -1,6 +1,6 @@
 local skynet = require "skynet"
+local service = require "server.game.service"
 local cmd = require "server.func.cmd"
-local child = require "server.game.watchdog.child"
 
 local gate = skynet.newservice("gate")
 skynet.call(gate, "lua", "open", {
@@ -8,7 +8,6 @@ skynet.call(gate, "lua", "open", {
     maxclient = 6666,
     nodelay = true
 })
-child.start(2, gate)
 
 local acc_secret = {}
 local acc_fd = {}
@@ -52,7 +51,7 @@ local scmd = {
     end,
     data = function(fd, msg)
         local acc = fd_acc[fd]
-        child.data(fd, msg, acc)
+        service.send_id("character", "watchdog_data", fd, msg, acc, gate)
     end
 }
 cmd.socket = function(c, ...)
