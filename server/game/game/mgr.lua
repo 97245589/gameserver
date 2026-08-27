@@ -1,22 +1,21 @@
 local skynet = require "skynet"
 local ldb = require "server.func.ldb"
 local timerf = require "server.func.timer"
-local msgpack = require "lgame.msgpack"
-local msgpack_core = msgpack.create(1024 * 500)
 
 local M = {}
 M.dbinfo = {}
 
 local init_db = function()
     local dbinfo = {}
-    -- local bin = ldb.call("hget", "game", "info")
-    -- if bin then
-    --     dbinfo = msgpack.decode(bin)
-    -- end
+    local bin = ldb.call("hget", "game", "info")
+    if bin then
+        dbinfo = skynet.unpack(bin)
+    end
     M.dbinfo = dbinfo
 end
 local save_data = function()
-    -- ldb.send("hset", "game", "info", msgpack_core:encode(M.dbinfo))
+    local bin = skynet.packstring(M.dbinfo)
+    -- ldb.send("hset", "game", "info", bin)
 end
 
 local timer_func = {}
@@ -32,12 +31,16 @@ M.add_timer_func = function(tp, func)
 end
 
 skynet.fork(function()
+    local lastup = os.time()
     while true do
         skynet.sleep(100)
         local ok, err = pcall(function()
             local tm = os.time()
             timer.expire(tm)
-            save_data()
+            if tm - lastup > 20 then
+                save_data()
+                lastup = tm
+            end
         end)
         if not ok then
             print("tick err", err)

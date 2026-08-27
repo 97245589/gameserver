@@ -5,7 +5,7 @@ local mod = require "server.game.character.mod"
 local toolf = require "server.func.tool"
 local timerf = require "server.func.timer"
 local msgpack = require "lgame.msgpack"
-local msgpack_core = msgpack.create(1024 * 500)
+local msgpack_core = msgpack.create(1024 * 1024)
 
 local M = { kick = nil }
 local characters = {}
