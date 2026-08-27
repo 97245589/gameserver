@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local crc16 = require "server.func.tool".crc16
+local toolf = require "server.func.tool"
 
 local M = {}
 
@@ -12,18 +12,8 @@ M.service = service_num
 
 local get_name = function(name, id)
     local num = service_num[name]
-    if not num then
-        error("rpc getname err " .. name)
-        return
-    elseif 1 == num then
-        return name
-    else
-        if type(id) == "string" then
-            id = crc16(id)
-        end
-        local idx = id % num + 1
-        return name .. idx
-    end
+    local idx = id % num + 1
+    return name .. idx
 end
 
 M.send_id = function(name, cmd, id, ...)
