@@ -1,4 +1,5 @@
 local skynet = require "skynet"
+require "skynet.manager"
 require "server.func.print"
 
 local sort_sp = function()
@@ -22,9 +23,12 @@ local sort_sp = function()
         table.insert(arr, line)
     end
 
-    print(table.concat(arr))
+    local f = io.open(fname, "w")
+    f:write(table.concat(arr))
+    f:close()
 end
 
 skynet.start(function()
     sort_sp()
+    skynet.abort()
 end)

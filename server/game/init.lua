@@ -14,5 +14,5 @@ skynet.start(function()
         end
     end
 
-    skynet.exit()
+    require "server.service.cluster"
 end)

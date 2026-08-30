@@ -3,8 +3,39 @@
     session 1 : integer
 }
 
-#comment-test
-verify 1 {
+#loginserver start =====
+exchange 1 {
+    request {
+        cpub 0 : string
+    }
+    response {
+        code 0 : integer
+        spub 1 : string
+    }
+}
+
+login_verify 2 {
+    request {
+        acc 0 : string
+        acctoken 1 : string
+    }
+    response {
+        code 0 : integer
+    }
+}
+
+select_gameserver 3 {
+    request {
+        serverid 1 : integer
+    }
+    response {
+        code 0 : integer
+    }
+}
+#loginserver end ======
+
+#gameserver start ======
+verify 4 {
     request { #comment-test
         acc 1 : string
         token 2 : string
@@ -14,7 +45,7 @@ verify 1 {
     }
 }
 
-select_character 2 {
+select_character 5 {
     request {
         characterid 1 : integer
     }
@@ -23,7 +54,7 @@ select_character 2 {
     }
 }
 
-req_test 3 {
+req_test 6 {
     request {
         req 1 : string
     }
@@ -32,9 +63,10 @@ req_test 3 {
     }
 }
 
-push_test 4 {
+push_test 7 {
     request {
         push 1 : string
     }
     response {}
 }
+#gameserver end =====
