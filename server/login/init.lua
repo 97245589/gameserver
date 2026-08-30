@@ -4,8 +4,9 @@ local cluster = require "skynet.cluster"
 start(function()
     local sc = require "server.service.cluster"
     local server_host = sc.get_server_host()
-    sc.set_diff_func(function(nserver_host)
-        server_host = nserver_host
+    sc.set_diff_func(function(upd, del)
+        server_host = sc.get_server_host()
+        print("diff", dump(upd), dump(del), dump(server_host))
     end)
     require "server.login.logind"
     local cmd = require "server.func.cmd"

@@ -4,9 +4,10 @@ local toolf = require "server.func.tool"
 local M = {}
 
 local service_num = {
-    character = 3,
+    character = 5,
     watchdog = 1,
     game = 1,
+    cluster = 1,
 }
 M.service = service_num
 

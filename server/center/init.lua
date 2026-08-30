@@ -24,7 +24,7 @@ start(function()
                     server_heartbeat[server] = nil
                 end
             end
-            print("server_host", dump(server_host))
+            -- print("server_host", dump(server_host))
         end
     end)
 end)

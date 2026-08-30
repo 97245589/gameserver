@@ -19,32 +19,38 @@ cluster.register(server_mark, skynet.self())
 local diff_func
 if server_mark ~= "center" then
     local diff = function(nobj, oobj)
+        local upd = {}
         for server, host in pairs(nobj) do
             local ohost = oobj[server]
             if host ~= ohost then
-                return true
+                upd[server] = host
             end
             oobj[server] = nil
         end
-        return next(oobj)
+        local del = oobj
+        return upd, del
     end
 
     local conn_center = function()
         local bin = cluster.call("center", "@center", "heartbeat", server_mark, shost)
         local nserver_host = skynet.unpack(toolf.decompress(bin))
-        if diff(nserver_host, server_host) then
-            cluster.reload(nserver_host)
-            if diff_func then
-                diff_func(nserver_host)
-            end
-            print("cluster diff", dump(nserver_host))
-        end
+        local upd, del = diff(nserver_host, server_host)
         server_host = nserver_host
+        if next(upd) or next(del) then
+            cluster.reload(server_host)
+            if diff_func then
+                diff_func(upd, del)
+            end
+            -- print("cluster diff", dump(server_host))
+        end
     end
 
     skynet.fork(function()
         while true do
-            conn_center()
+            local ok, err = pcall(conn_center)
+            if not ok then
+                print(err)
+            end
             skynet.sleep(300)
         end
     end)
