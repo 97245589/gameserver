@@ -8,7 +8,7 @@ local get_res = login.get_res
 
 skynet.start(function()
     local fd = clogin({
-        loginhost = "0.0.0.0:10031",
+        -- loginhost = "0.0.0.0:10031",
         gamehost = "0.0.0.0:10012",
         acc = "hhh",
         cid = 100
