@@ -41,7 +41,7 @@ if server_mark ~= "center" then
             if diff_func then
                 diff_func(upd, del)
             end
-            -- print("cluster diff", dump(server_host))
+            print("server_host", dump(server_host))
         end
     end
 

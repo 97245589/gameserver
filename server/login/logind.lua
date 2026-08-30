@@ -1,4 +1,4 @@
-local mode, loginaddr = ...
+local mode = ...
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local socket = require "skynet.socket"
@@ -39,12 +39,12 @@ if mode == "child" then
 
     local verify = function(fd, secret)
         local _, name, args, res = get_req(fd)
-        local acc, acctoken = args.acc, args.acctoken
-        if name ~= "login_verify" or not acc or not acctoken then
+        local acc, token = args.acc, args.token
+        if name ~= "login_verify" or not acc or not token then
             return
         end
 
-        if crypt.desencode(secret, acc) ~= acctoken then
+        if crypt.desencode(secret, acc) ~= token then
             print("login verity err", acc)
             return
         end
@@ -63,11 +63,9 @@ if mode == "child" then
         end
 
         local server = "game" .. serverid
-        local ret = skynet.send(loginaddr, "lua", "acc_server", acc, server)
-        if not ret then
-            return
-        end
+        skynet.send("login", "lua", "acc_server", acc, server)
         cluster.send(server, "watchdog", "acc_secret", acc, secret)
+
         send_package(fd, res({
             code = 0,
         }))
@@ -98,7 +96,10 @@ if mode == "child" then
         skynet.dispatch("lua", function(_, _, fd, addr)
             socket.start(fd)
             socket.limit(fd, 4096)
-            pcall(login, fd, addr)
+            local ok, err = pcall(login, fd, addr)
+            if not ok then
+                print("login err", err)
+            end
             socket.close(fd)
             skynet.response()(false)
         end)
@@ -107,9 +108,8 @@ else
     local addrs = {}
     local childnum = 10
 
-    local lattr = skynet.self()
     for i = 1, childnum do
-        local addr = skynet.newservice("server/login/logind", "child", lattr)
+        local addr = skynet.newservice("server/login/logind", "child")
         table.insert(addrs, addr)
     end
 
