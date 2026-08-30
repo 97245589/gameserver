@@ -9,4 +9,4 @@ start(function()
 
     local cmd = require "server.func.cmd"
     require "server.service.cluster"
-end)
+end, "cluster")
