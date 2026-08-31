@@ -8,10 +8,10 @@ local req = proto.req
 
 local session = 0
 local send_req = function(fd, name, args)
-    session = session + 1
-    if session < 1 or session > 120 then
-        session = 1
+    if session >= 0xffff then
+        session = 0
     end
+    session = session + 1
     local str = req(name, args, session)
     socket.write(fd, string.pack(">s2", str))
     return name, session
@@ -53,17 +53,18 @@ local clogin = function(info)
             serverid = 1
         })
         get_res(fd)
+        skynet.sleep(1)
         return secret
     end
 
     local conn_game = function()
         local secret = conn_login()
-        skynet.sleep(50)
         local fd = socket.open(gamehost)
         send_req(fd, "verify", {
             acc = acc, token = secret and crypt.desencode(secret, acc)
         })
         get_res(fd)
+        skynet.sleep(1)
         send_req(fd, "select_character", {
             characterid = cid
         })
