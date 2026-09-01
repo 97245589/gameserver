@@ -44,13 +44,12 @@ local clogin = function(info)
         })
         local _, _, args, _ = get_res(fd)
         local secret = crypt.dhsecret(args.spub, cpri)
-        send_req(fd, "login_verify", {
-            acc = acc,
-            token = crypt.desencode(secret, acc)
-        })
-        get_res(fd)
+
+        local arr = { acc, tostring(100) }
         send_req(fd, "select_gameserver", {
-            serverid = 1
+            arr = arr,
+            token = crypt.desencode(secret, acc .. arr[2]),
+            serverid = 1,
         })
         get_res(fd)
         skynet.sleep(1)
@@ -60,8 +59,14 @@ local clogin = function(info)
     local conn_game = function()
         local secret = conn_login()
         local fd = socket.open(gamehost)
+        local arr = { acc, tostring(999) }
+        local token
+        if secret then
+            token = crypt.desencode(secret, acc .. arr[2])
+        end
         send_req(fd, "verify", {
-            acc = acc, token = secret and crypt.desencode(secret, acc)
+            arr = arr,
+            token = token
         })
         get_res(fd)
         skynet.sleep(1)

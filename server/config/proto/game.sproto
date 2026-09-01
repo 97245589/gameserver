@@ -14,19 +14,11 @@ exchange 1 {
     }
 }
 
-login_verify 2 {
+select_gameserver 2 {
     request {
-        acc 0 : string
+        arr 0 : *string
         token 1 : string
-    }
-    response {
-        code 0 : integer
-    }
-}
-
-select_gameserver 3 {
-    request {
-        serverid 1 : integer
+        serverid 2 : integer
     }
     response {
         code 0 : integer
@@ -35,9 +27,9 @@ select_gameserver 3 {
 #loginserver end ======
 
 #gameserver start ======
-verify 4 {
+verify 3 {
     request { #comment-test
-        acc 1 : string
+        arr 0 : *string
         token 2 : string
     }
     response {
@@ -45,7 +37,7 @@ verify 4 {
     }
 }
 
-select_character 5 {
+select_character 4 {
     request {
         characterid 1 : integer
     }
@@ -54,7 +46,7 @@ select_character 5 {
     }
 }
 
-req_test 6 {
+req_test 5 {
     request {
         req 1 : string
     }
@@ -63,7 +55,7 @@ req_test 6 {
     }
 }
 
-push_test 7 {
+push_test 6 {
     request {
         push 1 : string
     }

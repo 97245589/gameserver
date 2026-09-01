@@ -21,8 +21,9 @@ local switch = {
 
 local gametype = tonumber(skynet.getenv("gametype"))
 local verify = function(args)
-    local acc = args.acc
+    local arr = args.arr
     local token = args.token
+    local acc = arr[1]
     if not acc then
         return
     end
@@ -30,7 +31,9 @@ local verify = function(args)
         return acc
     end
     local secret = skynet.call("watchdog", "lua", "get_secret", acc)
-    if token ~= crypt.desencode(secret, acc) then
+    local str = crypt.desdecode(secret, token)
+    -- print("verify", str, dump(arr))
+    if str ~= acc .. arr[2] then
         return
     end
     return acc
@@ -49,7 +52,7 @@ M.watchdog_data = function(fd, msg, acc, gate)
             return
         else
             -- print("verify succ", fd, acc)
-            skynet.send("watchdog", "lua", "verify_success", fd, acc)
+            skynet.call("watchdog", "lua", "verify_success", fd, acc)
         end
     end
 

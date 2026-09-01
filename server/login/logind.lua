@@ -25,9 +25,8 @@ if mode == "child" then
 
     local exchange = function(fd, spub)
         local _, name, args, res = get_req(fd)
-
         local cpub = args.cpub
-        if name ~= "exchange" or not cpub then
+        if not cpub then
             return
         end
         send_package(fd, res({
@@ -37,34 +36,24 @@ if mode == "child" then
         return cpub
     end
 
-    local verify = function(fd, secret)
+    local select_gameserver = function(fd, secret)
         local _, name, args, res = get_req(fd)
-        local acc, token = args.acc, args.token
-        if name ~= "login_verify" or not acc or not token then
-            return
-        end
-
-        if crypt.desencode(secret, acc) ~= token then
-            print("login verity err", acc)
-            return
-        end
-
-        send_package(fd, res({
-            code = 0
-        }))
-        return acc
-    end
-
-    local select_gameserver = function(fd, secret, acc)
-        local _, name, args, res = get_req(fd)
+        local arr = args.arr
+        local token = args.token
         local serverid = args.serverid
-        if name ~= "select_gameserver" or not serverid then
+        if not arr or not token or not serverid then
+            return
+        end
+        local acc = arr[1]
+        local str = acc .. arr[2]
+        -- print("verify", str == crypt.desdecode(secret, token))
+        if str ~= crypt.desdecode(secret, token) then
             return
         end
 
         local server = "game" .. serverid
         skynet.send("login", "lua", "acc_server", acc, server)
-        cluster.send(server, "watchdog", "acc_secret", acc, secret)
+        cluster.call(server, "watchdog", "acc_secret", acc, secret)
 
         send_package(fd, res({
             code = 0,
@@ -80,14 +69,8 @@ if mode == "child" then
         if not cpub then
             return
         end
-
         local secret = crypt.dhsecret(cpub, spri)
-        local acc = verify(fd, secret)
-        if not acc then
-            return
-        end
-
-        if not select_gameserver(fd, secret, acc) then
+        if not select_gameserver(fd, secret) then
             return
         end
     end
