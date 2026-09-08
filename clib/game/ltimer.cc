@@ -1,7 +1,6 @@
 extern "C" {
 #include "lauxlib.h"
 }
-#include <iostream>
 #include <set>
 #include <sstream>
 #include <string>
