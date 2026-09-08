@@ -45,8 +45,8 @@ end)
 M.add_timer = function(character, tm, cmd, ...)
     timer.add(character.id, tm, cmd, ...)
 end
-M.add_timer_func = function(fid, func)
-    timer_func[fid] = func
+M.add_timer_func = function(cmd, func)
+    timer_func[cmd] = func
 end
 
 M.character_leave = function(id)

@@ -26,8 +26,8 @@ end)
 M.add_timer = function(tm, cmd, ...)
     timer.add(0, tm, cmd, ...)
 end
-M.add_timer_func = function(tp, func)
-    timer_func[tp] = func
+M.add_timer_func = function(cmd, func)
+    timer_func[cmd] = func
 end
 
 skynet.fork(function()
