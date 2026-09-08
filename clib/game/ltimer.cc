@@ -76,7 +76,7 @@ static int add(lua_State* L) {
   const char* p = luaL_checklstring(L, 4, &len);
 
   Timer& timer = **pp;
-  timer.add({id, tm, {p, len}});
+  timer.add({.id_ = id, .tm_ = tm, .info_ = {p, len}});
   return 0;
 }
 
@@ -87,7 +87,7 @@ static int del(lua_State* L) {
   const char* p = luaL_checklstring(L, 3, &len);
 
   Timer& timer = **pp;
-  timer.del({id, 0, {p, len}});
+  timer.del({.id_ = id, .tm_ = 0, .info_ = {p, len}});
   return 0;
 }
 

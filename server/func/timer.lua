@@ -23,8 +23,8 @@ return function(cb)
         local arr = core:expire(tm)
         for i = 1, #arr, 2 do
             local id = arr[i]
-            local mark = arr[i + 1]
-            cb(id, skynet.unpack(mark))
+            local info = arr[i + 1]
+            cb(id, skynet.unpack(info))
         end
     end
 
