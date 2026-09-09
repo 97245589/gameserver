@@ -52,7 +52,6 @@ local clogin = function(info)
             serverid = 1,
         })
         get_res(fd)
-        skynet.sleep(1)
         return secret
     end
 
@@ -69,7 +68,6 @@ local clogin = function(info)
             token = token
         })
         get_res(fd)
-        skynet.sleep(1)
         send_req(fd, "select_character", {
             characterid = cid
         })

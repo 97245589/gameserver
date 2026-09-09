@@ -50,10 +50,8 @@ M.watchdog_data = function(fd, msg, acc, gate)
         if not acc then
             close_conn(fd)
             return
-        else
-            -- print("verify succ", fd, acc)
-            skynet.call("watchdog", "lua", "verify_success", fd, acc)
         end
+        skynet.call("watchdog", "lua", "verify_success", fd, acc)
     end
 
     local f = switch[cmd]
