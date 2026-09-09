@@ -1,30 +1,35 @@
 local llru = require "lgame.lru"
 
-return function(num)
-    local core = llru.create(num)
+local __meta = {
+    __index = function(tb, k)
+        local core = tb.__core
+        local info = tb.__info
+        local v = info[k]
+        if v ~= nil then
+            core:update(k)
+        end
+        return v
+    end,
+    __newindex = function(tb, k, v)
+        local core = tb.__core
+        local info = tb.__info
+        if v ~= nil then
+            local evict = core:update(k)
+            if evict then
+                info[evict] = nil
+            end
+        else
+            core:del(k)
+        end
+        info[k] = v
+    end
+}
 
-    local obj = {
-        __INFO = {}
+return function(num)
+    local tb = {
+        __info = {},
+        __core = llru.create(num)
     }
-    setmetatable(obj, {
-        __index = function(tb, k)
-            local v = tb.__INFO[k]
-            if v then
-                core:update(k)
-            end
-            return v
-        end,
-        __newindex = function(tb, k, v)
-            if v ~= nil then
-                local evict = core:update(k)
-                if evict then
-                    tb.__INFO[evict] = nil
-                end
-            else
-                core:del(k)
-            end
-            tb.__INFO[k] = v
-        end,
-    })
-    return obj
+    setmetatable(tb, __meta)
+    return tb
 end

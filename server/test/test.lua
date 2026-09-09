@@ -40,13 +40,14 @@ local clib = function()
 
     local lru = function()
         local lruf = require "server.func.lru"
-        local lruobj = lruf(2)
-        lruobj[0] = 0
-        lruobj[1] = 10
-        -- lruobj[0] = 100
-        lruobj[1] = nil
-        lruobj[2] = 20
-        print(dump(lruobj))
+        local obj = lruf(2)
+        obj[0] = 0
+        obj[1] = 10
+        obj[0] = 100
+        -- local v = obj[1]
+        obj[2] = 20
+        print(dump(obj))
+        print(obj.__core:dump())
     end
 
     local msgpack = function()
@@ -70,43 +71,46 @@ local clib = function()
     end
 end
 
-local leveldb = function()
-    local db = require "server.func.ldb"
+local db_test = function()
+    local leveldb = function()
+        local db = require "server.func.ldb"
 
-    db.call("del", "test")
-    db.call("hmset", "test", 10, 100, 20, 200)
-    print(dump(db.call("hgetall", "test")))
+        db.call("del", "test")
+        db.call("hmset", "test", 10, 100, 20, 200)
+        print(dump(db.call("hgetall", "test")))
 
-    local t = skynet.now()
-    for i = 1, 100000 do
-        db.call("hmset", "test", i, i * 10)
+        local t = skynet.now()
+        for i = 1, 100000 do
+            db.call("hmset", "test", i, i * 10)
+        end
+        print(skynet.now() - t)
+        print(db.call("hget", "test", 12345))
+        db.call("del", "test")
+        db.call("compact")
+        print("compact end")
     end
-    print(skynet.now() - t)
-    print(db.call("hget", "test", 12345))
-    db.call("del", "test")
-    db.call("compact")
-    print("compact end")
+
+    local redis_test = function()
+        local redis = require "skynet.db.redis"
+        local db = redis.connect({
+            host = "127.0.0.1",
+            port = 6379,
+        })
+
+        for i = 1, 50 do
+            db:hset("test", "hello" .. i, "world" .. i)
+        end
+        print(dump(db:hkeys("test")))
+
+        db:flushall()
+        db:disconnect()
+    end
 end
 
-local redis_test = function()
-    local redis = require "skynet.db.redis"
-    local db = redis.connect({
-        host = "127.0.0.1",
-        port = 6379,
-    })
 
-    for i = 1, 50 do
-        db:hset("test", "hello" .. i, "world" .. i)
-    end
-    print(dump(db:hkeys("test")))
-
-    db:flushall()
-    db:disconnect()
-end
 
 skynet.start(function()
-    -- clib()
     tool()
-    -- leveldb()
-    -- redis_test()
+    -- clib()
+    -- db_test()
 end)
