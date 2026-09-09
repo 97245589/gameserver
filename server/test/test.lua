@@ -88,8 +88,25 @@ local leveldb = function()
     print("compact end")
 end
 
+local redis_test = function()
+    local redis = require "skynet.db.redis"
+    local db = redis.connect({
+        host = "127.0.0.1",
+        port = 6379,
+    })
+
+    for i = 1, 50 do
+        db:hset("test", "hello" .. i, "world" .. i)
+    end
+    print(dump(db:hkeys("test")))
+
+    db:flushall()
+    db:disconnect()
+end
+
 skynet.start(function()
     -- clib()
     tool()
     -- leveldb()
+    -- redis_test()
 end)
