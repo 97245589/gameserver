@@ -1,15 +1,35 @@
 local skynet = require "skynet"
 local squeue = require "skynet.queue"
 local ldb = require "server.func.ldb"
-local mod = require "server.game.character.mod"
 local toolf = require "server.func.tool"
 local timerf = require "server.func.timer"
 local msgpack = require "lgame.msgpack"
 local msgpack_core = msgpack.create(1024 * 1024)
 
-local M = { kick = nil }
-local characters = {}
+local M = {}
 
+local modules = {}
+local initdata_funcs = {}
+M.add_module = function(mod, name)
+    if modules[name] then
+        print("add module err repeated", name)
+        return
+    end
+    modules[name] = mod
+    if mod.init_data then
+        table.insert(initdata_funcs, mod.init_data)
+    end
+    if mod.init_mod then
+        mod.init_mod()
+    end
+end
+local init_character = function(character)
+    for _, f in ipairs(initdata_funcs) do
+        f(character)
+    end
+end
+
+local characters = {}
 local cs = squeue()
 M.get_character = function(cid)
     local character = characters[cid]
@@ -20,7 +40,7 @@ M.get_character = function(cid)
                 -- local bin = ldb.call("hget", "character", cid)
                 -- character = msgpack.decode(bin)
                 character = {}
-                mod.init_character(character)
+                init_character(character)
                 characters[cid] = character
             end
         end)
@@ -49,11 +69,16 @@ M.add_timer_func = function(cmd, func)
     timer_func[cmd] = func
 end
 
-M.character_leave = function(id)
+local kick_func
+M.set_kick_func = function(f)
+    kick_func = f
+end
+
+local character_leave = function(id)
+    kick_func(id)
     characters[id] = nil
     timer.delid(id)
 end
-
 local db_cids = {}
 local tick_save = function()
     if not next(db_cids) then
@@ -65,7 +90,7 @@ local tick_save = function()
         local character = characters[cid]
         -- ldb.send("hset", "character", cid, msgpack_core:encode(character))
         if tm >= character.tm + 10 then
-            M.kick(cid)
+            character_leave(cid)
             characters[cid] = nil
         end
 

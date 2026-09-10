@@ -29,7 +29,7 @@ cmd.verify_success = function(fd, acc)
     local bfd = acc_fd[acc]
     if bfd then
         fd_acc[bfd] = nil
-        skynet.send(gate, "lua", "kick", fd)
+        skynet.send(gate, "lua", "kick", bfd)
     end
     acc_fd[acc] = fd
     fd_acc[fd] = acc

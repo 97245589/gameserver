@@ -1,4 +1,4 @@
-local mod = require "server.game.character.mod"
+local mgr = require "server.game.character.mgr"
 
 local M = {}
 
@@ -11,5 +11,5 @@ M.init_data = function(character)
     crole.level = 1
 end
 
-mod.add_module(M, "role")
+mgr.add_module(M, "role")
 return M

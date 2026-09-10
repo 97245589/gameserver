@@ -15,7 +15,7 @@ local send_package = function(fd, str)
     socket.write(fd, string.pack(">s2", str))
 end
 
-M.kick = function(cid)
+local kick = function(cid)
     local fd = cid_fd[cid]
     cid_fd[cid] = nil
     if fd then
@@ -23,11 +23,10 @@ M.kick = function(cid)
         skynet.send("watchdog", "lua", "close_conn", fd)
     end
 end
-mgr.kick = M.kick
+mgr.set_kick_func(kick)
 
 M.character_enter = function(cid, acc, fd, gate)
     print("character enter", cid, acc, fd, gate)
-    M.kick(cid)
     skynet.send(gate, "lua", "forward", fd)
     cid_fd[cid] = fd
     fd_cid[fd] = cid

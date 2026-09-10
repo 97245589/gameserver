@@ -7,15 +7,23 @@ M.dbinfo = {}
 
 local init_db = function()
     local dbinfo = {}
+    --[[
     local bin = ldb.call("hget", "game", "info")
     if bin then
         dbinfo = skynet.unpack(bin)
     end
+    ]]
     M.dbinfo = dbinfo
 end
-local save_data = function()
-    local bin = skynet.packstring(M.dbinfo)
-    -- ldb.send("hset", "game", "info", bin)
+init_db()
+
+local modules = {}
+M.add_module = function(mod, name)
+    if modules[name] then
+        print("add module err", name)
+        return
+    end
+    modules[name] = mod
 end
 
 local timer_func = {}
@@ -30,6 +38,10 @@ M.add_timer_func = function(cmd, func)
     timer_func[cmd] = func
 end
 
+local save_data = function()
+    local bin = skynet.packstring(M.dbinfo)
+    -- ldb.send("hset", "game", "info", bin)
+end
 skynet.fork(function()
     local lastup = os.time()
     while true do
