@@ -19,10 +19,19 @@ M.add_module = function(mod, name)
     if mod.init_data then
         table.insert(initdata_funcs, mod.init_data)
     end
-    if mod.init_mod then
-        mod.init_mod()
+    if mod.load then
+        mod.load()
     end
 end
+
+M.modules_load = function()
+    for name, mod in pairs(modules) do
+        if mod.load then
+            mod.load()
+        end
+    end
+end
+
 local init_character = function(character)
     for _, f in ipairs(initdata_funcs) do
         f(character)

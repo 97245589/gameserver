@@ -1,8 +1,11 @@
 local mgr = require "server.game.character.mgr"
+local config = require "server.game.common.config"
+
+local config_item = config.get("item")
 
 local M = {}
 
-M.init_mod = function()
+M.load = function()
 end
 
 M.init_data = function(character)

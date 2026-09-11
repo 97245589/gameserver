@@ -1,12 +1,15 @@
 local skynet = require "skynet"
 local ldb = require "server.func.ldb"
 local timerf = require "server.func.timer"
+local time = require "server.game.common.time"
 
 local M = {}
 M.dbinfo = {}
 
 local init_db = function()
     local dbinfo = {}
+    dbinfo.server_open_time = dbinfo.server_open_time or time.day_start()
+    time.set_open_time(dbinfo.server_open_time)
     --[[
     local bin = ldb.call("hget", "game", "info")
     if bin then
