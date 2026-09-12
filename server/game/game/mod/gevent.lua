@@ -14,7 +14,7 @@ dbinfo.gevent = dbinfo.gevent or {
 }
 local gevent = dbinfo.gevent
 
-local impl = {}
+local impls = {}
 
 local add_timer = function(tm, opt, eid)
     mgr.timer.add(0, tm, enum.timer_gevent, opt, eid)
@@ -31,7 +31,7 @@ local handler = {
             end_tm = end_tm
         }
         add_timer(end_tm, enum.event_close, eid)
-        local impl_event = impl[eid]
+        local impl_event = impls[eid]
         if impl_event and impl_event.open then
             impl_event.open()
         end
