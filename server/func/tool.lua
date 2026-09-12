@@ -4,7 +4,6 @@ local lutil = require "lgame.util"
 return {
     clone = ltool.clone,
     tblen = ltool.tblen,
-    keys = ltool.keys,
     crc16 = lutil.crc16,
     compress = lutil.zstd_compress,
     decompress = lutil.zstd_decompress,

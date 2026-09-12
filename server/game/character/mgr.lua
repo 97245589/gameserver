@@ -1,7 +1,6 @@
 local skynet = require "skynet"
 local squeue = require "skynet.queue"
 local ldb = require "server.func.ldb"
-local toolf = require "server.func.tool"
 local timerf = require "server.func.timer"
 local questf = require "server.game.common.quest"
 local msgpack = require "lgame.msgpack"
@@ -105,11 +104,13 @@ end
 local db_cids = {}
 local tick_save = function()
     if not next(db_cids) then
-        db_cids = toolf.keys(characters, 1)
+        for cid in pairs(characters) do
+            db_cids[cid] = 1
+        end
     end
     local tm = os.time()
     local i = 1
-    for cid, _ in pairs(db_cids) do
+    for cid in pairs(db_cids) do
         local character = characters[cid]
         -- ldb.send("hset", "character", cid, msgpack_core:encode(character))
         if tm >= character.tm + 10 then
