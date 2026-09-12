@@ -17,7 +17,7 @@ local gevent = dbinfo.gevent
 local impl = {}
 
 local add_timer = function(tm, opt, eid)
-    mgr.add_timer(tm, enum.timer_gevent, opt, eid)
+    mgr.timer.add(0, tm, enum.timer_gevent, opt, eid)
 end
 
 local handler = {
@@ -47,7 +47,7 @@ local handler = {
         end
     end
 }
-mgr.add_timer_func(enum.timer_gevent, function(opt, eid)
+mgr.set_timer_handler(enum.timer_gevent, function(opt, eid)
     handler[opt](eid)
 end)
 

@@ -29,16 +29,18 @@ M.add_module = function(mod, name)
     modules[name] = mod
 end
 
-local timer_func = {}
+local timer_handler = {}
 local timer = timerf(function(id, cmd, ...)
-    local func = timer_func[cmd]
+    local func = timer_handler[cmd]
     func(...)
 end)
-M.add_timer = function(tm, cmd, ...)
-    timer.add(0, tm, cmd, ...)
-end
-M.add_timer_func = function(cmd, func)
-    timer_func[cmd] = func
+M.timer = timer
+M.set_timer_handler = function(cmd, func)
+    if timer_handler[cmd] then
+        print("set timer hander err", cmd)
+        return
+    end
+    timer_handler[cmd] = func
 end
 
 local save_data = function()

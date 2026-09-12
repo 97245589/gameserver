@@ -3,6 +3,7 @@ local squeue = require "skynet.queue"
 local ldb = require "server.func.ldb"
 local toolf = require "server.func.tool"
 local timerf = require "server.func.timer"
+local questf = require "server.game.common.quest"
 local msgpack = require "lgame.msgpack"
 local msgpack_core = msgpack.create(1024 * 1024)
 
@@ -59,23 +60,36 @@ M.get_character = function(cid)
     return character
 end
 
-local timer_func = {}
+local timer_handler = {}
 local timer = timerf(function(id, cmd, ...)
     local character = characters[id]
     if not character then
         return
     end
-    local f = timer_func[cmd]
+    local f = timer_handler[cmd]
     if not f then
         return
     end
     f(character, ...)
 end)
-M.add_timer = function(character, tm, cmd, ...)
-    timer.add(character.id, tm, cmd, ...)
+M.timer = timer
+M.set_timer_handler = function(cmd, func)
+    if timer_handler[cmd] then
+        print("add timer handler err", cmd)
+        return
+    end
+    timer_handler[cmd] = func
 end
-M.add_timer_func = function(cmd, func)
-    timer_func[cmd] = func
+
+local quest_handler = {}
+local quest = questf(quest_handler)
+M.quest = quest
+M.set_quest_handler = function(cmd, func)
+    if quest_handler[cmd] then
+        print("add quest hander err", cmd)
+        return
+    end
+    quest_handler[cmd] = func
 end
 
 local kick_func
