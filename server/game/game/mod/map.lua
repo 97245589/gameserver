@@ -24,7 +24,6 @@ local init = function()
     end
 
     create_map(1, 100)
-    skynet.send(addrs[1], "lua", "create", 1)
 end
 init()
 

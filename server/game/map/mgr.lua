@@ -15,6 +15,13 @@ cmd.del = function(mapid)
     maps[mapid] = nil
 end
 
+cmd.ch_enter = function(mapid, info)
+    local m = maps[mapid]
+    if not m then
+        return
+    end
+end
+
 skynet.fork(function()
     while true do
         skynet.sleep(20)
