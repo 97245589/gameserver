@@ -1,11 +1,7 @@
 local M = {}
 
-M.printt = function(...)
-    local arr = table.pack(...)
-    for _, ts in ipairs(arr) do
-        print(os.date("%Y-%m-%d %H:%M:%S", ts))
-    end
-    print("======")
+M.format = function(ts)
+    return os.date("%Y-%m-%d %H:%M:%S", ts)
 end
 
 M.day_start = function(ts)

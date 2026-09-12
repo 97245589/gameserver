@@ -3,6 +3,7 @@ local start = require "server.service.service"
 
 start(function()
     skynet.sleep(100)
-    require "server.game.game.mgr"
     require "server.game.game.rpc"
+    require "server.game.game.mod.gevent"
+    require "server.game.game.mod.map"
 end, "game")

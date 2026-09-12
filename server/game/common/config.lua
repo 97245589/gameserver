@@ -22,9 +22,6 @@ M.overwrite = function(name)
         configs[name] = get_config(name)
         return
     end
-    for k in pairs(c) do
-        c[k] = nil
-    end
     local nc = get_config(name)
     for k, v in pairs(nc) do
         c[k] = v
