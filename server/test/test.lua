@@ -12,7 +12,6 @@ local tb = {
 }
 local tool = function()
     print(toolf.tblen(tb))
-    print(dump(toolf.keys(tb)), dump(toolf.keys(tb, 1)))
     -- print(dump(_G, 1))
 
     local ntb = toolf.clone(tb)
