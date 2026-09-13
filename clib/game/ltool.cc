@@ -115,7 +115,7 @@ void Clone::clonetable(int idx) {
   while (lua_next(L, idx) != 0) {
     clone(-2);
     clone(-2);
-    lua_settable(L, nidx);
+    lua_rawset(L, nidx);
     lua_pop(L, 1);
   }
   --dep;

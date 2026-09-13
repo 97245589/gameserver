@@ -55,7 +55,7 @@ void Decode::decode() {
       for (uint32_t i = 0; i < len; ++i) {
         decode();
         decode();
-        lua_settable(L, -3);
+        lua_rawset(L, -3);
       }
       return;
     }
