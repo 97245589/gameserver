@@ -3,8 +3,8 @@ local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 
 start(function()
-    skynet.newservice("server/login/cluster")
     require "server.login.logind"
+    local sc = require "server.service.cluster"
 
     local cmd = require "server.func.cmd"
 
