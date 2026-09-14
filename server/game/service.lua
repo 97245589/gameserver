@@ -1,14 +1,17 @@
 local skynet = require "skynet"
 local toolf = require "server.func.tool"
+require "server.func.print"
 
 local M = {}
 
-local service_num = {
-    character = 5,
-    watchdog = 1,
-    game = 1,
-}
-M.service = service_num
+local service_arr = { "character", 5, "game", 1, "watchdog", 1 }
+local service_num = {}
+for i = 1, #service_arr, 2 do
+    local name = service_arr[i]
+    local num = service_arr[i + 1]
+    service_num[name] = num
+end
+M.service_arr = service_arr
 
 local get_name = function(name, id)
     local num = service_num[name]

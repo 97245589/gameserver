@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local start = require "server.service.service"
-local mapmgr = require "server.game.common.mapmgr"
+local mapmgr = require "server.game.game.mod.mapmgr"
 
 local server_mark = skynet.getenv("server_mark")
 start(function()
@@ -10,6 +10,6 @@ start(function()
         print("===", dump(upd))
     end)
 
-    mapmgr.init("server/cross/map", 2)
-    mapmgr.add_map(1, 88)
+    mapmgr.init(3)
+    mapmgr.add(1, 88)
 end)

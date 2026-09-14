@@ -1,4 +1,4 @@
-local mapmgr = require "server.game.common.mapmgr"
+local mapmgr = require "server.game.game.mod.mapmgr"
 
-mapmgr.init("server/game/map/init", 2)
-mapmgr.add_map(1, 100)
+mapmgr.init(2)
+mapmgr.add(1, 100)

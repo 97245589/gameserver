@@ -1,10 +1,5 @@
-local map = require "server.game.common.mapser"
-local cmd = require "server.func.cmd"
+local start = require "server.service.service"
 
-map.start(function()
+start(function()
+    require "server.game.map.map"
 end)
-
-map.set_map_impl(100, {
-    actor_die = function()
-    end
-})

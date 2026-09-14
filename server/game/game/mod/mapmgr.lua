@@ -1,33 +1,26 @@
 local skynet = require "skynet"
 
 local M = {}
-
 local mapid_addr = {}
 local addrs = {}
 
-M.add_map = function(idx, mapid, info)
+M.add = function(idx, mapid, info)
     local addr = addrs[idx]
     skynet.send(addr, "lua", "add", mapid, info)
+    mapid_addr[mapid] = addr
 end
 
-M.del_map = function(mapid)
+M.del = function(mapid)
     local addr = mapid_addr[mapid]
-    skynet.send(addr, "lua", "del", mapid)
+    skynet.send(addr, "lua", "add", mapid)
     mapid_addr[mapid] = nil
 end
 
-M.init = function(path, num)
+M.init = function(num)
     for i = 1, num do
-        local addr = skynet.newservice(path)
+        local addr = skynet.newservice("server/game/map/init")
         table.insert(addrs, addr)
     end
-end
-
-M.get_info = function()
-    return {
-        addrs = addrs,
-        mapid_addr = mapid_addr
-    }
 end
 
 return M

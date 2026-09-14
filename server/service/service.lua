@@ -20,6 +20,6 @@ return function(func, name)
             end
         end)
 
-        skynet.fork(func)
+        func()
     end)
 end

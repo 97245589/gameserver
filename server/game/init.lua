@@ -2,16 +2,21 @@ local skynet = require "skynet"
 
 skynet.start(function()
     local service = require "server.game.service"
+    local arr = service.service_arr
 
-    for name, num in pairs(service.service) do
+    for i = 1, #arr, 2 do
+        local name = arr[i]
+        local num = arr[i + 1]
+
         local path = string.format("server/game/%s/init", name)
         if num <= 1 then
             skynet.newservice(path)
         else
-            for i = 1, num do
-                skynet.newservice(path, name .. i)
+            for idx = 1, num do
+                skynet.newservice(path, name .. idx)
             end
         end
     end
+
     skynet.exit()
 end)
