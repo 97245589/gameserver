@@ -73,17 +73,62 @@ end
 local db_test = function()
     local leveldb = function()
         local db = require "server.func.ldb"
-
         db.call("del", "test")
-        db.call("hmset", "test", 10, 100, 20, 200)
+        db.call("hmset", "test", 10, 100, 20, 200, 50, 500)
+        print(dump(db.call("keys", "*")))
+        print(dump(db.call("hmget", "test", 10, 60, 20)))
+        print(dump(db.call("hgetall", "test")))
+        db.call("hdel", "test", 20, 100, 10)
         print(dump(db.call("hgetall", "test")))
 
         local t = skynet.now()
         for i = 1, 100000 do
             db.call("hmset", "test", i, i * 10)
         end
-        print(skynet.now() - t)
-        print(db.call("hget", "test", 12345))
+        print(skynet.now() - t, #db.call("hkeys", "test"))
+        db.call("del", "test")
+        db.call("compact")
+        print("compact end")
+    end
+
+    local hscan = function()
+        local traversal = function(db, key, match, count, cb)
+            local input = { key, 0 }
+            if match then
+                table.insert(input, "match")
+                table.insert(input, match)
+            end
+            if count then
+                table.insert(input, "count")
+                table.insert(input, count)
+            end
+
+            local cursor = 0
+            while cursor ~= "0" do
+                input[2] = cursor
+                local arr = db.call("hscan", table.unpack(input))
+                cursor = arr[1]
+                if not cb(arr[2]) then
+                    return
+                end
+            end
+        end
+
+        local db = require "server.func.ldb"
+        db.call("del", "test")
+
+        for i = 1, 50 do
+            db.call("hset", "test", i, i * 10)
+        end
+
+        -- print(dump(db.call("hscan", "test", 0)))
+        -- print(dump(db.call("hscan", "test", 0, "match", "*5", "count", 5)))
+
+        traversal(db, "test", "*1*", 6, function(arr)
+            print(dump(arr))
+            return true
+        end)
+
         db.call("del", "test")
         db.call("compact")
         print("compact end")
@@ -98,45 +143,6 @@ local db_test = function()
         end
         print(dump(db:hkeys("test")))
 
-        db:flushall()
-        db:disconnect()
-    end
-
-    local hscan = function()
-        local traversal = function(db, hkey, match, count, cb)
-            local input = { hkey, 0 }
-            if match then
-                table.insert(input, "match")
-                table.insert(input, match)
-            end
-            if count then
-                table.insert(input, "count")
-                table.insert(input, count)
-            end
-            local cursor = 0
-            while cursor ~= "0" do
-                input[2] = cursor
-                local arr = db:hscan(table.unpack(input))
-                cursor = arr[1]
-                if not cb(arr[2]) then
-                    return
-                end
-            end
-        end
-
-        local redis = require "skynet.db.redis"
-        local db = redis.connect({ host = "127.0.0.1", port = 6379 })
-
-        for i = 1, 600 do
-            db:hset("test", i, i * 10)
-        end
-
-        local i = 0
-        traversal(db, "test", nil, 10, function(arr)
-            i = i + #arr
-            return true
-        end)
-        print(i)
         db:flushall()
         db:disconnect()
     end
