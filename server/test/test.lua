@@ -71,7 +71,7 @@ local clib = function()
 end
 
 local db_test = function()
-    local leveldb = function()
+    local dbtest = function()
         local db = require "server.func.ldb"
         db.call("del", "test")
         db.call("hmset", "test", 10, 100, 20, 200, 50, 500)
@@ -85,8 +85,9 @@ local db_test = function()
         for i = 1, 100000 do
             db.call("hmset", "test", i, i * 10)
         end
-        print(skynet.now() - t, #db.call("hkeys", "test"))
+        print(skynet.now() - t, #db.call("hgetall", "test"))
         db.call("del", "test")
+        print(dump(db.call("hgetall", "test")))
         db.call("compact")
         print("compact end")
     end
@@ -151,7 +152,7 @@ end
 
 
 skynet.start(function()
-    tool()
+    -- tool()
     -- clib()
-    -- db_test()
+    db_test()
 end)

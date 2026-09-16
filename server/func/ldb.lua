@@ -1,15 +1,15 @@
 local skynet = require "skynet"
-local leveldb = require "lgame.leveldb"
+local ldb = require "lgame.db"
 
 local mode = ...
 
 if mode == "child" then
     skynet.start(function()
         require "server.func.print"
-        local pdb = leveldb.create("run/db/" .. skynet.getenv("server_mark")) -- ldb.release(pdb)
+        local pdb = ldb.create("run/db/" .. skynet.getenv("server_mark")) -- ldb.release(pdb)
 
         skynet.dispatch("lua", function(_, _, cmd, ...)
-            skynet.retpack(leveldb[cmd](pdb, ...))
+            skynet.retpack(ldb[cmd](pdb, ...))
         end)
     end)
 else
