@@ -36,7 +36,7 @@ struct Rank {
     int64_t id = ele.id_;
     if (auto it = idit_.find(id); it != idit_.end()) {
       ranks_.erase(it->second);
-      idit_.erase(id);
+      idit_.erase(it);
     }
     auto [it, ok] = ranks_.insert(ele);
     if (ok) idit_[id] = it;
