@@ -6,13 +6,14 @@ extern "C" {
 #include <list>
 #include <sstream>
 #include <tuple>
-#include <unordered_map>
 using namespace std;
+
+#include "parallel_hashmap/phmap.h"
 
 static const char* META = "LLRU";
 struct Lru {
   list<int64_t> ids_;
-  unordered_map<int64_t, list<int64_t>::iterator> idit_;
+  phmap::flat_hash_map<int64_t, list<int64_t>::iterator> idit_;
   int max_;
 
   tuple<bool, int64_t> update(int64_t id) {

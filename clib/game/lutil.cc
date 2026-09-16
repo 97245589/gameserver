@@ -1,6 +1,6 @@
 extern "C" {
 #include "lauxlib.h"
-#include "zstd.h"
+#include "zstd/zstd.h"
 }
 #include <cstdint>
 #include <string>

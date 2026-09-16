@@ -5,9 +5,10 @@ extern "C" {
 #include <cstdint>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-#include <string>
 #include <tuple>
 using namespace std;
+
+#include "parallel_hashmap/phmap.h"
 
 struct Rank {
   struct Ele {
@@ -28,7 +29,7 @@ struct Rank {
                        __gnu_pbds::tree_order_statistics_node_update>;
 
   Rankset ranks_;
-  __gnu_pbds::cc_hash_table<int64_t, Rankset::iterator> idit_;
+  phmap::flat_hash_map<int64_t, Rankset::iterator> idit_;
   int max_;
 
   tuple<bool, int64_t> add(const Ele& ele) {
