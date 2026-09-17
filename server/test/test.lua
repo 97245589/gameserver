@@ -91,7 +91,6 @@ local db_test = function()
         db.call("compact")
         print("compact end")
     end
-    dbtest()
 
     local redis_test = function()
         local redis = require "skynet.db.redis"
@@ -110,7 +109,7 @@ end
 
 
 skynet.start(function()
-    -- tool()
+    tool()
     -- clib()
-    db_test()
+    -- db_test()
 end)
