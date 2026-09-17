@@ -91,49 +91,7 @@ local db_test = function()
         db.call("compact")
         print("compact end")
     end
-
-    local hscan = function()
-        local traversal = function(db, key, match, count, cb)
-            local input = { key, 0 }
-            if match then
-                table.insert(input, "match")
-                table.insert(input, match)
-            end
-            if count then
-                table.insert(input, "count")
-                table.insert(input, count)
-            end
-
-            local cursor = 0
-            while cursor ~= "0" do
-                input[2] = cursor
-                local arr = db.call("hscan", table.unpack(input))
-                cursor = arr[1]
-                if not cb(arr[2]) then
-                    return
-                end
-            end
-        end
-
-        local db = require "server.func.ldb"
-        db.call("del", "test")
-
-        for i = 1, 50 do
-            db.call("hset", "test", i, i * 10)
-        end
-
-        -- print(dump(db.call("hscan", "test", 0)))
-        -- print(dump(db.call("hscan", "test", 0, "match", "*5", "count", 5)))
-
-        traversal(db, "test", "*1*", 6, function(arr)
-            print(dump(arr))
-            return true
-        end)
-
-        db.call("del", "test")
-        db.call("compact")
-        print("compact end")
-    end
+    dbtest()
 
     local redis_test = function()
         local redis = require "skynet.db.redis"
