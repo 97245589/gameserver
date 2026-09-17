@@ -4,12 +4,12 @@ local mode = ...
 
 if mode == "child" then
     skynet.start(function()
-        local dbfunc = require "server.func.dbfunc"
+        local dbimpl = require "server.func.dbimpl"
         require "server.func.print"
         local ldb = require "lgame.leveldb"
         local path = "run/db/" .. skynet.getenv("server_mark")
         local pdb = ldb.create(path)
-        dbfunc.set_pdb(pdb)
+        dbimpl.set_pdb(pdb)
 
         skynet.dispatch("lua", function(_, _, cmd, ...)
             if cmd == "exit" then
@@ -18,15 +18,15 @@ if mode == "child" then
                 skynet.exit()
                 return
             end
-            local f = dbfunc[cmd]
+            local f = dbimpl[cmd]
             if not f then
-                print("dbser err no cmd", cmd)
+                print("dbservice err no cmd", cmd)
             end
-            skynet.retpack(dbfunc[cmd](...))
+            skynet.retpack(f(...))
         end)
     end)
 else
-    local addr = skynet.uniqueservice("server/func/ldb", "child")
+    local addr = skynet.uniqueservice("server/func/dbservice", "child")
 
     -- del keys hgetall hkeys hset hmset hget hmget hdel compact
     return {

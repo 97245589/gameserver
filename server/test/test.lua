@@ -72,7 +72,7 @@ end
 
 local db_test = function()
     local dbtest = function()
-        local db = require "server.func.ldb"
+        local db = require "server.func.dbservice"
         db.call("del", "test")
         db.call("hmset", "test", 10, 100, 20, 200, 50, 500)
         print(dump(db.call("keys", "*")))
