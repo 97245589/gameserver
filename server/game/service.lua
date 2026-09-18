@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local toolf = require "server.func.tool"
-require "server.func.print"
+require "server.func.tool"
 
 local M = {}
 

@@ -1,4 +1,4 @@
-require "server.func.print"
+require "server.func.tool"
 local enum = require "server.game.common.enum"
 
 local create_quest_mgr = function(handler)

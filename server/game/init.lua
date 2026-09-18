@@ -1,6 +1,7 @@
+local start = require "server.service.service"
 local skynet = require "skynet"
 
-skynet.start(function()
+local start_service = function()
     local service = require "server.game.service"
     local arr = service.service_arr
 
@@ -17,6 +18,17 @@ skynet.start(function()
             end
         end
     end
+end
 
-    skynet.exit()
-end)
+local start_cluster = function()
+    local gametype = tonumber(skynet.getenv("gametype"))
+    if gametype == 1 then
+        return
+    end
+    require "server.service.cluster"
+end
+
+start(function()
+    start_service()
+    start_cluster()
+end, "init")

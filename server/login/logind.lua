@@ -2,7 +2,7 @@ local mode = ...
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local socket = require "skynet.socket"
-require "server.func.print"
+require "server.func.tool"
 
 if mode == "child" then
     local proto = require "server.func.proto"

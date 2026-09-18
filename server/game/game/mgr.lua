@@ -1,5 +1,4 @@
 local skynet = require "skynet"
-local ldb = require "server.func.ldb"
 local timerf = require "server.func.timer"
 local time = require "server.game.common.time"
 

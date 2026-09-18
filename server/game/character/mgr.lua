@@ -1,6 +1,5 @@
 local skynet = require "skynet"
 local squeue = require "skynet.queue"
-local ldb = require "server.func.ldb"
 local timerf = require "server.func.timer"
 local questf = require "server.game.common.quest"
 local msgpack = require "lgame.msgpack"

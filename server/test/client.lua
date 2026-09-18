@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-require "server.func.print"
+require "server.func.tool"
 local login = require "server.test.func.clogin"
 
 local clogin = login.clogin

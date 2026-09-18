@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 require "skynet.manager"
-require "server.func.print"
+require "server.func.tool"
 
 local gen_pairs = function(tarr, spacenum)
     local s = "\n"

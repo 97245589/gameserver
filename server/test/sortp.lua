@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 require "skynet.manager"
-require "server.func.print"
+require "server.func.tool"
 
 local sort_sp = function()
     local string = string

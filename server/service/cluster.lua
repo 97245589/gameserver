@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local toolf = require "server.func.tool"
-require "server.func.print"
+require "server.func.tool"
 
 local sip = skynet.getenv("priip")
 local port = skynet.getenv("cluster_port")

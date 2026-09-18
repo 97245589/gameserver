@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local CMD = require "server.func.cmd"
-require "server.func.print"
+require "server.func.tool"
 
 return function(func, name)
     skynet.start(function()
