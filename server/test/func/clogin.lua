@@ -52,6 +52,7 @@ local clogin = function(info)
             serverid = 1,
         })
         get_res(fd)
+        print("conn login succ", acc, secret)
         return secret
     end
 
@@ -72,6 +73,7 @@ local clogin = function(info)
             characterid = cid
         })
         get_res(fd)
+        print("conn game succ", acc, secret)
         return fd
     end
 
