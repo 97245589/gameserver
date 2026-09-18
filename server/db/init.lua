@@ -1,5 +1,7 @@
 local start = require "server.service.service"
+local skynet = require "skynet"
 
 start(function()
-    local sc = require "server.service.cluster"
-end)
+    require "server.service.cluster"
+    skynet.newservice("server/db/mgr")
+end, "init")
