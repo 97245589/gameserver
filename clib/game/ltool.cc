@@ -2,11 +2,11 @@ extern "C" {
 #include "lauxlib.h"
 #include "zstd/zstd.h"
 }
-#include <cstdint>
-#include <string>
 using namespace std;
 
-static int crc16(lua_State* L) {
+#include "ltool.h"
+
+uint16_t Ltool::crc16(const char* p, int len) {
   static const uint16_t crc16tab[256] = {
       0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7, 0x8108,
       0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef, 0x1231, 0x0210,
@@ -37,14 +37,39 @@ static int crc16(lua_State* L) {
       0x5c64, 0x4c45, 0x3ca2, 0x2c83, 0x1ce0, 0x0cc1, 0xef1f, 0xff3e, 0xcf5d,
       0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8, 0x6e17, 0x7e36, 0x4e55, 0x5e74,
       0x2e93, 0x3eb2, 0x0ed1, 0x1ef0};
-  size_t lstr;
-  const char* pstr = luaL_checklstring(L, 1, &lstr);
-
-  int counter = 0;
   uint16_t crc = 0;
-  for (counter = 0; counter < lstr; counter++) {
-    crc = (crc << 8) ^ crc16tab[((crc >> 8) ^ *pstr++) & 0x00FF];
+  for (int counter = 0; counter < len; counter++) {
+    crc = (crc << 8) ^ crc16tab[((crc >> 8) ^ *p++) & 0x00FF];
   }
+  return crc;
+}
+
+bool Ltool::zstd_compress(string_view str, string& ret, int level) {
+  int buffsize = ZSTD_compressBound(str.size());
+  ret.resize(buffsize);
+  int len =
+      ZSTD_compress(ret.data(), ret.size(), str.data(), str.size(), level);
+  if (ZSTD_isError(len)) return false;
+  ret.resize(len);
+  return true;
+}
+
+bool Ltool::zstd_decompress(string_view str, string& ret) {
+  int buffsize = ZSTD_getFrameContentSize(str.data(), str.size());
+  if (buffsize == ZSTD_CONTENTSIZE_ERROR ||
+      buffsize == ZSTD_CONTENTSIZE_UNKNOWN)
+    return false;
+  ret.resize(buffsize);
+  int len = ZSTD_decompress(ret.data(), ret.size(), str.data(), str.size());
+  if (ZSTD_isError(len)) return false;
+  ret.resize(len);
+  return true;
+}
+
+static int crc16(lua_State* L) {
+  size_t len;
+  const char* p = luaL_checklstring(L, 1, &len);
+  uint16_t crc = Ltool::crc16(p, len);
   lua_pushinteger(L, crc);
   return 1;
 }
@@ -53,18 +78,12 @@ static int zstd_compress(lua_State* L) {
   size_t len;
   const char* p = luaL_checklstring(L, 1, &len);
   int level = 1;
-  if (lua_isinteger(L, 2)) {
-    level = lua_tointeger(L, 2);
-  }
+  if (lua_isinteger(L, 2)) level = lua_tointeger(L, 2);
 
-  string str;
-  int sesize = ZSTD_compressBound(len);
-  str.resize(sesize);
-  size_t rlen = ZSTD_compress(str.data(), str.size(), p, len, level);
-  if (ZSTD_isError(rlen)) {
-    return 0;
-  }
-  lua_pushlstring(L, str.data(), rlen);
+  string ret;
+  bool b = Ltool::zstd_compress({p, len}, ret, level);
+  if (!b) return 0;
+  lua_pushlstring(L, ret.data(), ret.size());
   return 1;
 }
 
@@ -72,17 +91,10 @@ static int zstd_decompress(lua_State* L) {
   size_t len;
   const char* p = luaL_checklstring(L, 1, &len);
 
-  int desize = ZSTD_getFrameContentSize(p, len);
-  if (desize == ZSTD_CONTENTSIZE_ERROR || desize == ZSTD_CONTENTSIZE_UNKNOWN) {
-    return 0;
-  }
-  string str;
-  str.resize(desize);
-  size_t rlen = ZSTD_decompress(str.data(), str.size(), p, len);
-  if (ZSTD_isError(rlen)) {
-    return 0;
-  }
-  lua_pushlstring(L, str.data(), rlen);
+  string ret;
+  bool b = Ltool::zstd_decompress({p, len}, ret);
+  if (!b) return 0;
+  lua_pushlstring(L, ret.data(), ret.size());
   return 1;
 }
 

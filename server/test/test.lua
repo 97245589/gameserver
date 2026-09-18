@@ -11,17 +11,20 @@ local tb = {
     [10] = 100,
 }
 local tool = function()
-    print(toolf.tblen(tb))
-    -- print(dump(_G, 1))
+    local test = function()
+        print(toolf.tblen(tb))
+        -- print(dump(_G, 1))
 
-    local ntb = toolf.clone(tb)
-    print(tb, ntb, dump(ntb))
+        local ntb = toolf.clone(tb)
+        print(tb, ntb, dump(ntb))
 
-    print(dump(toolf.split("h e/l/ /1//2", " /")))
+        print(dump(toolf.split("h e/l/ /1//2", " /")))
 
-    local lcrc16 = require "skynet.db.redis.crc16"
-    local str = "qweasd123"
-    print(toolf.crc16(str), lcrc16(str))
+        local lcrc16 = require "skynet.db.redis.crc16"
+        local str = "qweasd123"
+        print(toolf.crc16(str), lcrc16(str))
+    end
+    test()
 end
 
 local clib = function()
@@ -64,9 +67,9 @@ local clib = function()
         local bin = skynet.packstring(obj)
         local cbin = toolf.compress(bin)
         local nbin = toolf.decompress(cbin)
-        print(#bin, #cbin, #nbin)
-        local nobj = skynet.unpack(nbin)
-        print(dump(nobj, 2))
+        print(#bin, #cbin, #nbin, bin == nbin)
+        print(dump(skynet.unpack(nbin), 1))
+        print(toolf.decompress("hello"), "illegal")
     end
 end
 
@@ -108,6 +111,6 @@ end
 
 skynet.start(function()
     tool()
-    -- clib()
-    -- db_test()
+    clib()
+    db_test()
 end)
