@@ -8,7 +8,9 @@ if mode == "child" then
     local dbimpl = require "server.func.dbimpl"
     local cmds = require "server.func.cmd"
 
-    local pdb
+    local path = "run/db/" .. skynet.getenv("server_mark")
+    local pdb = ldb.create(path)
+    dbimpl.set_pdb(pdb)
 
     cmds.exit = function()
         if pdb then
@@ -27,9 +29,6 @@ if mode == "child" then
     end
 
     start(function()
-        local path = "run/db/" .. skynet.getenv("server_mark")
-        pdb = ldb.create(path)
-        dbimpl.set_pdb(pdb)
     end)
 else
     local addr = skynet.uniqueservice("server/func/dbservice", "child")
