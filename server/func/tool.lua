@@ -25,4 +25,29 @@ M.split = function(str, sp)
     return arr
 end
 
+M.timeout_call = function(ti, ...)
+    local co = coroutine.running()
+    local ret
+
+    skynet.fork(function(...)
+        ret = table.pack(pcall(skynet.call, ...))
+        if co then
+            skynet.wakeup(co)
+        end
+    end, ...)
+
+    skynet.sleep(ti)
+    co = nil -- prevent wakeup after call
+    if ret then
+        if ret[1] then
+            return table.unpack(ret, 1, ret.n)
+        else
+            error(ret[2])
+        end
+    else
+        -- timeout
+        return false
+    end
+end
+
 return M
