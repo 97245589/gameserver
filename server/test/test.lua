@@ -83,14 +83,17 @@ local db_test = function()
         print(dump(db.call("hgetall", "test")))
         db.call("hdel", "test", 20, 100, 10)
         print(dump(db.call("hgetall", "test")))
+    end
 
-        local t = skynet.now()
-        for i = 1, 100000 do
-            db.call("hmset", "test", i, i * 10)
-        end
-        print(skynet.now() - t, #db.call("hgetall", "test"))
+    local dbpress = function()
+        local db = require "server.func.dbservice"
         db.call("del", "test")
-        print(dump(db.call("hgetall", "test")))
+        local t = skynet.now()
+        for i = 1, 1000000 do
+            db.call("hset", "test", "hello" .. i, "test world" .. i)
+        end
+        print(skynet.now() - t, db.call("hget", "test", "hello" .. 999999))
+        -- db.call("del", "test")
         db.call("compact")
         print("compact end")
     end
