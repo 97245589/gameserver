@@ -1,6 +1,6 @@
-COMMON_FLAGS := -O2 -fPIC -I../skynet/3rd/lua -I../3rd -L../3rd
+COMMON_FLAGS := -O2 -fPIC -I../skynet/3rd/lua -I../3rd
 CXX_FLAGS := $(COMMON_FLAGS) -std=c++17
-LINK := -s -shared -flto=auto
+LINK := -L../3rd -s -shared -flto=auto
 
 all : lgame.so
 
