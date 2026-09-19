@@ -6,10 +6,7 @@ local mapmgr = require "server.game.game.mod.mapmgr"
 local server_mark = skynet.getenv("server_mark")
 start(function()
     local sc = require "server.service.cluster"
-    sc.set_diff_func("cross", function(upd, del)
-        print("===", dump(upd))
-    end)
-
+    
     mapmgr.init(3)
     mapmgr.add(1, 88)
 end)

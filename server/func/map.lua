@@ -1,6 +1,5 @@
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
-require "server.func.tool"
 
 local M = {}
 

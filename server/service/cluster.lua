@@ -1,7 +1,6 @@
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
 local toolf = require "server.func.tool"
-require "server.func.tool"
 
 local sip = skynet.getenv("priip")
 local port = skynet.getenv("cluster_port")
@@ -16,7 +15,7 @@ cluster.reload(server_host)
 cluster.open(server_mark)
 cluster.register(server_mark, skynet.self())
 
-local diff_func = {}
+local diff_cb
 if server_mark ~= "center" then
     local diff = function(nobj, oobj)
         local upd = {}
@@ -38,10 +37,10 @@ if server_mark ~= "center" then
         server_host = nserver_host
         if next(upd) or next(del) then
             cluster.reload(server_host)
-            for _, cb in pairs(diff_func) do
-                cb(upd, del)
+            if diff_cb then
+                diff_cb(upd, del)
             end
-            print("server_host", dump(server_host))
+            -- print("serverhost:", dump(server_host))
         end
     end
 
@@ -60,11 +59,7 @@ return {
     get_server_host = function()
         return server_host
     end,
-    set_diff_func = function(name, func)
-        if diff_func[name] then
-            print("set diff func err", name)
-            return
-        end
-        diff_func[name] = func
-    end
+    set_diff_cb = function(func)
+        diff_cb = func
+    end,
 }
