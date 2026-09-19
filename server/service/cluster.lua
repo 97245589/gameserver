@@ -16,7 +16,7 @@ cluster.reload(server_host)
 cluster.open(server_mark)
 cluster.register(server_mark, skynet.self())
 
-local diff_func
+local diff_func = {}
 if server_mark ~= "center" then
     local diff = function(nobj, oobj)
         local upd = {}
@@ -38,8 +38,8 @@ if server_mark ~= "center" then
         server_host = nserver_host
         if next(upd) or next(del) then
             cluster.reload(server_host)
-            if diff_func then
-                diff_func(upd, del)
+            for _, cb in pairs(diff_func) do
+                cb(upd, del)
             end
             print("server_host", dump(server_host))
         end
@@ -60,7 +60,11 @@ return {
     get_server_host = function()
         return server_host
     end,
-    set_diff_func = function(func)
-        diff_func = func
+    set_diff_func = function(name, func)
+        if diff_func[name] then
+            print("set diff func err", name)
+            return
+        end
+        diff_func[name] = func
     end
 }

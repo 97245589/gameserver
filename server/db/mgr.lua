@@ -42,7 +42,7 @@ start(function()
 
     waddr = skynet.newservice("server/db/service")
     skynet.send(waddr, "lua", "set_pdb", pdb)
-    for i = 1, 5 do
+    for i = 1, 3 do
         local addr = skynet.newservice("server/db/service")
         table.insert(raddrs, addr)
         skynet.send(addr, "lua", "set_pdb", pdb)
