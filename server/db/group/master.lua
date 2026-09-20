@@ -135,12 +135,12 @@ M.cluster_diff = function(upd, del)
     select_master()
 end
 
-M.group_master = function(group, sname)
-    group_master[group] = sname
+M.group_master = function(group, mname)
+    group_master[group] = mname
     if group == mygroupid then
-        master = sname
+        master = mname
     end
-    print("group master", group, sname, server_name)
+    print(string.format("%s recv group master %s", server_name, mname))
 end
 
 M.master_bygroup = function(group)
@@ -148,6 +148,13 @@ M.master_bygroup = function(group)
         return true
     end
     return false, group_master[group]
+end
+
+M.get_master = function()
+    if server_name == master then
+        return
+    end
+    return master
 end
 
 return M
