@@ -22,6 +22,4 @@ M.group_by_key = function(key)
     return ins(slot)
 end
 
-print("test slot", ins(100), ins(1000))
-
 return M

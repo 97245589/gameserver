@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
-local cmds = require "server.func.cmd"
+local version = require "server.db.group.version"
 
 local server_name = skynet.getenv("server_name")
 local myid = tonumber(skynet.getenv("server_id"))
@@ -64,7 +64,22 @@ local select_master = function()
     if 1 == #servers then
         master = server_name
     else
-        master = server_name
+        local vs = {}
+        vs[1] = version.get_version()
+        for i = 2, #servers do
+            local server = servers[i]
+            vs[i] = cluster.call(server, "group", "get_version")
+        end
+
+        local min = math.maxinteger
+        local midx
+        for i = 1, #servers do
+            if min > vs[i] then
+                min = vs[i]
+                midx = i
+            end
+        end
+        master = servers[midx]
     end
 
     for gid, gservers in pairs(groups) do
@@ -80,6 +95,9 @@ local add_db_servers = function(servers)
         local id, group = parse_servername(name)
         if not id then
             goto cont
+        end
+        if group == mygroupid then
+            master = nil
         end
         table.insert(dservers, name)
         groups[group] = groups[group] or {}
@@ -108,22 +126,28 @@ local del_db_servers = function(servers)
     end
 end
 
-cmds.group_master = function(group, sname)
+local M = {}
+
+M.cluster_diff = function(upd, del)
+    add_db_servers(upd)
+    del_db_servers(del)
+    print("dbserves groups:", dump(groups))
+    select_master()
+end
+
+M.group_master = function(group, sname)
     group_master[group] = sname
     if group == mygroupid then
         master = sname
     end
     print("group master", group, sname, server_name)
 end
-cmds.cluster_diff = function(upd, del)
-    add_db_servers(upd)
-    del_db_servers(del)
-    print("dbserves groups:", dump(groups))
-    select_master()
-end
-cmds.master_bygroup = function(group)
+
+M.master_bygroup = function(group)
     if group == mygroupid and master == server_name then
         return true
     end
     return false, group_master[group]
 end
+
+return M
