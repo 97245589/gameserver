@@ -1,5 +1,6 @@
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
+local cmds = require "server.func.cmd"
 
 local server_name = skynet.getenv("server_name")
 local myid = tonumber(skynet.getenv("server_id"))
@@ -37,7 +38,7 @@ local send_master = function(name)
     if name == server_name then
         return
     end
-    cluster.send(name, "mgr", "group_master", mygroupid, master)
+    cluster.send(name, "group", "group_master", mygroupid, master)
 end
 local notify_master = function(upd)
     if not master then
@@ -107,24 +108,22 @@ local del_db_servers = function(servers)
     end
 end
 
-return {
-    group_master = function(group, sname)
-        group_master[group] = sname
-        if group == mygroupid then
-            master = sname
-        end
-        print("group master", group, sname, server_name)
-    end,
-    cluster_diff = function(upd, del)
-        add_db_servers(upd)
-        del_db_servers(del)
-        print("dbserves groups:", dump(groups))
-        select_master()
-    end,
-    master_bygroup = function(group)
-        if group == mygroupid and master == server_name then
-            return true
-        end
-        return false, group_master[group]
+cmds.group_master = function(group, sname)
+    group_master[group] = sname
+    if group == mygroupid then
+        master = sname
     end
-}
+    print("group master", group, sname, server_name)
+end
+cmds.cluster_diff = function(upd, del)
+    add_db_servers(upd)
+    del_db_servers(del)
+    print("dbserves groups:", dump(groups))
+    select_master()
+end
+cmds.master_bygroup = function(group)
+    if group == mygroupid and master == server_name then
+        return true
+    end
+    return false, group_master[group]
+end
