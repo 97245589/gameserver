@@ -30,6 +30,10 @@ elseif mode == "create" then
         return addrs
     end
 
+    cmds.get_pdb = function()
+        return pdb
+    end
+
     start(function()
         for i = 1, 5 do
             local addr = skynet.newservice("server/db/db", "child")
@@ -41,6 +45,7 @@ else
     local cfg = require "server.db.cfg"
     local caddr = skynet.uniqueservice("server/db/db", "create")
     local addrs = skynet.call(caddr, "lua", "addrs")
+    local pdb = skynet.call(caddr, "lua", "get_pdb")
 
     local M = {}
 
@@ -61,6 +66,10 @@ else
         else
             print("db ope err", cmd, ...)
         end
+    end
+
+    M.get_pdb = function()
+        return pdb
     end
 
     return M
