@@ -8,7 +8,7 @@ if mode == "child" then
     local dbimpl = require "server.func.dbimpl"
     local cmds = require "server.func.cmd"
 
-    local path = "run/db/" .. skynet.getenv("server_mark")
+    local path = "run/db/" .. skynet.getenv("server_name")
     local pdb = ldb.create(path)
     dbimpl.set_pdb(pdb)
 

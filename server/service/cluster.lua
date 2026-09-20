@@ -5,18 +5,18 @@ local toolf = require "server.func.tool"
 local sip = skynet.getenv("priip")
 local port = skynet.getenv("cluster_port")
 local shost = sip .. ":" .. port
-local server_mark = skynet.getenv("server_mark")
+local server_name = skynet.getenv("server_name")
 local centerhost = skynet.getenv("center")
 local server_host = { center = centerhost }
-if server_mark ~= "center" then
-    server_host[server_mark] = shost
+if server_name ~= "center" then
+    server_host[server_name] = shost
 end
 cluster.reload(server_host)
-cluster.open(server_mark)
-cluster.register(server_mark, skynet.self())
+cluster.open(server_name)
+cluster.register(server_name, skynet.self())
 
 local diff_cb
-if server_mark ~= "center" then
+if server_name ~= "center" then
     local diff = function(nobj, oobj)
         local upd = {}
         for server, host in pairs(nobj) do
@@ -31,14 +31,14 @@ if server_mark ~= "center" then
     end
 
     local conn_center = function()
-        local bin = cluster.call("center", "@center", "heartbeat", server_mark, shost)
+        local bin = cluster.call("center", "@center", "heartbeat", server_name, shost)
         local nserver_host = skynet.unpack(toolf.decompress(bin))
         local upd, del = diff(nserver_host, server_host)
         server_host = nserver_host
         if next(upd) or next(del) then
             cluster.reload(server_host)
             if diff_cb then
-                diff_cb(upd, del)
+                skynet.fork(diff_cb, upd, del)
             end
             -- print("serverhost:", dump(server_host))
         end

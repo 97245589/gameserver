@@ -1,12 +1,12 @@
 include "include"
 
 cluster_port = 10020
-server_name = "center"
-server_mark = server_name
+server_type = "center"
+server_name = server_type
 
 thread = 1
 
 if $DAEMON then
-    logger = "run/" .. server_mark .. ".log"
-    daemon = "run/" .. server_mark .. ".pid"
+    logger = "run/" .. server_name .. ".log"
+    daemon = "run/" .. server_name .. ".pid"
 end

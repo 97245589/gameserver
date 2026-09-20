@@ -37,7 +37,7 @@ cmds.ope = function(cmd, ...)
 end
 
 start(function()
-    local path = "run/db/" .. skynet.getenv("server_mark")
+    local path = "run/db/" .. skynet.getenv("server_name")
     local pdb = ldb.create(path, 8 * 1024 * 1024)
 
     waddr = skynet.newservice("server/db/service")
