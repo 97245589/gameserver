@@ -1,5 +1,5 @@
 local start = require "server.service.service"
 
 start(function()
-    require "server.db.proxy.mgr"
-end, "proxy")
+    require "server.db.version.mgr"
+end, "version")

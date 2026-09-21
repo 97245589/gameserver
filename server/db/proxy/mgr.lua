@@ -23,10 +23,6 @@ cmds.ope = function(cmd, key, ...)
     end
 end
 
-cmds.dbwrite = function(...)
-    print("dbwrite", ...)
-end
-
 cmds.get_pdb = function()
     return db.get_pdb()
 end

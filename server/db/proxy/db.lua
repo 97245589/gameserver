@@ -7,7 +7,7 @@ if mode == "child" then
     local dbimpl = require "server.func.dbimpl"
 
     dbimpl.set_writecb(function(...)
-        skynet.send(paddr, "lua", "dbwrite", ...)
+        skynet.send("version", "lua", "dbwrite", ...)
     end)
 
     cmds.set_pdb = function(pdb)
