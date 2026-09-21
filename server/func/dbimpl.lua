@@ -1,5 +1,6 @@
 local ldb = require "lgame.leveldb"
 local pdb
+local write_cb
 
 local SEPARATOR = string.char(0xff)
 
@@ -116,11 +117,15 @@ M.keys = function(patt)
     return ret
 end
 
+M.set_writecb = function(f)
+    write_cb = f
+end
+
 M.del = function(key)
     htraversal(key, nil, nil, function(arr)
         for i = 1, #arr, 2 do
             local field = arr[i]
-            ldb.del(pdb, key .. SEPARATOR .. field)
+            M.hdel(key, field)
         end
         return true
     end)
@@ -149,6 +154,9 @@ end
 M.hset = function(key, field, val)
     local rawkey = key .. SEPARATOR .. field
     ldb.put(pdb, rawkey, val)
+    if write_cb then
+        write_cb("put", rawkey)
+    end
 end
 
 M.hdel = function(key, ...)
@@ -156,6 +164,9 @@ M.hdel = function(key, ...)
     for idx, field in ipairs(arr) do
         local rawkey = key .. SEPARATOR .. field
         ldb.del(pdb, rawkey)
+        if write_cb then
+            write_cb("del", rawkey)
+        end
     end
 end
 

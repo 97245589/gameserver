@@ -1,11 +1,14 @@
-local mode = ...
-
+local mode, paddr = ...
 local skynet = require "skynet"
 
 if mode == "child" then
     local start = require "server.service.service"
     local cmds = require "server.func.cmd"
     local dbimpl = require "server.func.dbimpl"
+
+    dbimpl.set_writecb(function(...)
+        skynet.send(paddr, "lua", "dbwrite", ...)
+    end)
 
     cmds.set_pdb = function(pdb)
         dbimpl.set_pdb(pdb)
@@ -17,37 +20,20 @@ if mode == "child" then
 
     start(function()
     end)
-elseif mode == "create" then
-    local start = require "server.service.service"
-    local cmds = require "server.func.cmd"
+else
     local ldb = require "lgame.leveldb"
+    local cfg = require "server.db.cfg"
+    local M = {}
+    local addrs = {}
     local path = "run/db/" .. skynet.getenv("server_name")
     local pdb = ldb.create(path, 1024 * 1024 * 16)
 
-    local addrs = {}
-
-    cmds.addrs = function()
-        return addrs
+    local self = skynet.self()
+    for i = 1, 5 do
+        local addr = skynet.newservice("server/db/proxy/db", "child", self)
+        skynet.send(addr, "lua", "set_pdb", pdb)
+        table.insert(addrs, addr)
     end
-
-    cmds.get_pdb = function()
-        return pdb
-    end
-
-    start(function()
-        for i = 1, 5 do
-            local addr = skynet.newservice("server/db/db", "child")
-            skynet.call(addr, "lua", "set_pdb", pdb)
-            table.insert(addrs, addr)
-        end
-    end)
-else
-    local cfg = require "server.db.cfg"
-    local caddr = skynet.uniqueservice("server/db/db", "create")
-    local addrs = skynet.call(caddr, "lua", "addrs")
-    local pdb = skynet.call(caddr, "lua", "get_pdb")
-
-    local M = {}
 
     local read_cmds = cfg.read_cmds
     local write_cmds = cfg.write_cmds

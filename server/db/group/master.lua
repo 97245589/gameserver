@@ -1,6 +1,5 @@
 local skynet = require "skynet"
 local cluster = require "skynet.cluster"
-local version = require "server.db.group.version"
 
 local server_name = skynet.getenv("server_name")
 local myid = tonumber(skynet.getenv("server_id"))
@@ -64,22 +63,7 @@ local select_master = function()
     if 1 == #servers then
         master = server_name
     else
-        local vs = {}
-        vs[1] = version.get_version()
-        for i = 2, #servers do
-            local server = servers[i]
-            vs[i] = cluster.call(server, "group", "get_version")
-        end
-
-        local min = math.maxinteger
-        local midx
-        for i = 1, #servers do
-            if min > vs[i] then
-                min = vs[i]
-                midx = i
-            end
-        end
-        master = servers[midx]
+        master = server_name
     end
 
     for gid, gservers in pairs(groups) do
