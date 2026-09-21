@@ -70,6 +70,15 @@ local clib = function()
         print(dump(skynet.unpack(nbin), 1))
         print(toolf.decompress("hello"), "illegal")
     end
+
+    local trie = function()
+        local ltrie = require "lgame.trie"
+        local core = ltrie.create()
+        for i = 1, 10 do
+            core:set(i, i * 10)
+        end
+        print(dump(core:prefix_range("")))
+    end
 end
 
 local db_test = function()
