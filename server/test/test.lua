@@ -21,7 +21,7 @@ local tool = function()
         print(dump(toolf.split("h e/l/ /1//2", " /")))
 
         local lcrc16 = require "skynet.db.redis.crc16"
-        local str = "qweasd123"
+        local str = "qweasd123" .. string.char(0xff)
         print(toolf.crc16(str), lcrc16(str))
     end
 end
