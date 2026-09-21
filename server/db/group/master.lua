@@ -38,16 +38,17 @@ local send_master = function(name)
         return
     end
     cluster.send(name, "group", "group_master", mygroupid, master)
+    print("send master ===", name)
 end
 local notify_master = function(upd)
     if not master then
         return
     end
-    local servers = mygroup_servers()
-    if not servers then
+    local myservers = mygroup_servers()
+    if not myservers then
         return
     end
-    for _, name in ipairs(servers) do
+    for _, name in ipairs(upd) do
         send_master(name)
     end
 end
