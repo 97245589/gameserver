@@ -27,6 +27,6 @@ cmds.dbwrite = function(...)
     print("dbwrite", ...)
 end
 
-cmds.get_version = function()
-    return 0
+cmds.get_pdb = function()
+    return db.get_pdb()
 end
