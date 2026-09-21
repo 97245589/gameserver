@@ -24,7 +24,6 @@ local tool = function()
         local str = "qweasd123"
         print(toolf.crc16(str), lcrc16(str))
     end
-    test()
 end
 
 local clib = function()
@@ -83,6 +82,10 @@ local db_test = function()
         print(dump(db.call("hgetall", "test")))
         db.call("hdel", "test", 20, 100, 10)
         print(dump(db.call("hgetall", "test")))
+        db.call("del", "test")
+        print(dump(db.call("hgetall", "test")))
+        db.call("compact")
+        print("compact end")
     end
 
     local dbpress = function()
