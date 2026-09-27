@@ -25,6 +25,21 @@ M.split = function(str, sp)
     return arr
 end
 
+M.execute = function(cmd)
+    local c = cmd .. ">/dev/null 2>&1"
+    os.execute(c)
+end
+
+M.popen = function(cmd)
+    local h = io.popen(cmd)
+    if not h then
+        return
+    end
+    local ret = h:read("*a")
+    h:close()
+    return ret
+end
+
 M.timeout_call = function(ti, ...)
     local co = coroutine.running()
     local ret

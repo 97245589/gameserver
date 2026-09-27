@@ -24,6 +24,10 @@ local tool = function()
         local str = "qweasd123" .. string.char(0xff)
         print(toolf.crc16(str), lcrc16(str))
     end
+
+    local cmd_test = function()
+        print(toolf.popen("ls -l"))
+    end
 end
 
 local clib = function()
