@@ -2,12 +2,13 @@ local ldb = require "lgame.leveldb"
 local pdb
 
 local SEPARATOR = string.char(0xff)
+local DCOUNT = 1000
 
 local M = {}
 
 local scan = function(cursor, patt, count)
     patt = patt or "*"
-    count = count or 10
+    count = count or DCOUNT
     local start = ""
     local end_ = SEPARATOR
     if type(cursor) == "string" then
@@ -55,7 +56,7 @@ M.traversal = traversal
 
 local hscan = function(key, cursor, patt, count)
     patt = patt or "*"
-    count = count or 10
+    count = count or DCOUNT
     local start = key .. SEPARATOR
     local end_ = key .. SEPARATOR .. SEPARATOR
     if type(cursor) == "string" then
