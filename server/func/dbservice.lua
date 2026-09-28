@@ -40,7 +40,7 @@ elseif mode == "create" then
 
     rpc.exit = function()
         for _, addr in ipairs(addrs) do
-            skynet.skill(addr)
+            skynet.kill(addr)
         end
         ldb.release(pdb)
         skynet.exit()
